@@ -1,9 +1,0 @@
-# SpringApplicationRunListener
-org.springframework.boot.SpringApplicationRunListener=\
-org.monkey.mmq.core.code.SpringApplicationRunListener
-# ApplicationListener
-org.springframework.context.ApplicationListener=\
-org.monkey.mmq.core.code.StandaloneProfileApplicationListener
-# ApplicationContextInitializer
-org.springframework.context.ApplicationContextInitializer=\
-  org.monkey.mmq.core.utils.ApplicationUtils
