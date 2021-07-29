@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="mmq-config" />
+        <module name="mmq-broker" />
+        <module name="mmq-device" />
+        <module name="mmq-auth" />
+        <module name="mmq-bridge" />
+        <module name="mmq-core" />
+        <module name="mmq-rule-engine" />
+        <module name="mmq-api" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="mmq-consistency" target="8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
