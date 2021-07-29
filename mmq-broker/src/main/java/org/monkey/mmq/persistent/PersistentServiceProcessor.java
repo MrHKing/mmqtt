@@ -76,7 +76,6 @@ public class PersistentServiceProcessor extends BasePersistentServiceProcessor {
             Loggers.RAFT.info("Raft group {} has leader {}", raftGroup, leader);
         });
         this.protocol.addRequestProcessors(Collections.singletonList(this));
-        NotifyCenter.registerSubscriber(notifier);
         waitLeader();
     }
     

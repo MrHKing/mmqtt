@@ -17,6 +17,7 @@
 package org.monkey.mmq;
 
 
+import org.monkey.mmq.core.env.Constants;
 import org.monkey.mmq.core.env.EnvUtil;
 import org.monkey.mmq.metadata.UtilsAndCommons;
 import org.springframework.boot.SpringApplication;
@@ -37,6 +38,7 @@ public class BrokerApplication {
 
 	public static void main(String[] args) {
 		EnvUtil.setMmqHomePath(args[0]);
+		System.setProperty(Constants.STANDALONE_MODE_PROPERTY_NAME, "true");
 		SpringApplication.run(BrokerApplication.class, args);
 	}
 }

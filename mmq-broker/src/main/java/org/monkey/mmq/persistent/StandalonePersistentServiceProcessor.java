@@ -24,6 +24,7 @@ import org.monkey.mmq.core.entity.Response;
 import org.monkey.mmq.core.entity.WriteRequest;
 import org.monkey.mmq.core.exception.ErrorCode;
 import org.monkey.mmq.core.exception.MmqException;
+import org.monkey.mmq.core.notify.NotifyCenter;
 import org.monkey.mmq.core.utils.ByteUtils;
 import org.monkey.mmq.metadata.Datum;
 import org.monkey.mmq.metadata.Record;
@@ -42,6 +43,7 @@ import java.util.Optional;
 public class StandalonePersistentServiceProcessor extends BasePersistentServiceProcessor {
     
     public StandalonePersistentServiceProcessor() throws Exception {
+        super.afterConstruct();
 
     }
     

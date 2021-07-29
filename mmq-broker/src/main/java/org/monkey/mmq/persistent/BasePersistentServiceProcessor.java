@@ -116,6 +116,7 @@ public abstract class BasePersistentServiceProcessor extends RequestProcessor4CP
     @SuppressWarnings("unchecked")
     public void afterConstruct() {
         NotifyCenter.registerToPublisher(ValueChangeEvent.class, queueMaxSize);
+        NotifyCenter.registerSubscriber(notifier);
     }
     
     @Override
