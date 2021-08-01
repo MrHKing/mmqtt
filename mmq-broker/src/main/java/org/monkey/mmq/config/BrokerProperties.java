@@ -21,12 +21,12 @@ public class BrokerProperties {
 	/**
 	 * SSL端口号, 默认8883端口
 	 */
-	private int port = 8887;
+	private int port = 8885;
 
 	/**
 	 * WebSocket SSL端口号, 默认9993端口
 	 */
-	private int websocketPort = 9997;
+	private int websocketPort = 9995;
 
 	/**
 	 * WebSocket Path值, 默认值 /mqtt

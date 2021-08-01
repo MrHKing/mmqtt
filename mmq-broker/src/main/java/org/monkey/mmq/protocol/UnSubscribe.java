@@ -45,14 +45,21 @@ public class UnSubscribe {
 			try {
 				subscribeStoreService.delete(topicFilter, clinetId);
 			} catch (MmqException e) {
-				LoggerUtils.printIfDebugEnabled(Loggers.BROKER,"UNSUBSCRIBE - ErrorCode: {}, ErrMsg: {}", e.getErrCode(), e.getErrMsg());
+				Loggers.BROKER.error("UNSUBSCRIBE - ErrorCode: {}, ErrMsg: {}", e.getErrCode(), e.getErrMsg());
 			}
-			LoggerUtils.printIfDebugEnabled(Loggers.BROKER,"UNSUBSCRIBE - clientId: {}, topicFilter: {}", clinetId, topicFilter);
+			Loggers.BROKER.info("UNSUBSCRIBE - clientId: {}, topicFilter: {}", clinetId, topicFilter);
 		});
-		MqttUnsubAckMessage unsubAckMessage = (MqttUnsubAckMessage) MqttMessageFactory.newMessage(
-			new MqttFixedHeader(MqttMessageType.UNSUBACK, false, MqttQoS.AT_MOST_ONCE, false, 0),
-			MqttMessageIdVariableHeader.from(msg.variableHeader().messageId()), null);
+//
+//		MqttUnsubAckMessage unsubAckMessage = (MqttUnsubAckMessage) MqttMessageFactory.newMessage(
+//				new MqttFixedHeader(MqttMessageType.UNSUBACK, false, MqttQoS.AT_MOST_ONCE, false, 0),
+//				MqttMessageIdVariableHeader.from(msg.variableHeader().messageId()), null);
+//		channel.writeAndFlush(unsubAckMessage);
+
+		MqttMessage unsubAckMessage = MqttMessageFactory.newMessage(
+				new MqttFixedHeader(MqttMessageType.UNSUBACK, false, MqttQoS.AT_MOST_ONCE, false, 0),
+				MqttMessageIdVariableHeader.from(msg.variableHeader().messageId()), null);
 		channel.writeAndFlush(unsubAckMessage);
+
 	}
 
 }

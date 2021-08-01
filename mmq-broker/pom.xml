@@ -79,5 +79,9 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>mmq-auth</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+        </dependency>
     </dependencies>
 </project>
