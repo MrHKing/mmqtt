@@ -1,9 +1,24 @@
-/**
- * Copyright (c) 2020, Solley (hkk@yanboo.com.cn) All rights reserved.
+/*
+ * Copyright 2021-2021 Monkey Group.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.monkey.mmq.config;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.context.WebServerInitializedEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 /**
@@ -11,7 +26,7 @@ import org.springframework.stereotype.Component;
  * @author Solley
  */
 @Component
-public class BrokerProperties {
+public class BrokerProperties implements ApplicationListener<WebServerInitializedEvent> {
 
 	/**
 	 * Broker唯一标识
@@ -21,12 +36,14 @@ public class BrokerProperties {
 	/**
 	 * SSL端口号, 默认8883端口
 	 */
-	private int port = 8885;
+	@Value("${mmq.broker.port}")
+	private int port;
 
 	/**
 	 * WebSocket SSL端口号, 默认9993端口
 	 */
-	private int websocketPort = 9995;
+	@Value("${mmq.broker.websocketPort}")
+	private int websocketPort;
 
 	/**
 	 * WebSocket Path值, 默认值 /mqtt
@@ -36,11 +53,13 @@ public class BrokerProperties {
 	/**
 	 * SSL密钥文件密码
 	 */
+	@Value("${mmq.broker.ssl.password}")
 	private String sslPassword;
 
 	/**
 	 * SSL是否启用
 	 */
+	@Value("${mmq.broker.ssl.enabled}")
 	private boolean sslEnabled;
 
 	/**
@@ -62,21 +81,6 @@ public class BrokerProperties {
 	 * Socket参数, 是否开启心跳保活机制, 默认开启
 	 */
 	private boolean soKeepAlive = true;
-
-	/**
-	 * 是否集群
-	 */
-	private boolean isClustered = false;
-
-	/**
-	 * 是否启用kafka
-	 */
-	private boolean kafkaEnable = false;
-
-	/**
-	 * 是否k8s模式下
-	 */
-	private boolean k8sEnable = false;
 
 	public String getId() {
 		return id;
@@ -168,27 +172,8 @@ public class BrokerProperties {
 		return this;
 	}
 
-	public boolean getIsClustered() {
-		return isClustered;
-	}
+	@Override
+	public void onApplicationEvent(WebServerInitializedEvent webServerInitializedEvent) {
 
-	public void setIsClustered(boolean isClustered) {
-		this.isClustered = isClustered;
-	}
-
-	public boolean getKafkaEnable() {
-		return kafkaEnable;
-	}
-
-	public void setKafkaEnable(boolean kafkaEnable) {
-		this.kafkaEnable = kafkaEnable;
-	}
-
-	public boolean getK8sEnable() {
-		return k8sEnable;
-	}
-
-	public void setK8sEnable(boolean k8sEnable) {
-		this.k8sEnable = k8sEnable;
 	}
 }

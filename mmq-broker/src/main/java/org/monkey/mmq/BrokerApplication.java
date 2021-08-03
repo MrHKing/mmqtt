@@ -37,8 +37,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class BrokerApplication {
 
 	public static void main(String[] args) {
-		EnvUtil.setMmqHomePath(args[0]);
-		System.setProperty(Constants.STANDALONE_MODE_PROPERTY_NAME, "true");
+//		EnvUtil.setMmqHomePath(args[0]);
+//		System.setProperty(Constants.STANDALONE_MODE_PROPERTY_NAME, "true");
 		SpringApplication.run(BrokerApplication.class, args);
 	}
 }

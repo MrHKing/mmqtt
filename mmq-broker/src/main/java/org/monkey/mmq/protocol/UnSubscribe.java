@@ -49,11 +49,6 @@ public class UnSubscribe {
 			}
 			Loggers.BROKER.info("UNSUBSCRIBE - clientId: {}, topicFilter: {}", clinetId, topicFilter);
 		});
-//
-//		MqttUnsubAckMessage unsubAckMessage = (MqttUnsubAckMessage) MqttMessageFactory.newMessage(
-//				new MqttFixedHeader(MqttMessageType.UNSUBACK, false, MqttQoS.AT_MOST_ONCE, false, 0),
-//				MqttMessageIdVariableHeader.from(msg.variableHeader().messageId()), null);
-//		channel.writeAndFlush(unsubAckMessage);
 
 		MqttMessage unsubAckMessage = MqttMessageFactory.newMessage(
 				new MqttFixedHeader(MqttMessageType.UNSUBACK, false, MqttQoS.AT_MOST_ONCE, false, 0),

@@ -309,6 +309,7 @@
         <module>mmq-rule-engine</module>
         <module>mmq-config</module>
         <module>mmq-api</module>
+        <module>distribution</module>
     </modules>
     <!-- 所有的子项目默认依赖 -->
     <dependencies>
@@ -372,6 +373,11 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>mmq-device</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>distribution</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

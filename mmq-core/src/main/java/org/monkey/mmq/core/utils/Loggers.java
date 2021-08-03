@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Loggers for core.
  *
- * @author nkorange
+ * @author solley
  * @since 1.2.0
  */
 public class Loggers {
@@ -31,10 +31,10 @@ public class Loggers {
     public static final Logger AUTH = LoggerFactory.getLogger("org.monkey.mmq.core.auth");
     
     public static final Logger CORE = LoggerFactory.getLogger("org.monkey.mmq.core");
-    
-    public static final Logger RAFT = LoggerFactory.getLogger("org.monkey.mmq.core.protocol.raft");
 
-    public static final Logger BROKER = LoggerFactory.getLogger("org.monkey.mmq.core.protocol.broker");
+    public static final Logger RAFT = LoggerFactory.getLogger("org.monkey.mmq.core.distributed.raft");
+
+    public static final Logger BROKER = LoggerFactory.getLogger("org.monkey.mmq.protocol");
     
     public static final Logger DISTRO = LoggerFactory.getLogger("org.monkey.mmq.core.protocol.distro");
     
