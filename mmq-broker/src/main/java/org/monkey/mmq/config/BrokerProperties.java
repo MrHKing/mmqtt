@@ -16,6 +16,7 @@
 
 package org.monkey.mmq.config;
 
+import org.monkey.mmq.core.env.EnvUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.context.ApplicationListener;
@@ -26,23 +27,22 @@ import org.springframework.stereotype.Component;
  * @author Solley
  */
 @Component
-public class BrokerProperties implements ApplicationListener<WebServerInitializedEvent> {
+public class BrokerProperties {
 
-	/**
-	 * Broker唯一标识
-	 */
-	private String id;
+	private static final String MMQ_BROKER_PORT_PROPERTY = "mmq.broker.port";
+	private static final String DEFAULT_MMQ_BROKER_PORT = "1883";
+
+	private static final String MMQ_BROKER_WEBSOCKET_PROPERTY = "mmq.broker.websocketPort";
+	private static final String DEFAULT_MMQ_BROKER_WEBSOCKET = "2883";
 
 	/**
 	 * SSL端口号, 默认8883端口
 	 */
-	@Value("${mmq.broker.port}")
 	private int port;
 
 	/**
 	 * WebSocket SSL端口号, 默认9993端口
 	 */
-	@Value("${mmq.broker.websocketPort}")
 	private int websocketPort;
 
 	/**
@@ -53,14 +53,12 @@ public class BrokerProperties implements ApplicationListener<WebServerInitialize
 	/**
 	 * SSL密钥文件密码
 	 */
-	@Value("${mmq.broker.ssl.password}")
-	private String sslPassword;
+	private String sslPassword = "123456";
 
 	/**
 	 * SSL是否启用
 	 */
-	@Value("${mmq.broker.ssl.enabled}")
-	private boolean sslEnabled;
+	private boolean sslEnabled = false;
 
 	/**
 	 * 心跳时间(秒), 默认60秒, 该值可被客户端连接时相应配置覆盖
@@ -82,58 +80,24 @@ public class BrokerProperties implements ApplicationListener<WebServerInitialize
 	 */
 	private boolean soKeepAlive = true;
 
-	public String getId() {
-		return id;
-	}
-
-	public BrokerProperties setId(String id) {
-		this.id = id;
-		return this;
-	}
-
 	public int getPort() {
-		return port;
-	}
-
-	public BrokerProperties setPort(int sslPort) {
-		this.port = sslPort;
-		return this;
+		return Integer.valueOf(EnvUtil.getProperty(MMQ_BROKER_PORT_PROPERTY, DEFAULT_MMQ_BROKER_PORT));
 	}
 
 	public int getWebsocketPort() {
-		return websocketPort;
-	}
-
-	public BrokerProperties setWebsocketPort(int websocketPort) {
-		this.websocketPort = websocketPort;
-		return this;
+		return Integer.valueOf(EnvUtil.getProperty(MMQ_BROKER_WEBSOCKET_PROPERTY, DEFAULT_MMQ_BROKER_WEBSOCKET));
 	}
 
 	public String getWebsocketPath() {
 		return websocketPath;
 	}
 
-	public BrokerProperties setWebsocketPath(String websocketPath) {
-		this.websocketPath = websocketPath;
-		return this;
-	}
-
 	public String getSslPassword() {
 		return sslPassword;
 	}
 
-	public BrokerProperties setSslPassword(String sslPassword) {
-		this.sslPassword = sslPassword;
-		return this;
-	}
-
 	public boolean getSslEnabled() {
 		return sslEnabled;
-	}
-
-	public BrokerProperties setSslEnabled(boolean sslEnabled) {
-		this.sslEnabled = sslEnabled;
-		return this;
 	}
 
 	public int getKeepAlive() {
@@ -170,10 +134,5 @@ public class BrokerProperties implements ApplicationListener<WebServerInitialize
 	public BrokerProperties setSoKeepAlive(boolean soKeepAlive) {
 		this.soKeepAlive = soKeepAlive;
 		return this;
-	}
-
-	@Override
-	public void onApplicationEvent(WebServerInitializedEvent webServerInitializedEvent) {
-
 	}
 }
