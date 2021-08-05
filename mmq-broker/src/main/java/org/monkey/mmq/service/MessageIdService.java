@@ -17,8 +17,8 @@
 package org.monkey.mmq.service;
 
 
+import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.exception.MmqException;
-import org.monkey.mmq.core.utils.Loggers;
 import org.monkey.mmq.metadata.KeyBuilder;
 import org.monkey.mmq.metadata.RecordListener;
 import org.monkey.mmq.metadata.UtilsAndCommons;
@@ -62,7 +62,7 @@ public class MessageIdService implements RecordListener<MessageIdMateData> {
 				}
 			}
 		} catch (Exception e) {
-			Loggers.BROKER.error("listen subscribe service failed.", e);
+			Loggers.BROKER_SERVER.error("listen subscribe service failed.", e);
 		}
 		return 0;
 	}
@@ -76,7 +76,7 @@ public class MessageIdService implements RecordListener<MessageIdMateData> {
 			consistencyService.listen(KeyBuilder.getMessageIdStoreKey(), this);
 			consistencyService.put(UtilsAndCommons.MESSAGE_Id_STORE, new MessageIdMateData());
 		} catch (MmqException e) {
-			Loggers.BROKER.error("listen subscribe service failed.", e);
+			Loggers.BROKER_SERVER.error("listen subscribe service failed.", e);
 		}
 
 	}

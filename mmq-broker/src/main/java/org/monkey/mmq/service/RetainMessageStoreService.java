@@ -15,8 +15,8 @@
  */
 package org.monkey.mmq.service;
 
+import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.exception.MmqException;
-import org.monkey.mmq.core.utils.Loggers;
 import org.monkey.mmq.metadata.KeyBuilder;
 import org.monkey.mmq.metadata.RecordListener;
 import org.monkey.mmq.metadata.message.DupPubRelMessageMateData;
@@ -84,7 +84,7 @@ public class RetainMessageStoreService implements RecordListener<RetainMessageMa
         try {
             consistencyService.listen(KeyBuilder.getRetainStoreKey(), this);
         } catch (MmqException e) {
-            Loggers.BROKER.error("listen subscribe service failed.", e);
+            Loggers.BROKER_SERVER.error("listen subscribe service failed.", e);
         }
     }
 

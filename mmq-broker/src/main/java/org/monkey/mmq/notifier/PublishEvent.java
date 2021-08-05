@@ -19,7 +19,7 @@ import org.monkey.mmq.core.entity.InternalMessage;
 import org.monkey.mmq.core.notify.Event;
 
 /**
- * Health Controller.
+ * 发布事件
  *
  * @author solley
  */

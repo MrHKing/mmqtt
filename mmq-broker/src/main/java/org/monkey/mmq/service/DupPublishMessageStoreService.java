@@ -16,8 +16,8 @@
 
 package org.monkey.mmq.service;
 
+import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.exception.MmqException;
-import org.monkey.mmq.core.utils.Loggers;
 import org.monkey.mmq.metadata.KeyBuilder;
 import org.monkey.mmq.metadata.RecordListener;
 import org.monkey.mmq.metadata.UtilsAndCommons;
@@ -56,7 +56,7 @@ public class DupPublishMessageStoreService implements RecordListener<DupPublishM
         try {
             consistencyService.listen(KeyBuilder.getPublishStoreKey(), this);
         } catch (MmqException e) {
-            Loggers.BROKER.error("listen subscribe service failed.", e);
+            Loggers.BROKER_SERVER.error("listen subscribe service failed.", e);
         }
     }
 
@@ -86,11 +86,11 @@ public class DupPublishMessageStoreService implements RecordListener<DupPublishM
                 try {
                     consistencyService.remove(publish.getKey());
                 } catch (MmqException e) {
-                    Loggers.BROKER.error(e.getMessage());
+                    Loggers.BROKER_SERVER.error(e.getMessage());
                 }
             });
         } catch (Exception e) {
-            Loggers.BROKER.error(e.getMessage());
+            Loggers.BROKER_SERVER.error(e.getMessage());
         }
     }
 

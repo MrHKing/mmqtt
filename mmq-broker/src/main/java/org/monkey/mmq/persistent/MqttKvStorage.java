@@ -35,7 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 /**
- * Kv storage implementation for naming.
+ * Kv storage implementation for mqtt.
  *
  * @author solley
  */

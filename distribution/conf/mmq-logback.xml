@@ -49,12 +49,29 @@
         </encoder>
     </appender>
 
-    <appender name="core-auth"
+    <appender name="mmq-core"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_HOME}/core-auth.log</file>
+        <file>${LOG_HOME}/mmq-core.log</file>
         <append>true</append>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_HOME}/core-auth.log.%d{yyyy-MM-dd}.%i</fileNamePattern>
+            <fileNamePattern>${LOG_HOME}/mmq-core.log.%d{yyyy-MM-dd}.%i</fileNamePattern>
+            <maxFileSize>2GB</maxFileSize>
+            <maxHistory>7</maxHistory>
+            <totalSizeCap>7GB</totalSizeCap>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+        <encoder>
+            <Pattern>%date %level %msg%n%n</Pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <appender name="core-cluster"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/core-cluster.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/core-cluster.log.%d{yyyy-MM-dd}.%i</fileNamePattern>
             <maxFileSize>2GB</maxFileSize>
             <maxHistory>7</maxHistory>
             <totalSizeCap>7GB</totalSizeCap>
@@ -83,12 +100,63 @@
         </encoder>
     </appender>
 
-    <appender name="protocol-broker"
+    <appender name="broker-protocol"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_HOME}/protocol-broker.log</file>
+        <file>${LOG_HOME}/broker-protocol.log</file>
         <append>true</append>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_HOME}/protocol-broker.log.%d{yyyy-MM-dd}.%i</fileNamePattern>
+            <fileNamePattern>${LOG_HOME}/broker-protocol.log.%d{yyyy-MM-dd}.%i</fileNamePattern>
+            <maxFileSize>2GB</maxFileSize>
+            <maxHistory>7</maxHistory>
+            <totalSizeCap>7GB</totalSizeCap>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+        <encoder>
+            <Pattern>%date %level %msg%n%n</Pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <appender name="broker-service"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/broker-service.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/broker-service.log.%d{yyyy-MM-dd}.%i</fileNamePattern>
+            <maxFileSize>2GB</maxFileSize>
+            <maxHistory>7</maxHistory>
+            <totalSizeCap>7GB</totalSizeCap>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+        <encoder>
+            <Pattern>%date %level %msg%n%n</Pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <appender name="broker-persistent"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/broker-persistent.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/broker-persistent.log.%d{yyyy-MM-dd}.%i</fileNamePattern>
+            <maxFileSize>2GB</maxFileSize>
+            <maxHistory>7</maxHistory>
+            <totalSizeCap>7GB</totalSizeCap>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+        <encoder>
+            <Pattern>%date %level %msg%n%n</Pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <appender name="broker-notifier"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/broker-notifier.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/broker-notifier.log.%d{yyyy-MM-dd}.%i</fileNamePattern>
             <maxFileSize>2GB</maxFileSize>
             <maxHistory>7</maxHistory>
             <totalSizeCap>7GB</totalSizeCap>
@@ -122,20 +190,39 @@
         <appender-ref ref="rootFile"/>
     </root>
 
-    <logger name="org.monkey.mmq.core.auth" additivity="false">
-        <level value="DEBUG"/>
-        <appender-ref ref="core-auth"/>
+    <logger name="org.monkey.mmq.core" additivity="false">
+        <level value="INFO"/>
+        <appender-ref ref="mmq-core"/>
     </logger>
-
 
     <logger name="org.monkey.mmq.core.distributed.raft" additivity="false">
         <level value="INFO"/>
         <appender-ref ref="protocol-raft"/>
     </logger>
 
+    <logger name="org.monkey.mmq.core.cluster" additivity="false">
+        <level value="INFO"/>
+        <appender-ref ref="core-cluster"/>
+    </logger>
+
     <logger name="org.monkey.mmq.protocol" additivity="false">
         <level value="INFO"/>
-        <appender-ref ref="protocol-broker"/>
+        <appender-ref ref="broker-protocol"/>
+    </logger>
+
+    <logger name="org.monkey.mmq.service" additivity="false">
+        <level value="INFO"/>
+        <appender-ref ref="broker-service"/>
+    </logger>
+
+    <logger name="org.monkey.mmq.persistent" additivity="false">
+        <level value="INFO"/>
+        <appender-ref ref="broker-persistent"/>
+    </logger>
+
+    <logger name="org.monkey.mmq.notifier" additivity="false">
+        <level value="INFO"/>
+        <appender-ref ref="broker-notifier"/>
     </logger>
 
     <logger name="com.alipay.sofa.jraft" additivity="false">

@@ -91,9 +91,6 @@ public final class PersistentNotifier extends Subscriber<ValueChangeEvent> {
      * @param <T>    type
      */
     public <T extends Record> void notify(final String key, final DataOperation action, final T value) {
-//        if (!listenerMap.containsKey(key)) {
-//            return;
-//        }
         listenerMap.forEach((k,v) -> {
             if (key.startsWith(k)) {
                 for (RecordListener listener : listenerMap.get(k)) {

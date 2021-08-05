@@ -27,6 +27,7 @@ import com.alipay.sofa.jraft.rpc.impl.GrpcRaftRpcFactory;
 import com.alipay.sofa.jraft.rpc.impl.MarshallerRegistry;
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl;
 import com.alipay.sofa.jraft.util.RpcFactoryHelper;
+import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.cluster.ServerMemberManager;
 import org.monkey.mmq.core.common.Constants;
 import org.monkey.mmq.core.entity.InternalMessage;
@@ -37,7 +38,6 @@ import org.monkey.mmq.core.notify.Event;
 import org.monkey.mmq.core.notify.NotifyCenter;
 import org.monkey.mmq.core.notify.listener.Subscriber;
 import org.monkey.mmq.core.utils.InetUtils;
-import org.monkey.mmq.core.utils.Loggers;
 import org.monkey.mmq.notifier.processor.PublishRequestProcessor;
 import org.monkey.mmq.service.MessageIdService;
 import org.monkey.mmq.service.SessionStoreService;
@@ -84,7 +84,7 @@ public final class BroadcastManager extends Subscriber<PublishEvent> {
                 sessionStoreService,
                 messageIdService));
         if (!this.rpcServer.init(null)) {
-            Loggers.BROKER.error("Fail to init [BaseRpcServer].");
+            Loggers.BROKER_NOTIFIER.error("Fail to init [BaseRpcServer].");
             throw new RuntimeException("Fail to init [BaseRpcServer].");
         }
         //raftGroupService = new RaftGroupService(Constants.MQTT_PERSISTENT_BROKER_GROUP, localPeerId, copy, rpcServer, true);

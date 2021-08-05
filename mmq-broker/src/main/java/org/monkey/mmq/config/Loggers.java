@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.monkey.mmq.core.utils;
+package org.monkey.mmq.config;
 
 import ch.qos.logback.classic.Level;
 import org.slf4j.Logger;
@@ -28,23 +28,28 @@ import org.slf4j.LoggerFactory;
  */
 public class Loggers {
     
-    public static final Logger CORE = LoggerFactory.getLogger("org.monkey.mmq.core");
+    public static final Logger BROKER_PROTOCOL = LoggerFactory.getLogger("org.monkey.mmq.protocol");
 
-    public static final Logger RAFT = LoggerFactory.getLogger("org.monkey.mmq.core.distributed.raft");
-    
-    public static final Logger CLUSTER = LoggerFactory.getLogger("org.monkey.mmq.core.cluster");
-    
+    public static final Logger BROKER_SERVER = LoggerFactory.getLogger("org.monkey.mmq.service");
+
+    public static final Logger BROKER_PERSISTENT = LoggerFactory.getLogger("org.monkey.mmq.persistent");
+
+    public static final Logger BROKER_NOTIFIER = LoggerFactory.getLogger("org.monkey.mmq.notifier");
+
     public static void setLogLevel(String logName, String level) {
         
         switch (logName) {
-            case "mmq-core":
-                ((ch.qos.logback.classic.Logger) CORE).setLevel(Level.valueOf(level));
+            case "broker-protocol":
+                ((ch.qos.logback.classic.Logger) BROKER_PROTOCOL).setLevel(Level.valueOf(level));
                 break;
-            case "core-raft":
-                ((ch.qos.logback.classic.Logger) RAFT).setLevel(Level.valueOf(level));
+            case "broker-service":
+                ((ch.qos.logback.classic.Logger) BROKER_SERVER).setLevel(Level.valueOf(level));
                 break;
-            case "core-cluster":
-                ((ch.qos.logback.classic.Logger) CLUSTER).setLevel(Level.valueOf(level));
+            case "broker-persistent":
+                ((ch.qos.logback.classic.Logger) BROKER_PERSISTENT).setLevel(Level.valueOf(level));
+                break;
+            case "broker-notifier":
+                ((ch.qos.logback.classic.Logger) BROKER_NOTIFIER).setLevel(Level.valueOf(level));
                 break;
             default:
                 break;

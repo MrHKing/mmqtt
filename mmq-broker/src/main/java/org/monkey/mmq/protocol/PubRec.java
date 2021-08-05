@@ -20,9 +20,9 @@ package org.monkey.mmq.protocol;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.*;
 import io.netty.util.AttributeKey;
+import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.core.utils.LoggerUtils;
-import org.monkey.mmq.core.utils.Loggers;
 import org.monkey.mmq.metadata.message.DupPubRelMessageMateData;
 import org.monkey.mmq.service.DupPubRelMessageStoreService;
 import org.monkey.mmq.service.DupPublishMessageStoreService;
@@ -46,7 +46,7 @@ public class PubRec {
 		MqttMessage pubRelMessage = MqttMessageFactory.newMessage(
 			new MqttFixedHeader(MqttMessageType.PUBREL, false, MqttQoS.AT_MOST_ONCE, false, 0),
 			MqttMessageIdVariableHeader.from(variableHeader.messageId()), null);
-		LoggerUtils.printIfDebugEnabled(Loggers.BROKER,"PUBREC - clientId: {}, messageId: {}", (String) channel.attr(AttributeKey.valueOf("clientId")).get(), variableHeader.messageId());
+		LoggerUtils.printIfDebugEnabled(Loggers.BROKER_PROTOCOL,"PUBREC - clientId: {}, messageId: {}", (String) channel.attr(AttributeKey.valueOf("clientId")).get(), variableHeader.messageId());
 		dupPublishMessageStoreService.delete((String) channel.attr(AttributeKey.valueOf("clientId")).get(), variableHeader.messageId());
 		DupPubRelMessageMateData dupPubRelMessageStore = new DupPubRelMessageMateData().setClientId((String) channel.attr(AttributeKey.valueOf("clientId")).get())
 			.setMessageId(variableHeader.messageId());

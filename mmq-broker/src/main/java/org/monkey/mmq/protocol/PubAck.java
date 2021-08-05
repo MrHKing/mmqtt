@@ -19,9 +19,9 @@ package org.monkey.mmq.protocol;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.MqttMessageIdVariableHeader;
 import io.netty.util.AttributeKey;
+import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.core.utils.LoggerUtils;
-import org.monkey.mmq.core.utils.Loggers;
 import org.monkey.mmq.service.DupPublishMessageStoreService;
 import org.monkey.mmq.service.MessageIdService;
 
@@ -42,7 +42,7 @@ public class PubAck {
 
 	public void processPubAck(Channel channel, MqttMessageIdVariableHeader variableHeader) throws MmqException {
 		int messageId = variableHeader.messageId();
-		LoggerUtils.printIfDebugEnabled(Loggers.BROKER,"PINGREQ - clientId: {}", "PUBACK - clientId: {}, messageId: {}", (String) channel.attr(AttributeKey.valueOf("clientId")).get(), messageId);
+		LoggerUtils.printIfDebugEnabled(Loggers.BROKER_PROTOCOL,"PINGREQ - clientId: {}", "PUBACK - clientId: {}, messageId: {}", (String) channel.attr(AttributeKey.valueOf("clientId")).get(), messageId);
 		dupPublishMessageStoreService.delete((String) channel.attr(AttributeKey.valueOf("clientId")).get(), messageId);
 		//messageIdService.releaseMessageId(messageId);
 	}

@@ -19,8 +19,8 @@ package org.monkey.mmq.protocol;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.*;
 import io.netty.util.AttributeKey;
+import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.utils.LoggerUtils;
-import org.monkey.mmq.core.utils.Loggers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +36,7 @@ public class PubRel {
 		MqttMessage pubCompMessage = MqttMessageFactory.newMessage(
 			new MqttFixedHeader(MqttMessageType.PUBCOMP, false, MqttQoS.AT_MOST_ONCE, false, 0),
 			MqttMessageIdVariableHeader.from(variableHeader.messageId()), null);
-		LoggerUtils.printIfDebugEnabled(Loggers.BROKER,"PUBREL - clientId: {}, messageId: {}", (String) channel.attr(AttributeKey.valueOf("clientId")).get(), variableHeader.messageId());
+		LoggerUtils.printIfDebugEnabled(Loggers.BROKER_PROTOCOL,"PUBREL - clientId: {}, messageId: {}", (String) channel.attr(AttributeKey.valueOf("clientId")).get(), variableHeader.messageId());
 		channel.writeAndFlush(pubCompMessage);
 	}
 

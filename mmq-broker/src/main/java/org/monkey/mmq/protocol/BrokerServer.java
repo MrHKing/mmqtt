@@ -38,8 +38,8 @@ import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import org.monkey.mmq.codec.MqttWebSocketCodec;
 import org.monkey.mmq.config.BrokerProperties;
+import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.utils.LoggerUtils;
-import org.monkey.mmq.core.utils.Loggers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -81,7 +81,7 @@ public class BrokerServer {
 
 	@PostConstruct
 	public void start() throws Exception {
-		LoggerUtils.printIfInfoEnabled(Loggers.BROKER,"Initializing {} MQTT Broker ...", "[" + id + "]");
+		LoggerUtils.printIfInfoEnabled(Loggers.BROKER_PROTOCOL,"Initializing {} MQTT Broker ...", "[" + id + "]");
 		bossGroup = brokerProperties.isUseEpoll() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
 		workerGroup = brokerProperties.isUseEpoll() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
 		if (brokerProperties.getSslEnabled()) {
@@ -94,12 +94,12 @@ public class BrokerServer {
 		}
 		mqttServer();
 		websocketServer();
-		LoggerUtils.printIfInfoEnabled(Loggers.BROKER,"MQTT Broker {} is up and running. Open SSLPort: {} WebSocketSSLPort: {}", "[" + id + "]", brokerProperties.getPort(), brokerProperties.getWebsocketPort());
+		LoggerUtils.printIfInfoEnabled(Loggers.BROKER_PROTOCOL,"MQTT Broker {} is up and running. Open SSLPort: {} WebSocketSSLPort: {}", "[" + id + "]", brokerProperties.getPort(), brokerProperties.getWebsocketPort());
 	}
 
 	@PreDestroy
 	public void stop() {
-		LoggerUtils.printIfInfoEnabled(Loggers.BROKER,"Shutdown {} MQTT Broker ...", "[" +id + "]");
+		LoggerUtils.printIfInfoEnabled(Loggers.BROKER_PROTOCOL,"Shutdown {} MQTT Broker ...", "[" +id + "]");
 		bossGroup.shutdownGracefully();
 		bossGroup = null;
 		workerGroup.shutdownGracefully();
@@ -108,7 +108,7 @@ public class BrokerServer {
 		channel = null;
 		websocketChannel.closeFuture().syncUninterruptibly();
 		websocketChannel = null;
-		LoggerUtils.printIfInfoEnabled(Loggers.BROKER,"MQTT Broker {} shutdown finish.", "[" + id + "]");
+		LoggerUtils.printIfInfoEnabled(Loggers.BROKER_PROTOCOL,"MQTT Broker {} shutdown finish.", "[" + id + "]");
 	}
 
 	private void mqttServer() throws Exception {

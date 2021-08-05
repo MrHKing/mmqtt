@@ -19,8 +19,8 @@ package org.monkey.mmq.protocol;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.*;
 import io.netty.util.AttributeKey;
+import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.utils.LoggerUtils;
-import org.monkey.mmq.core.utils.Loggers;
 
 /**
  * PINGREQ连接处理
@@ -31,7 +31,7 @@ public class PingReq {
 	public void processPingReq(Channel channel, MqttMessage msg) {
 		MqttMessage pingRespMessage = MqttMessageFactory.newMessage(
 			new MqttFixedHeader(MqttMessageType.PINGRESP, false, MqttQoS.AT_MOST_ONCE, false, 0), null, null);
-		LoggerUtils.printIfDebugEnabled(Loggers.BROKER,"PINGREQ - clientId: {}", (String) channel.attr(AttributeKey.valueOf("clientId")).get());
+		LoggerUtils.printIfDebugEnabled(Loggers.BROKER_PROTOCOL,"PINGREQ - clientId: {}", (String) channel.attr(AttributeKey.valueOf("clientId")).get());
 		channel.writeAndFlush(pingRespMessage);
 	}
 

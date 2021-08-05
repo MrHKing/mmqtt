@@ -19,9 +19,8 @@ package org.monkey.mmq.protocol;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.*;
 import io.netty.util.AttributeKey;
+import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.exception.MmqException;
-import org.monkey.mmq.core.utils.LoggerUtils;
-import org.monkey.mmq.core.utils.Loggers;
 import org.monkey.mmq.service.SubscribeStoreService;
 
 import java.util.List;
@@ -45,9 +44,9 @@ public class UnSubscribe {
 			try {
 				subscribeStoreService.delete(topicFilter, clinetId);
 			} catch (MmqException e) {
-				Loggers.BROKER.error("UNSUBSCRIBE - ErrorCode: {}, ErrMsg: {}", e.getErrCode(), e.getErrMsg());
+				Loggers.BROKER_PROTOCOL.error("UNSUBSCRIBE - ErrorCode: {}, ErrMsg: {}", e.getErrCode(), e.getErrMsg());
 			}
-			Loggers.BROKER.info("UNSUBSCRIBE - clientId: {}, topicFilter: {}", clinetId, topicFilter);
+			Loggers.BROKER_PROTOCOL.info("UNSUBSCRIBE - clientId: {}, topicFilter: {}", clinetId, topicFilter);
 		});
 
 		MqttMessage unsubAckMessage = MqttMessageFactory.newMessage(

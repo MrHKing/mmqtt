@@ -24,9 +24,9 @@ import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.AttributeKey;
 import io.netty.util.CharsetUtil;
 import org.monkey.mmq.auth.IAuthService;
+import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.exception.KvStorageException;
 import org.monkey.mmq.core.utils.LoggerUtils;
-import org.monkey.mmq.core.utils.Loggers;
 import org.monkey.mmq.core.utils.StringUtils;
 import org.monkey.mmq.metadata.message.DupPubRelMessageMateData;
 import org.monkey.mmq.metadata.message.DupPublishMessageMateData;
@@ -143,7 +143,7 @@ public class Connect {
 			new MqttFixedHeader(MqttMessageType.CONNACK, false, MqttQoS.AT_MOST_ONCE, false, 0),
 			new MqttConnAckVariableHeader(MqttConnectReturnCode.CONNECTION_ACCEPTED, sessionPresent), null);
 		channel.writeAndFlush(okResp);
-		LoggerUtils.printIfDebugEnabled(Loggers.BROKER,"CONNECT - clientId: {}, cleanSession: {}", msg.payload().clientIdentifier(), msg.variableHeader().isCleanSession());
+		LoggerUtils.printIfDebugEnabled(Loggers.BROKER_PROTOCOL,"CONNECT - clientId: {}, cleanSession: {}", msg.payload().clientIdentifier(), msg.variableHeader().isCleanSession());
 		// 如果cleanSession为0, 需要重发同一clientId存储的未完成的QoS1和QoS2的DUP消息
 		if (!msg.variableHeader().isCleanSession()) {
 			List<DupPublishMessageMateData> dupPublishMessageStoreList = dupPublishMessageStoreService.get(msg.payload().clientIdentifier());

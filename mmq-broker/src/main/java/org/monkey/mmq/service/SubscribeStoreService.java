@@ -15,8 +15,8 @@
  */
 package org.monkey.mmq.service;
 
+import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.exception.MmqException;
-import org.monkey.mmq.core.utils.Loggers;
 import org.monkey.mmq.core.utils.StringUtils;
 import org.monkey.mmq.metadata.Datum;
 import org.monkey.mmq.metadata.KeyBuilder;
@@ -57,7 +57,7 @@ public class SubscribeStoreService implements RecordListener<SubscribeMateData> 
         try {
             consistencyService.listen(KeyBuilder.getSubscribeStoreKey(), this);
         } catch (MmqException e) {
-            Loggers.BROKER.error("listen subscribe service failed.", e);
+            Loggers.BROKER_SERVER.error("listen subscribe service failed.", e);
         }
     }
 
@@ -80,11 +80,11 @@ public class SubscribeStoreService implements RecordListener<SubscribeMateData> 
                 try {
                     consistencyService.remove(subscribe.getKey());
                 } catch (MmqException e) {
-                    Loggers.BROKER.error(e.getMessage());
+                    Loggers.BROKER_SERVER.error(e.getMessage());
                 }
             });
         } catch (Exception e) {
-            Loggers.BROKER.error(e.getMessage());
+            Loggers.BROKER_SERVER.error(e.getMessage());
         }
     }
 

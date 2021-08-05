@@ -19,9 +19,9 @@ package org.monkey.mmq.protocol;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.MqttMessage;
 import io.netty.util.AttributeKey;
+import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.exception.KvStorageException;
 import org.monkey.mmq.core.utils.LoggerUtils;
-import org.monkey.mmq.core.utils.Loggers;
 import org.monkey.mmq.metadata.message.SessionMateData;
 import org.monkey.mmq.service.DupPubRelMessageStoreService;
 import org.monkey.mmq.service.DupPublishMessageStoreService;
@@ -64,7 +64,7 @@ public class DisConnect {
 			dupPublishMessageStoreService.deleteForClient(clientId);
 			dupPubRelMessageStoreService.deleteForClient(clientId);
 		}
-		LoggerUtils.printIfDebugEnabled(Loggers.BROKER,"DISCONNECT - clientId: {}, cleanSession: {}", clientId, sessionStore.isCleanSession());
+		LoggerUtils.printIfDebugEnabled(Loggers.BROKER_PROTOCOL,"DISCONNECT - clientId: {}, cleanSession: {}", clientId, sessionStore.isCleanSession());
 		sessionStoreService.delete(clientId);
 		channel.close();
 	}

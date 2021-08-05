@@ -19,11 +19,11 @@ import com.alipay.sofa.jraft.rpc.RpcContext;
 import com.alipay.sofa.jraft.rpc.RpcProcessor;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.mqtt.*;
+import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.cluster.Member;
 import org.monkey.mmq.core.cluster.ServerMemberManager;
 import org.monkey.mmq.core.entity.InternalMessage;
 import org.monkey.mmq.core.entity.ReadRequest;
-import org.monkey.mmq.core.utils.Loggers;
 import org.monkey.mmq.metadata.subscribe.SubscribeMateData;
 import org.monkey.mmq.service.MessageIdService;
 import org.monkey.mmq.service.SessionStoreService;
@@ -83,7 +83,7 @@ public class PublishRequestProcessor implements RpcProcessor<InternalMessage> {
                     MqttPublishMessage publishMessage = (MqttPublishMessage) MqttMessageFactory.newMessage(
                             new MqttFixedHeader(MqttMessageType.PUBLISH, dup, respQoS, retain, 0),
                             new MqttPublishVariableHeader(topic, 0), Unpooled.buffer().writeBytes(messageBytes));
-                    Loggers.BROKER.debug("PUBLISH - clientId: {}, topic: {}, Qos: {}", subscribeStore.getClientId(), topic, respQoS.value());
+                    Loggers.BROKER_NOTIFIER.debug("PUBLISH - clientId: {}, topic: {}, Qos: {}", subscribeStore.getClientId(), topic, respQoS.value());
                     sessionStoreService.get(subscribeStore.getClientId()).getChannel().writeAndFlush(publishMessage);
                 }
                 if (respQoS == MqttQoS.AT_LEAST_ONCE) {
@@ -91,7 +91,7 @@ public class PublishRequestProcessor implements RpcProcessor<InternalMessage> {
                     MqttPublishMessage publishMessage = (MqttPublishMessage) MqttMessageFactory.newMessage(
                             new MqttFixedHeader(MqttMessageType.PUBLISH, dup, respQoS, retain, 0),
                             new MqttPublishVariableHeader(topic, messageId), Unpooled.buffer().writeBytes(messageBytes));
-                    Loggers.BROKER.debug("PUBLISH - clientId: {}, topic: {}, Qos: {}, messageId: {}", subscribeStore.getClientId(), topic, respQoS.value(), messageId);
+                    Loggers.BROKER_NOTIFIER.debug("PUBLISH - clientId: {}, topic: {}, Qos: {}, messageId: {}", subscribeStore.getClientId(), topic, respQoS.value(), messageId);
                     sessionStoreService.get(subscribeStore.getClientId()).getChannel().writeAndFlush(publishMessage);
                 }
                 if (respQoS == MqttQoS.EXACTLY_ONCE) {
@@ -99,7 +99,7 @@ public class PublishRequestProcessor implements RpcProcessor<InternalMessage> {
                     MqttPublishMessage publishMessage = (MqttPublishMessage) MqttMessageFactory.newMessage(
                             new MqttFixedHeader(MqttMessageType.PUBLISH, dup, respQoS, retain, 0),
                             new MqttPublishVariableHeader(topic, messageId), Unpooled.buffer().writeBytes(messageBytes));
-                    Loggers.BROKER.debug("PUBLISH - clientId: {}, topic: {}, Qos: {}, messageId: {}", subscribeStore.getClientId(), topic, respQoS.value(), messageId);
+                    Loggers.BROKER_NOTIFIER.debug("PUBLISH - clientId: {}, topic: {}, Qos: {}, messageId: {}", subscribeStore.getClientId(), topic, respQoS.value(), messageId);
                     sessionStoreService.get(subscribeStore.getClientId()).getChannel().writeAndFlush(publishMessage);
                 }
             }
