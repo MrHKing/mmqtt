@@ -7,7 +7,7 @@
 
 *MMQ broker* 是跨平台的，支持 Linux、Unix、macOS 以及 Windows。这意味着 *MMQ broker* 可以部署在 x86_64 架构的服务器上。由于使用raft一致性算法，集群部署建议奇数个。
 
-#### jar包安装
+#### 直接安装
 
 #### Docker安装
 
