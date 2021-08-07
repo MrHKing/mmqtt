@@ -7,23 +7,37 @@
 
 *MMQ broker* 是跨平台的，支持 Linux、Unix、macOS 以及 Windows。这意味着 *MMQ broker* 可以部署在 x86_64 架构的服务器上。由于使用raft一致性算法，集群部署建议奇数个。
 
+#### 从 Github 上下载源码方式
+```bash
+git clone https://github.com/MrHKing/mmq.git
+cd mmq
+mvn -Prelease-mmq -Dmaven.test.skip=true clean install -U
+```
+
 #### 直接安装
+您可以从 最新稳定版本 下载 mmq-server-$version.zip 包。
+
+```bash
+unzip mmq-server-$version.zip 或者 tar -xvf mmq-server-$version.tar.gz
+cd mmq/bin
+```
 
 #### Docker安装
 
 #### Kubernetes安装
 
 # 快速入门
+
 ### 单机版启动
 
 ```bash
-cd .\bin
+cd mmq\bin
 #windows start
 startup.cmd -m standalone
 ```
 
 ```bash
-cd ./bin
+cd mmq/bin
 #linux start
 sh startup.sh -m standalone
 #linux shutdown
@@ -33,19 +47,19 @@ sh shutdown.sh
 ### 集群版启动
 
 ```bash
-cd ./config
+cd mmq/config
 #配置集群文件
 cp cluster.conf.example cluster.conf
 ```
 
 ```bash
-cd .\bin
+cd mmq\bin
 #windows start
 startup.cmd
 ```
 
 ```bash
-cd ./bin
+cd mmq/bin
 #linux start
 sh startup.sh
 #linux shutdown
