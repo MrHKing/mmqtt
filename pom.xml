@@ -105,6 +105,7 @@
         <grpc-java.version>1.24.0</grpc-java.version>
         <proto-google-common-protos.version>1.17.0</proto-google-common-protos.version>
         <protobuf-java.version>3.8.0</protobuf-java.version>
+        <tomcat-embed-jasper.version>9.0.40</tomcat-embed-jasper.version>
         <javatuples.version>1.2</javatuples.version>
     </properties>
     <!-- == -->
@@ -589,6 +590,12 @@
                 <groupId>org.apache.derby</groupId>
                 <artifactId>derby</artifactId>
                 <version>${derby.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-jasper</artifactId>
+                <version>${tomcat-embed-jasper.version}</version>
             </dependency>
 
             <!-- JRaft -->

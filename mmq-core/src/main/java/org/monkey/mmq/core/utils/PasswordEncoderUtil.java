@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2021 Monkey Group.
+ * Copyright 1999-2018 Alibaba Group Holding Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.monkey.mmq.web;
 
-import org.monkey.mmq.core.env.EnvUtil;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.servlet.ServletComponentScan;
+package org.monkey.mmq.core.utils;
+
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
- * Health Controller.
+ * Password encoder tool.
  *
- * @author solley
+ * @author nacos
  */
-@SpringBootApplication(scanBasePackages = "org.monkey.mmq")
-@ServletComponentScan
-public class Mmq {
-    public static void main(String[] args) {
-        EnvUtil.setIsStandalone(true);
-        SpringApplication.run(Mmq.class, args);
+public class PasswordEncoderUtil {
+    
+    public static Boolean matches(String raw, String encoded) {
+        return new BCryptPasswordEncoder().matches(raw, encoded);
+    }
+    
+    public static String encode(String raw) {
+        return new BCryptPasswordEncoder().encode(raw);
     }
 }

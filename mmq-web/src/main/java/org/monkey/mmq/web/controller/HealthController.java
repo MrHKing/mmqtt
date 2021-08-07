@@ -13,20 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.monkey.mmq.controller;
+package org.monkey.mmq.web.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController("consoleHealth")
+/**
+ * Health Controller.
+ *
+ * @author solley
+ */
+@RestController
+@RequestMapping("/v1/console/health")
 public class HealthController {
-    /**
-     * Whether the MMQ is in broken states or not, and cannot recover except by being restarted.
-     *
-     * @return HTTP code equal to 200 indicates that MMQ is in right states. HTTP code equal to 500 indicates that
-     * MMQ is in broken states.
-     */
     @GetMapping("/liveness")
     public ResponseEntity<String> liveness() {
         return ResponseEntity.ok().body("OK");

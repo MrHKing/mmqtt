@@ -22,6 +22,7 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -53,7 +54,15 @@ public class EmbeddedUserPersistServiceImpl implements UserPersistService {
 
     @Override
     public Page<User> getUsers(int pageNo, int pageSize) {
-        return null;
+        Page<User> userPage = new Page<>();
+        List<User> users = new ArrayList<>();
+        User user = new User();
+        user.setUsername("mmq");
+        user.setPassword("$2a$10$VxvrQ0Omo9ilSFjFwJKE5.7AVg0ug6.dMS.TVQBxbnuNkzuDDQdCS");
+        users.add(user);
+        userPage.setPageItems(users);
+        userPage.setTotalCount(1);
+        return userPage;
     }
 
     @Override

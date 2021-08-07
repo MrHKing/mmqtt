@@ -35,7 +35,7 @@ public class ProtocolProcess {
 	@Autowired
 	private SubscribeStoreService subscribeStoreService;
 
-	@Qualifier("authService")
+	@Qualifier("mqttAuthService")
 	@Autowired
 	private IAuthService authService;
 

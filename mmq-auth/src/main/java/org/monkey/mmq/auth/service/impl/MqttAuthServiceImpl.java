@@ -27,10 +27,10 @@ import javax.annotation.PostConstruct;
 import java.security.interfaces.RSAPrivateKey;
 
 /**
- * 用户名和密码认证服务
+ * MQTT用户名和密码认证服务
  */
-@Service("authService")
-public class AuthServiceImpl implements IAuthService {
+@Service("mqttAuthService")
+public class MqttAuthServiceImpl implements IAuthService {
 
 	private RSAPrivateKey privateKey;
 
