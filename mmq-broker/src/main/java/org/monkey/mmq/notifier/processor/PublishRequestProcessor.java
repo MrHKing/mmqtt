@@ -33,7 +33,7 @@ import java.lang.management.ManagementFactory;
 import java.util.List;
 
 /**
- * Health Controller.
+ * RPC消息接受
  *
  * @author solley
  */

@@ -22,7 +22,7 @@ import io.netty.handler.codec.mqtt.MqttPublishMessage;
 import java.io.Serializable;
 
 /**
- * 会话存储
+ * 会话存储元数据
  * @author Solley
  */
 public class SessionMateData implements Serializable {

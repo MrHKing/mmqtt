@@ -16,7 +16,7 @@
 package org.monkey.mmq.service;
 
 /**
- * Health Controller.
+ * 会话存储
  *
  * @author solley
  */

@@ -48,14 +48,14 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 
 /**
- * Health Controller.
+ * 消息广播管理
  *
  * @author solley
  */
 @Component
 public final class BroadcastManager extends Subscriber<PublishEvent> {
 
-    private final int queueMaxSize = 16;
+    private final int queueMaxSize = 60000;
 
     private final RpcServer rpcServer;
 

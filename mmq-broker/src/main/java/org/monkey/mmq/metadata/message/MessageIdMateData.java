@@ -21,7 +21,7 @@ import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Health Controller.
+ * 消息ID元数据
  *
  * @author solley
  */

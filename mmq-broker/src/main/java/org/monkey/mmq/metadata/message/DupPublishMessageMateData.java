@@ -21,7 +21,7 @@ import org.monkey.mmq.metadata.Record;
 import java.io.Serializable;
 
 /**
- * PUBLISH重发消息存储
+ * PUBLISH重发消息存储元数据
  * @author Solley
  */
 public class DupPublishMessageMateData implements Record, Serializable {

@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
- * Health Controller.
+ * Retain消息存储
  *
  * @author solley
  */

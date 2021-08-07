@@ -21,7 +21,7 @@ import org.monkey.mmq.metadata.Record;
 import java.io.Serializable;
 
 /**
- * Retain标志消息存储
+ * Retain标志消息存储元数据
  * @author Solley
  */
 public class RetainMessageMateData implements Record, Serializable {
