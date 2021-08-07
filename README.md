@@ -64,12 +64,12 @@ sh shutdown.sh
 Apache License 2.0, 详见 [LICENSE](./LICENSE)。
 
 # 开发计划
-##规则引擎
-###桥接kafka
-###桥接MQTT
-###桥接Tdengine
-###桥接influxdb
-##模块
-###Coap协议网关
-###TCP协议网关
-###JT/T808网关
+## 规则引擎
+### 桥接kafka
+### 桥接MQTT
+### 桥接Tdengine
+### 桥接influxdb
+## 模块
+### Coap协议网关
+### TCP协议网关
+### JT/T808网关

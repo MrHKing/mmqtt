@@ -20,6 +20,8 @@ public class SubscribeMateData implements Record, Serializable {
 
 	private String topicFilter;
 
+	private String key;
+
 	private int mqttQoS;
 
 	public SubscribeMateData() {
@@ -57,5 +59,13 @@ public class SubscribeMateData implements Record, Serializable {
 	public SubscribeMateData setMqttQoS(int mqttQoS) {
 		this.mqttQoS = mqttQoS;
 		return this;
+	}
+
+	public String getKey() {
+		return key;
+	}
+
+	public void setKey(String key) {
+		this.key = key;
 	}
 }

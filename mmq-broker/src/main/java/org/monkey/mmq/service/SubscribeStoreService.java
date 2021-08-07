@@ -15,6 +15,7 @@
  */
 package org.monkey.mmq.service;
 
+import cn.hutool.core.util.StrUtil;
 import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.core.utils.StringUtils;
@@ -47,7 +48,9 @@ public class SubscribeStoreService implements RecordListener<SubscribeMateData> 
     @Resource(name = "persistentConsistencyServiceDelegate")
     private ConsistencyService consistencyService;
 
-    private Map<String, SubscribeMateData> subscribes = new ConcurrentHashMap<>();
+    private Map<String, ConcurrentHashMap<String, SubscribeMateData>> subscribes = new ConcurrentHashMap<>();
+
+    private Map<String, ConcurrentHashMap<String, SubscribeMateData>> subWildcard = new ConcurrentHashMap<>();
 
     /**
      * Init
@@ -62,52 +65,77 @@ public class SubscribeStoreService implements RecordListener<SubscribeMateData> 
     }
 
     public void put(String topicFilter, SubscribeMateData subscribeStore) throws MmqException {
-        consistencyService.put(UtilsAndCommons.SUBSCRIBE_STORE + subscribeStore.getClientId() + topicFilter, subscribeStore);
+        String key = UtilsAndCommons.SUBSCRIBE_STORE + "/" + topicFilter + "/" + subscribeStore.getClientId();
+        subscribeStore.setKey(key);
+        consistencyService.put(key, subscribeStore);
     }
 
     @Async
     public void delete(String topicFilter, String clientId) throws MmqException {
-        consistencyService.remove(UtilsAndCommons.SUBSCRIBE_STORE + clientId + topicFilter);
+        consistencyService.remove(UtilsAndCommons.SUBSCRIBE_STORE + "/" + topicFilter + "/" + clientId);
     }
 
     @Async
     public void deleteForClient(String clientId) {
         try {
-            Set<Map.Entry<String, SubscribeMateData>> curClientIdSubscribeStore
-                    = subscribes.entrySet().stream().filter(topic -> topic.getValue().getClientId().equals(clientId))
-                    .collect(Collectors.toSet());
-            curClientIdSubscribeStore.forEach(subscribe -> {
-                try {
-                    consistencyService.remove(subscribe.getKey());
-                } catch (MmqException e) {
-                    Loggers.BROKER_SERVER.error(e.getMessage());
-                }
+            subscribes.forEach((subKey, client) -> {
+                client.forEach((key, value)->{
+                    if (value.getClientId().equals(clientId)) {
+                        try {
+                            consistencyService.remove(key);
+                        } catch (MmqException e) {
+                            Loggers.BROKER_SERVER.error(e.getMessage());
+                        }
+                    }
+                });
             });
+
+            subWildcard.forEach((subKey, client) -> {
+                client.forEach((key, value)->{
+                    if (value.getClientId().equals(clientId)) {
+                        try {
+                            consistencyService.remove(key);
+                        } catch (MmqException e) {
+                            Loggers.BROKER_SERVER.error(e.getMessage());
+                        }
+                    }
+                });
+            });
+
         } catch (Exception e) {
             Loggers.BROKER_SERVER.error(e.getMessage());
         }
     }
 
-    public List<SubscribeMateData> search(String topicFilter) {
+    public List<SubscribeMateData> search(String topic) {
         List<SubscribeMateData> subscribeStores = new ArrayList<SubscribeMateData>();
-        Set<Map.Entry<String, SubscribeMateData>> subNotWildcard
-                = subscribes.entrySet().stream().filter(value ->
-                value.getValue().getTopicFilter().equals(topicFilter))
-                .collect(Collectors.toSet());
-        subNotWildcard.forEach(subscribe -> {
-            subscribeStores.add(subscribe.getValue());
+        subscribes.forEach((topicFilter, map) -> {
+            if (topic.equals(topicFilter)) {
+                subscribeStores.addAll(map.values());
+            }
         });
 
-        Set<Map.Entry<String, SubscribeMateData>> subWildcard
-                = new HashSet<>();
-        for (Map.Entry<String, SubscribeMateData> value : subscribes.entrySet()) {
-            if ((value.getValue().getTopicFilter().endsWith("#") || value.getValue().getTopicFilter().endsWith("+"))
-                    && topicFilter.startsWith(value.getValue().getTopicFilter().substring(0, value.getValue().getTopicFilter().length() - 1))) {
-                subWildcard.add(value);
+        subWildcard.forEach((topicFilter, map) -> {
+            if (StrUtil.split(topic, '/').size() >= StrUtil.split(topicFilter, '/').size()) {
+                List<String> splitTopics = StrUtil.split(topic, '/');//a
+                List<String> spliteTopicFilters = StrUtil.split(topicFilter, '/');//#
+                String newTopicFilter = "";
+                for (int i = 0; i < spliteTopicFilters.size(); i++) {
+                    String value = spliteTopicFilters.get(i);
+                    if (value.equals("+")) {
+                        newTopicFilter = newTopicFilter + "+/";
+                    } else if (value.equals("#")) {
+                        newTopicFilter = newTopicFilter + "#/";
+                        break;
+                    } else {
+                        newTopicFilter = newTopicFilter + splitTopics.get(i) + "/";
+                    }
+                }
+                newTopicFilter = StrUtil.removeSuffix(newTopicFilter, "/");
+                if (topicFilter.equals(newTopicFilter)) {
+                    subscribeStores.addAll(map.values());
+                }
             }
-        }
-        subWildcard.forEach(subscribe -> {
-            subscribeStores.add(subscribe.getValue());
         });
         return subscribeStores;
     }
@@ -124,11 +152,30 @@ public class SubscribeStoreService implements RecordListener<SubscribeMateData> 
 
     @Override
     public void onChange(String key, SubscribeMateData value) throws Exception {
-        subscribes.put(key, value);
+        if (StrUtil.contains(value.getTopicFilter(), '#') || StrUtil.contains(value.getTopicFilter(), '+')) {
+            ConcurrentHashMap<String, SubscribeMateData> clientConcurrentHashMap = subWildcard.get(value.getTopicFilter());
+            if (clientConcurrentHashMap == null) {
+                clientConcurrentHashMap = new ConcurrentHashMap<>();
+            }
+            clientConcurrentHashMap.put(key, value);
+            subWildcard.put(value.getTopicFilter(), clientConcurrentHashMap);
+        } else  {
+            ConcurrentHashMap<String, SubscribeMateData> clientConcurrentHashMap = subscribes.get(value.getTopicFilter());
+            if (clientConcurrentHashMap == null) {
+                clientConcurrentHashMap = new ConcurrentHashMap<>();
+            }
+            clientConcurrentHashMap.put(key, value);
+            subscribes.put(value.getTopicFilter(), clientConcurrentHashMap);
+        }
     }
 
     @Override
     public void onDelete(String key) throws Exception {
-        subscribes.remove(key);
+        subscribes.forEach((subKey, client) -> {
+            client.remove(key);
+        });
+        subWildcard.forEach((subKey, client) -> {
+            client.remove(key);
+        });
     }
 }
