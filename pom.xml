@@ -94,7 +94,9 @@
         <httpasyncclient.version>4.1.3</httpasyncclient.version>
         <mysql-connector-java.version>8.0.21</mysql-connector-java.version>
         <jraft-core.version>1.3.5</jraft-core.version>
+        <jjwt.version>0.11.2</jjwt.version>
         <rpc-grpc-impl.version>1.3.5</rpc-grpc-impl.version>
+        <reflections.version>0.9.11</reflections.version>
         <guava.version>30.1-jre</guava.version>
         <jackson-core.version>2.12.2</jackson-core.version>
         <jackson-databind.version>2.12.2</jackson-databind.version>
@@ -310,6 +312,7 @@
         <module>mmq-config</module>
         <module>mmq-api</module>
         <module>distribution</module>
+        <module>mmq-web</module>
     </modules>
     <!-- 所有的子项目默认依赖 -->
     <dependencies>
@@ -379,6 +382,35 @@
                 <groupId>${project.groupId}</groupId>
                 <artifactId>distribution</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>mmq-web</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-api</artifactId>
+                <version>${jjwt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-impl</artifactId>
+                <version>${jjwt.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-jackson</artifactId>
+                <version>${jjwt.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.reflections</groupId>
+                <artifactId>reflections</artifactId>
+                <version>${reflections.version}</version>
             </dependency>
 
             <dependency>

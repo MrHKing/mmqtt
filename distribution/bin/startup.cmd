@@ -25,7 +25,7 @@ set CUSTOM_SEARCH_LOCATIONS=file:%BASE_DIR%/conf/
 
 set MODE="cluster"
 set FUNCTION_MODE="all"
-set SERVER=mmq-broker-1.0-SNAPSHOT
+set SERVER=mmq-web-1.0-SNAPSHOT
 set MODE_INDEX=-1
 set FUNCTION_MODE_INDEX=-1
 set SERVER_INDEX=-1

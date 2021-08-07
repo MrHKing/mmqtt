@@ -14,17 +14,36 @@
  * limitations under the License.
  */
 
+package org.monkey.mmq.auth.model;
 
-package org.monkey.mmq.auth;
+import java.io.Serializable;
 
 /**
- * 用户和密码认证服务接口
- * @author Solley
+ * User.
+ *
+ * @author solley
  */
-public interface IAuthService {
-
-    /**
-     * 验证用户名和密码是否正确
-     */
-    boolean checkValid(String username, String password);
+public class User implements Serializable {
+    
+    private static final long serialVersionUID = 3371769277802700069L;
+    
+    private String username;
+    
+    private String password;
+    
+    public String getPassword() {
+        return password;
+    }
+    
+    public void setPassword(String password) {
+        this.password = password;
+    }
+    
+    public String getUsername() {
+        return username;
+    }
+    
+    public void setUsername(String username) {
+        this.username = username;
+    }
 }

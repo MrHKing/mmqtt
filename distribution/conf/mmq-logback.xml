@@ -17,7 +17,7 @@
 
 <configuration>
 
-    <springProperty scope="context" name="logPath" source="mmq.logs.path" defaultValue="${user.home}/mmq/logs"/>
+    <springProperty scope="context" name="logPath" source="mmq.logs.path" defaultValue="${mmq.home}/mmq/logs"/>
 
     <property name="LOG_HOME" value="${logPath}"/>
 

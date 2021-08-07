@@ -16,9 +16,10 @@
 
 package org.monkey.mmq.protocol;
 
-import org.monkey.mmq.auth.AuthService;
+import org.monkey.mmq.auth.service.IAuthService;
 import org.monkey.mmq.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,8 +35,9 @@ public class ProtocolProcess {
 	@Autowired
 	private SubscribeStoreService subscribeStoreService;
 
+	@Qualifier("authService")
 	@Autowired
-	private AuthService authService;
+	private IAuthService authService;
 
 	@Autowired
 	private MessageIdService messageIdService;

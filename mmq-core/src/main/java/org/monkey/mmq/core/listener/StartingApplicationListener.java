@@ -239,24 +239,7 @@ public class StartingApplicationListener implements MmqApplicationListener {
     
     private void judgeStorageMode(ConfigurableEnvironment env) {
         
-        // External data sources are used by default in cluster mode
-        boolean useExternalStorage = (DEFAULT_DATABASE.equalsIgnoreCase(env.getProperty(DATASOURCE_PLATFORM_PROPERTY, DEFAULT_DATASOURCE_PLATFORM)));
-        
-        // must initialize after setUseExternalDB
-        // This value is true in stand-alone mode and false in cluster mode
-        // If this value is set to true in cluster mode, mmq's distributed storage engine is turned on
-        // default value is depend on ${mmq.standalone}
-        
-        if (!useExternalStorage) {
-            boolean embeddedStorage = EnvUtil.getStandaloneMode() || Boolean.getBoolean("embeddedStorage");
-            // If the embedded data source storage is not turned on, it is automatically
-            // upgraded to the external data source storage, as before
-            if (!embeddedStorage) {
-                useExternalStorage = true;
-            }
-        }
-        
-        LOGGER.info("Mmq started successfully in {} mode. use {} storage",
-                System.getProperty(MODE_PROPERTY_KEY_STAND_MODE), useExternalStorage ? DATASOURCE_MODE_EXTERNAL : DATASOURCE_MODE_EMBEDDED);
+        LOGGER.info("Mmq started successfully in {} mode",
+                System.getProperty(MODE_PROPERTY_KEY_STAND_MODE));
     }
 }

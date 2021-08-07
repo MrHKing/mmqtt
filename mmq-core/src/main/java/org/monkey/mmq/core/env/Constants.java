@@ -22,34 +22,34 @@ package org.monkey.mmq.core.env;
  * @author solley
  */
 public interface Constants {
-    
+
     /**
      * Spring Profile : "standalone".
      */
     String STANDALONE_SPRING_PROFILE = "standalone";
-    
+
     /**
      * The System property name of  Standalone mode.
      */
     String STANDALONE_MODE_PROPERTY_NAME = "mmq.standalone";
-    
+
     /**
      * The System property name of  Function mode.
      */
     String FUNCTION_MODE_PROPERTY_NAME = "mmq.functionMode";
-    
+
     /**
      * The System property name of prefer hostname over ip.
      */
     String PREFER_HOSTNAME_OVER_IP_PROPERTY_NAME = "mmq.preferHostnameOverIp";
-    
+
     /**
      * the root context path.
      */
     String ROOT_WEB_CONTEXT_PATH = "/";
-    
+
     String MMQ_SERVER_IP = "mmq.server.ip";
-    
+
     String USE_ONLY_SITE_INTERFACES = "mmq.inetutils.use-only-site-local-interfaces";
     String PREFERRED_NETWORKS = "mmq.inetutils.preferred-networks";
     String IGNORED_INTERFACES = "mmq.inetutils.ignored-interfaces";
@@ -62,6 +62,6 @@ public interface Constants {
     String MMQ_SERVER_HEADER = "MMQ-Server";
     
     String REQUEST_PATH_SEPARATOR = "-->";
-    
+
     String AVAILABLE_PROCESSORS_BASIC = "mmq.core.sys.basic.processors";
 }

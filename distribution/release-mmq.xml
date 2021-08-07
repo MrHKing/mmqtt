@@ -54,7 +54,7 @@
         </file>
         <file>
             <!--打好的jar包名称和放置目录-->
-            <source>../mmq-broker/target/mmq-broker-1.0-SNAPSHOT.jar</source>
+            <source>../mmq-web/target/mmq-web-1.0-SNAPSHOT.jar</source>
             <outputDirectory>target/</outputDirectory>
         </file>
     </files>
@@ -63,7 +63,7 @@
         <moduleSet>
             <useAllReactorProjects>true</useAllReactorProjects>
             <includes>
-                <include>org.monkey.mmq:mmq-broker</include>
+                <include>org.monkey.mmq:mmq-web</include>
             </includes>
         </moduleSet>
     </moduleSets>

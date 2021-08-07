@@ -7,6 +7,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="mmq-config" />
+        <module name="mmq-web" />
         <module name="mmq-broker" />
         <module name="mmq-device" />
         <module name="mmq-auth" />
