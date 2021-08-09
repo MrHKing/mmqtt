@@ -110,7 +110,7 @@ public class MmqAuthConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-        //if (StringUtils.isBlank(authConfigs.getMmqAuthSystemType())) {
+        if (StringUtils.isBlank(authConfigs.getMmqAuthSystemType())) {
             http.csrf().disable().cors()// We don't need CSRF for JWT based authentication
                     .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and().authorizeRequests().requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
@@ -122,7 +122,7 @@ public class MmqAuthConfig extends WebSecurityConfigurerAdapter {
 
             http.addFilterBefore(new JwtAuthenticationTokenFilter(tokenProvider),
                     UsernamePasswordAuthenticationFilter.class);
-        //}
+        }
     }
 
     @Bean
