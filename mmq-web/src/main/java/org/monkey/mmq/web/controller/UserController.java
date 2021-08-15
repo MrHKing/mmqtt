@@ -18,6 +18,7 @@ package org.monkey.mmq.web.controller;
 
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import netscape.javascript.JSObject;
 import org.monkey.mmq.auth.common.ActionTypes;
 import org.monkey.mmq.auth.common.AuthConfigs;
 import org.monkey.mmq.auth.common.AuthSystemTypes;
@@ -132,6 +133,58 @@ public class UserController {
     }
 
     /**
+     * Get user info.
+     *
+     * @return Current login user info
+     */
+    @GetMapping("/info")
+    public Object getUsersInfo() {
+
+        return JacksonUtils.toObj("{\n" +
+                "    \"id\": \"4291d7da9005377ec9aec4a71ea837f\",\n" +
+                "    \"name\": \"天野远子\",\n" +
+                "    \"username\": \"admin\",\n" +
+                "    \"password\": \"\",\n" +
+                "    \"avatar\": \"/avatar2.jpg\",\n" +
+                "    \"status\": 1,\n" +
+                "    \"telephone\": \"\",\n" +
+                "    \"lastLoginIp\": \"27.154.74.117\",\n" +
+                "    \"lastLoginTime\": 1534837621348,\n" +
+                "    \"creatorId\": \"admin\",\n" +
+                "    \"createTime\": 1497160610259,\n" +
+                "    \"merchantCode\": \"TLif2btpzg079h15bk\",\n" +
+                "    \"deleted\": 0,\n" +
+                "    \"roleId\": \"admin\",\n" +
+                "    \"role\": {\n" +
+                "\t\"id\": \"admin\",\n" +
+                "\t\"name\": \"管理员\",\n" +
+                "\t\"describe\": \"拥有所有权限\",\n" +
+                "\t\"status\": 1,\n" +
+                "\t\"creatorId\": \"system\",\n" +
+                "\t\"createTime\": 1497160610259,\n" +
+                "\t\"deleted\": 0,\n" +
+                "\t\"permissions\": [{\n" +
+                "\t\t\"roleId\": \"admin\",\n" +
+                "\t\t\"permissionId\": \"dashboard\",\n" +
+                "\t\t\"permissionName\": \"仪表盘\",\n" +
+                "\t\t\"actions\": \"[]\",\n" +
+                "\t\t\"actionEntitySet\": [],\n" +
+                "\t\t\"actionList\": null,\n" +
+                "\t\t\"dataAccess\": null\n" +
+                "\t}, {\n" +
+                "\t\t\"roleId\": \"admin\",\n" +
+                "\t\t\"permissionId\": \"exception\",\n" +
+                "\t\t\"permissionName\": \"异常页面权限\",\n" +
+                "\t\t\"actions\": \"[]\",\n" +
+                "\t\t\"actionEntitySet\": [],\n" +
+                "\t\t\"actionList\": null,\n" +
+                "\t\t\"dataAccess\": null\n" +
+                "\t}]\n" +
+                "}\n" +
+                "  }");
+    }
+
+    /**
      * Get paged users.
      *
      * @param pageNo   number index of page
@@ -159,8 +212,7 @@ public class UserController {
     public Object login(@RequestParam String username, @RequestParam String password, HttpServletResponse response,
                         HttpServletRequest request) throws AccessException {
 
-        if (AuthSystemTypes.MMQ.name().equalsIgnoreCase(authConfigs.getMmqAuthSystemType()) || AuthSystemTypes.LDAP
-                .name().equalsIgnoreCase(authConfigs.getMmqAuthSystemType())) {
+        if (AuthSystemTypes.MMQ.name().equalsIgnoreCase(authConfigs.getMmqAuthSystemType())) {
             MmqUser user = (MmqUser) authService.login(request);
 
             response.addHeader(MmqAuthConfig.AUTHORIZATION_HEADER, MmqAuthConfig.TOKEN_PREFIX + user.getToken());

@@ -21,8 +21,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.monkey.mmq.core.common.Constants;
 import org.monkey.mmq.web.security.JwtTokenManager;
 import org.monkey.mmq.web.security.MmqAuthConfig;
+import org.monkey.mmq.web.util.BaseContextUtil;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -30,6 +32,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
+
+import static org.monkey.mmq.web.util.BaseContextUtil.USER_NAME;
 
 /**
  * jwt auth token filter.
@@ -55,9 +60,18 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
         if (StringUtils.isNotBlank(jwt) && SecurityContextHolder.getContext().getAuthentication() == null) {
             this.tokenManager.validateToken(jwt);
             Authentication authentication = this.tokenManager.getAuthentication(jwt);
+            User user = (User)authentication.getPrincipal();
+            BaseContextUtil.set(USER_NAME, user.getUsername());
             SecurityContextHolder.getContext().setAuthentication(authentication);
+        } else {
+            // TODO: 鉴权失败
         }
-        chain.doFilter(request, response);
+
+        try {
+            chain.doFilter(request, response);
+        } finally {
+            BaseContextUtil.remove();
+        }
     }
     
     /**

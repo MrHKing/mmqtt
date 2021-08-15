@@ -21,6 +21,7 @@ import org.monkey.mmq.auth.exception.AccessException;
 import org.monkey.mmq.auth.model.Permission;
 import org.monkey.mmq.auth.model.User;
 import org.monkey.mmq.auth.service.IAuthService;
+import org.monkey.mmq.core.env.EnvUtil;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -34,14 +35,30 @@ public class MqttAuthServiceImpl implements IAuthService {
 
 	private RSAPrivateKey privateKey;
 
+	private static final String MMQ_BROKER_DEFAULT_USER = "mmq.broker.default.user";
+	private static final String DEFAULT_MMQ_BROKER_DEFAULT_USER = "admin";
+
+	private static final String MMQ_BROKER_DEFAULT_PASSWORD = "mmq.broker.default.password";
+	private static final String DEFAULT_MMQ_BROKER_DEFAULT_PASSWORD = "admin@mmq";
+
+	public String getUser() {
+		return EnvUtil.getProperty(MMQ_BROKER_DEFAULT_USER, DEFAULT_MMQ_BROKER_DEFAULT_USER);
+	}
+
+	public String getPassword() {
+		return EnvUtil.getProperty(MMQ_BROKER_DEFAULT_PASSWORD, DEFAULT_MMQ_BROKER_DEFAULT_PASSWORD);
+	}
+
 	@Override
 	public boolean checkValid(String username, String password) {
 		if (StrUtil.isBlank(username)) return false;
 		if (StrUtil.isBlank(password)) return false;
+
+		if (this.getUser().equals(username) && this.getPassword().equals(password)) return true;
 //		RSA rsa = new RSA(privateKey, null);
 //		String value = rsa.encryptBcd(username, KeyType.PrivateKey);
 //		return value.equals(password) ? true : false;
-		return true;
+		return false;
 	}
 
 	@Override

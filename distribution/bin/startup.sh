@@ -51,7 +51,7 @@ if [ -z "$JAVA_HOME" ]; then
   fi
 fi
 
-export SERVER="mmq-web-1.0-SNAPSHOT"
+export SERVER="mmq-server"
 export MODE="cluster"
 export FUNCTION_MODE="all"
 export MEMBER_LIST=""
