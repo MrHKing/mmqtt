@@ -26,6 +26,7 @@ import io.netty.util.CharsetUtil;
 import org.monkey.mmq.auth.service.IAuthService;
 import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.exception.KvStorageException;
+import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.core.utils.LoggerUtils;
 import org.monkey.mmq.core.utils.StringUtils;
 import org.monkey.mmq.metadata.message.DupPubRelMessageMateData;
@@ -62,7 +63,7 @@ public class Connect {
 		this.authService = authService;
 	}
 
-	public void processConnect(Channel channel, MqttConnectMessage msg) throws KvStorageException {
+	public void processConnect(Channel channel, MqttConnectMessage msg) throws MmqException {
 		// 消息解码器出现异常
 		if (msg.decoderResult().isFailure()) {
 			Throwable cause = msg.decoderResult().cause();

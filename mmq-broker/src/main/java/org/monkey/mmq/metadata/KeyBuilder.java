@@ -65,4 +65,20 @@ public class KeyBuilder {
     public static String getRetainStoreKey() {
         return UtilsAndCommons.RETAIN_STORE;
     }
+
+    public static boolean matchSystemRunTimeKey(String key) {
+        return key.startsWith(UtilsAndCommons.SYSTEM_RUN_TIME_STORE);
+    }
+
+    public static String getSystemRunTimeStoreKey() {
+        return UtilsAndCommons.SYSTEM_RUN_TIME_STORE;
+    }
+
+    public static boolean matchSessionStoreKey(String key) {
+        return key.startsWith(UtilsAndCommons.SESSION_STORE);
+    }
+
+    public static String getSessionStoreKey() {
+        return UtilsAndCommons.SESSION_STORE;
+    }
 }

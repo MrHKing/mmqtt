@@ -18,24 +18,21 @@ package org.monkey.mmq.service;
 import cn.hutool.core.util.StrUtil;
 import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.exception.MmqException;
-import org.monkey.mmq.core.utils.StringUtils;
-import org.monkey.mmq.metadata.Datum;
 import org.monkey.mmq.metadata.KeyBuilder;
 import org.monkey.mmq.metadata.RecordListener;
 import org.monkey.mmq.metadata.UtilsAndCommons;
 import org.monkey.mmq.metadata.subscribe.SubscribeMateData;
+import org.monkey.mmq.metadata.system.SystemInfoMateData;
 import org.monkey.mmq.persistent.ConsistencyService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 订阅一致性存储
@@ -47,6 +44,9 @@ public class SubscribeStoreService implements RecordListener<SubscribeMateData> 
 
     @Resource(name = "persistentConsistencyServiceDelegate")
     private ConsistencyService consistencyService;
+
+    @Autowired
+    private SystemInfoStoreService systemInfoStoreService;
 
     private Map<String, ConcurrentHashMap<String, SubscribeMateData>> subscribes = new ConcurrentHashMap<>();
 
@@ -167,15 +167,33 @@ public class SubscribeStoreService implements RecordListener<SubscribeMateData> 
             clientConcurrentHashMap.put(key, value);
             subscribes.put(value.getTopicFilter(), clientConcurrentHashMap);
         }
+
+        AtomicInteger subCount = new AtomicInteger();
+        subscribes.forEach((subKey, client) -> {
+            subCount.addAndGet(client.size());
+        });
+        subWildcard.forEach((subKey, client) -> {
+            subCount.addAndGet(client.size());
+        });
+        SystemInfoMateData systemInfoMateData = systemInfoStoreService.getSystemInfo();
+        systemInfoMateData.setSubscribeCount(subCount.get());
+        systemInfoStoreService.put(systemInfoMateData);
     }
 
     @Override
     public void onDelete(String key) throws Exception {
+        AtomicInteger subCount = new AtomicInteger();
         subscribes.forEach((subKey, client) -> {
             client.remove(key);
+            subCount.addAndGet(client.size());
         });
         subWildcard.forEach((subKey, client) -> {
             client.remove(key);
+            subCount.addAndGet(client.size());
         });
+
+        SystemInfoMateData systemInfoMateData = systemInfoStoreService.getSystemInfo();
+        systemInfoMateData.setSubscribeCount(subCount.get());
+        systemInfoStoreService.put(systemInfoMateData);
     }
 }

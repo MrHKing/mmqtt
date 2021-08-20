@@ -21,6 +21,7 @@ import io.netty.handler.codec.mqtt.MqttMessage;
 import io.netty.util.AttributeKey;
 import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.exception.KvStorageException;
+import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.core.utils.LoggerUtils;
 import org.monkey.mmq.metadata.message.SessionMateData;
 import org.monkey.mmq.service.DupPubRelMessageStoreService;
@@ -50,7 +51,7 @@ public class DisConnect {
 		this.dupPubRelMessageStoreService = dupPubRelMessageStoreService;
 	}
 
-	public void processDisConnect(Channel channel, MqttMessage msg) throws KvStorageException {
+	public void processDisConnect(Channel channel, MqttMessage msg) throws MmqException {
 		String clientId = (String) channel.attr(AttributeKey.valueOf("clientId")).get();
 		SessionMateData sessionStore = sessionStoreService.get(clientId);
 

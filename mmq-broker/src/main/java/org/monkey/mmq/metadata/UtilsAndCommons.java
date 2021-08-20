@@ -36,6 +36,10 @@ import java.util.Map;
 public class UtilsAndCommons {
     
     public static final String MMQ_SERVER_CONTEXT = "/mmq";
+
+    public static final String SESSION_STORE = "00-00---000-SESSION_STORE-000---00-00";
+
+    public static final String SYSTEM_RUN_TIME_STORE = "00-00---000-SYSTEM_RUN_TIME_STORE-000---00-00";
     
     public static final String SUBSCRIBE_STORE = "00-00---000-MMQ_SUBSCRIBE_STORE-000---00-00";
 

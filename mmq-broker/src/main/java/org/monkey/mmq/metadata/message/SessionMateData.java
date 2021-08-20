@@ -18,6 +18,7 @@ package org.monkey.mmq.metadata.message;
 
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.MqttPublishMessage;
+import org.monkey.mmq.metadata.Record;
 
 import java.io.Serializable;
 
@@ -25,11 +26,13 @@ import java.io.Serializable;
  * 会话存储元数据
  * @author Solley
  */
-public class SessionMateData implements Serializable {
+public class SessionMateData implements Record, Serializable {
 
 	private static final long serialVersionUID = 5209539791996944490L;
 
 	private String clientId;
+
+	private String user;
 
 	private Channel channel;
 
@@ -78,5 +81,13 @@ public class SessionMateData implements Serializable {
 	public SessionMateData setWillMessage(MqttPublishMessage willMessage) {
 		this.willMessage = willMessage;
 		return this;
+	}
+
+	public String getUser() {
+		return user;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
 	}
 }
