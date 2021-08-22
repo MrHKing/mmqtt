@@ -44,6 +44,8 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.net.InetSocketAddress;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
@@ -70,6 +72,10 @@ public class SessionStoreService implements RecordListener<ClientMateData> {
         } catch (MmqException e) {
             Loggers.BROKER_SERVER.error("listen Session service failed.", e);
         }
+    }
+
+    public Collection<ClientMateData> getClients() {
+        return clientStory.values();
     }
 
     public void put(String clientId, SessionMateData sessionStore) throws MmqException {

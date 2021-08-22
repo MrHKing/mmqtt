@@ -31,6 +31,7 @@ import org.monkey.mmq.core.consistency.model.RestResultUtils;
 import org.monkey.mmq.core.utils.JacksonUtils;
 import org.monkey.mmq.core.utils.Objects;
 import org.monkey.mmq.core.utils.PasswordEncoderUtil;
+import org.monkey.mmq.web.config.NotWrap;
 import org.monkey.mmq.web.security.JwtTokenManager;
 import org.monkey.mmq.web.security.MmqAuthConfig;
 import org.monkey.mmq.web.security.MmqUser;

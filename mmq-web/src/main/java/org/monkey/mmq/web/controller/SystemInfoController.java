@@ -15,12 +15,19 @@
  */
 package org.monkey.mmq.web.controller;
 
+import org.monkey.mmq.metadata.message.ClientMateData;
 import org.monkey.mmq.metadata.system.SystemInfoMateData;
+import org.monkey.mmq.service.SessionStoreService;
 import org.monkey.mmq.service.SystemInfoStoreService;
+import org.monkey.mmq.core.consistency.model.ResponsePage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  * Health Controller.
@@ -34,10 +41,13 @@ public class SystemInfoController {
     @Autowired
     SystemInfoStoreService systemInfoStoreService;
 
+    @Autowired
+    SessionStoreService sessionStoreService;
+
     /**
      * Get system info.
      *
-     * @return Current login user info
+     * @return Current system info
      */
     @GetMapping("/info")
     public Object getSystemInfo() {
@@ -45,5 +55,19 @@ public class SystemInfoController {
         long contextTime = System.currentTimeMillis() - systemInfoMateData.getSystemRunTime();
         systemInfoMateData.setSystemRunTime(contextTime);
         return systemInfoMateData;
+    }
+
+    /**
+     * Get system connect clients.
+     *
+     * @return system connect clients
+     */
+    @GetMapping("/clients")
+    public ResponsePage<ClientMateData> getClients(@RequestParam int pageNo, @RequestParam int pageSize) {
+        Collection<ClientMateData> datas = sessionStoreService.getClients();
+        return new ResponsePage<>(pageSize, pageNo,
+                datas.size() / pageSize,
+                datas.size(),
+                datas.stream().skip(pageNo - 1).limit(pageSize).collect(Collectors.toList()));
     }
 }

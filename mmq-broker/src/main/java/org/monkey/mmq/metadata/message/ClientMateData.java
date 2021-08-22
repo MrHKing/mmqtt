@@ -18,6 +18,7 @@ package org.monkey.mmq.metadata.message;
 import org.monkey.mmq.metadata.Record;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * Health Controller.
@@ -32,12 +33,15 @@ public class ClientMateData implements Record, Serializable {
 
     private String user;
 
+    private Date connectTiem;
+
     private String address;
 
     public ClientMateData(String clientId, String user, String address) {
         this.clientId = clientId;
         this.user = user;
         this.address = address;
+        this.connectTiem = new Date();
     }
 
     public static long getSerialVersionUID() {
@@ -67,4 +71,13 @@ public class ClientMateData implements Record, Serializable {
     public void setAddress(String address) {
         this.address = address;
     }
+
+    public Date getConnectTiem() {
+        return connectTiem;
+    }
+
+    public void setConnectTiem(Date connectTiem) {
+        this.connectTiem = connectTiem;
+    }
+
 }

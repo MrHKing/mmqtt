@@ -5,7 +5,7 @@
   ,-+-. ;   , ||     ,-+-,.' _ | /   /  \-.     Running in ${mmq.mode} mode, ${mmq.function.mode} function modules
  ,--.'|'   |  ;|  ,-+-. ;   , |||   :    :|     Port: ${server.port}
 |   |  ,', |  ': ,--.'|'   |  |||   | .\  .     Pid: ${pid}
-|   | /  | |  |||   |  ,', |  |,.   ; |:  |     Console: http://${mmq.local.ip}:${server.port}/mmq/index.html
+|   | /  | |  |||   |  ,', |  |,.   ; |:  |     Console: http://${mmq.local.ip}:${server.port}/index.html
 '   | :  | :  |,|   | /  | |--' '   .  \  |     MQTT Port: ${mmq.broker.port}
 ;   . |  ; |--' |   : |  | ,     \   `.   |     MQTT WebsocketPort: ${mmq.broker.websocketPort}
 |   : |  | ,    |   : |  |/       `--'""| |     User Home: ${mmq.home}
