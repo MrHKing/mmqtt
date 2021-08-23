@@ -67,7 +67,7 @@
             <a-col :md="8" :sm="24">
               <a-form-item label="节点">
                 <a-select size="large" placeholder="请选择节点" v-model="node">
-                  <a-select-option v-for="item in nodeList" :key="item.ip" :value="item.ip">{{
+                  <a-select-option v-for="item in nodeList" :key="item.address" :value="item.address">{{
                     item.address
                   }}</a-select-option>
                 </a-select>
@@ -107,7 +107,7 @@ export default {
   data () {
     return {
       dateTime: moment(new Date()).format('YYYY-MM-DD'),
-      node: null,
+      node: '',
       nodeList: [],
       SystemInfoMateData: {
         clientCount: 0,

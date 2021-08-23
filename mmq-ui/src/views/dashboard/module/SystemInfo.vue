@@ -90,12 +90,13 @@ export default {
     loadTomcatInfo () {
       this.tableLoading = true
       this.time = moment().format('YYYY年MM月DD日 HH时mm分ss秒')
+      const url = this.nodeUrl ? 'http://' + this.nodeUrl : ''
       Promise.all([
-        getAction('http://' + this.nodeUrl + '/actuator/metrics/system.cpu.count'),
-        getAction('http://' + this.nodeUrl + '/actuator/metrics/system.cpu.usage'),
-        getAction('http://' + this.nodeUrl + '/actuator/metrics/process.start.time'),
-        getAction('http://' + this.nodeUrl + '/actuator/metrics/process.uptime'),
-        getAction('http://' + this.nodeUrl + '/actuator/metrics/process.cpu.usage')
+        getAction(url + '/actuator/metrics/system.cpu.count'),
+        getAction(url + '/actuator/metrics/system.cpu.usage'),
+        getAction(url + '/actuator/metrics/process.start.time'),
+        getAction(url + '/actuator/metrics/process.uptime'),
+        getAction(url + '/actuator/metrics/process.cpu.usage')
       ]).then((res) => {
         const info = []
         res.forEach((value, id) => {

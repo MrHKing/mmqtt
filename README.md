@@ -66,6 +66,12 @@ sh startup.sh
 sh shutdown.sh
 ```
 
+### Dashboard
+启动后访问 http://ip:8888/index.html
+
+默认账户：mmq
+
+默认密码：aaaaaa
 
 ## MQTT 规范
 
