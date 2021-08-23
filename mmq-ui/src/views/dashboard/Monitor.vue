@@ -1,32 +1,17 @@
 <template>
   <page-header-wrapper>
-    <div style="background: #ececec; padding: 30px">
+    <div style="background: #ececec; padding: 10px">
       <a-row :gutter="24">
-        <a-col :span="6">
-          <a-card>
-            <a-statistic
-              title="系统名称"
-              :value="SystemInfoMateData.systemName"
-              :precision="2"
-              :value-style="{ color: '#3f8600' }"
-              style="margin-right: 50px"
-            >
-              <template #prefix>
-                <a-icon type="border-bottom" />
-              </template>
-            </a-statistic>
-          </a-card>
-        </a-col>
         <a-col :span="6">
           <a-card>
             <a-statistic
               title="版本"
               :value="SystemInfoMateData.version"
               class="demo-class"
-              :value-style="{ color: '#3f8600' }"
+              :value-style="{ color: '#3f8600', fontSize: '32px' }"
             >
               <template #prefix>
-                <a-icon type="border-horizontal" />
+                <a-icon type="smile" theme="twoTone" />
               </template>
             </a-statistic>
           </a-card>
@@ -34,70 +19,96 @@
         <a-col :span="6">
           <a-card>
             <a-statistic
-              title="运行时间"
-              :value="SystemInfoMateData.systemRunTime + 'ms'"
+              title="系统时间"
+              :value="dateTime"
               class="demo-class"
-              :value-style="{ color: '#3f8600' }"
+              :value-style="{ color: '#3f8600', fontSize: '28px' }"
             >
               <template #prefix>
-                <a-icon type="border-outer" />
+                <a-icon type="smile" theme="twoTone" />
               </template>
             </a-statistic>
           </a-card>
         </a-col>
         <a-col :span="6">
-          <a-card>
-            <a-statistic title="系统时间" :value="dateTime" class="demo-class" :value-style="{ color: '#3f8600' }">
-              <template #prefix>
-                <a-icon type="border-inner" />
-              </template>
-            </a-statistic>
-          </a-card>
-        </a-col>
-      </a-row>
-      <a-row :gutter="24">
-        <a-col :span="12">
           <a-card>
             <a-statistic
               title="连接数"
               :value="SystemInfoMateData.clientCount"
               class="demo-class"
-              :value-style="{ color: '#3f8600' }"
+              :value-style="{ color: 'hotpink', fontSize: '32px' }"
             >
               <template #prefix>
-                <a-icon type="border-inner" />
+                <a-icon type="smile" theme="twoTone" />
               </template>
             </a-statistic>
           </a-card>
         </a-col>
-        <a-col :span="12">
+        <a-col :span="6">
           <a-card>
             <a-statistic
               title="订阅数"
               :value="SystemInfoMateData.subscribeCount"
               class="demo-class"
-              :value-style="{ color: '#3f8600' }"
+              :value-style="{ color: '#52c41a', fontSize: '32px' }"
             >
               <template #prefix>
-                <a-icon type="border-inner" />
+                <a-icon type="smile" theme="twoTone" />
               </template>
             </a-statistic>
           </a-card>
         </a-col>
       </a-row>
     </div>
+    <a-card style="ma" :bordered="false">
+      <div class="table-page-search-wrapper">
+        <a-form layout="inline">
+          <a-row :gutter="48">
+            <a-col :md="8" :sm="24">
+              <a-form-item label="节点">
+                <a-select size="large" placeholder="请选择节点" v-model="node">
+                  <a-select-option v-for="item in nodeList" :key="item.ip" :value="item.ip">{{
+                    item.address
+                  }}</a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+          </a-row>
+        </a-form>
+      </div>
+      <a-tabs default-active-key="1">
+        <a-tab-pane key="1" tab="基本信息"> <SystemInfo :nodeUrl="node"></SystemInfo> </a-tab-pane>
+        <a-tab-pane key="2" tab="Tomact信息"> <TomcatInfo :nodeUrl="node"></TomcatInfo> </a-tab-pane>
+        <a-tab-pane key="3" tab="JVM信息"> <JvmInfo :nodeUrl="node"></JvmInfo> </a-tab-pane>
+        <a-tab-pane key="4" tab="HTTP追踪">
+          <HttpTrace :nodeUrl="node"></HttpTrace>
+        </a-tab-pane>
+      </a-tabs>
+    </a-card>
   </page-header-wrapper>
 </template>
 
 <script>
 import moment from 'moment'
-import { getSystemInfo } from '@/api/system'
+import { getSystemInfo, getNodes } from '@/api/system'
+import HttpTrace from './module/HttpTrace'
+import JvmInfo from './module/JvmInfo'
+import SystemInfo from './module/SystemInfo'
+import TomcatInfo from './module/TomcatInfo'
 
 export default {
   name: 'Monitor',
+  components: {
+    HttpTrace,
+    JvmInfo,
+    SystemInfo,
+    TomcatInfo
+  },
   data () {
     return {
       dateTime: moment(new Date()).format('YYYY-MM-DD'),
+      node: null,
+      nodeList: [],
       SystemInfoMateData: {
         clientCount: 0,
         systemRunTime: 0,
@@ -115,6 +126,11 @@ export default {
     this.timer = setInterval(() => {
       _this.dateTime = moment(new Date()).format('YYYY-MM-DD HH:mm:ss') // 修改数据date
     }, 1000)
+
+    getNodes().then(res => {
+      this.nodeList = res.data
+      this.node = res.data[0].address
+    })
 
     getSystemInfo().then(res => {
       console.log(res)

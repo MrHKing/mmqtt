@@ -4,7 +4,7 @@ export default {
     'menu.dashboard': '监控',
     'menu.dashboard.monitor': '概述',
     'menu.dashboard.clients': '客户端',
-    'menu.dashboard.topics': 'Topics',
-    'menu.dashboard.subscription': 'Subscription',
+    'menu.dashboard.topics': '主题',
+    'menu.dashboard.subscription': '订阅',
     'menu.ruleEngine': '规则引擎'
 }

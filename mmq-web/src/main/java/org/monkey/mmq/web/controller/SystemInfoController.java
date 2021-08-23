@@ -15,12 +15,16 @@
  */
 package org.monkey.mmq.web.controller;
 
+import org.monkey.mmq.core.cluster.Member;
+import org.monkey.mmq.core.cluster.ServerMemberManager;
+import org.monkey.mmq.core.utils.StringUtils;
 import org.monkey.mmq.metadata.message.ClientMateData;
 import org.monkey.mmq.metadata.system.SystemInfoMateData;
 import org.monkey.mmq.service.SessionStoreService;
 import org.monkey.mmq.service.SystemInfoStoreService;
 import org.monkey.mmq.core.consistency.model.ResponsePage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -44,6 +48,10 @@ public class SystemInfoController {
     @Autowired
     SessionStoreService sessionStoreService;
 
+    @Autowired
+    @Qualifier("serverMemberManager")
+    ServerMemberManager memberManager;
+
     /**
      * Get system info.
      *
@@ -63,11 +71,24 @@ public class SystemInfoController {
      * @return system connect clients
      */
     @GetMapping("/clients")
-    public ResponsePage<ClientMateData> getClients(@RequestParam int pageNo, @RequestParam int pageSize) {
+    public ResponsePage<ClientMateData> getClients(@RequestParam int pageNo, @RequestParam int pageSize,
+                                                   @RequestParam(required = false, defaultValue = "") String clientId,
+                                                   @RequestParam(required = false, defaultValue = "") String address) {
         Collection<ClientMateData> datas = sessionStoreService.getClients();
         return new ResponsePage<>(pageSize, pageNo,
                 datas.size() / pageSize,
                 datas.size(),
-                datas.stream().skip(pageNo - 1).limit(pageSize).collect(Collectors.toList()));
+                datas.stream().filter(x -> x.getClientId().contains(clientId) && x.getAddress().contains(address))
+                        .skip(pageNo - 1).limit(pageSize).collect(Collectors.toList()));
+    }
+
+    /**
+     * Get system nodes.
+     *
+     * @return system connect nodes
+     */
+    @GetMapping("/nodes")
+    public Object getNodes() {
+        return memberManager.getServerList().values();
     }
 }
