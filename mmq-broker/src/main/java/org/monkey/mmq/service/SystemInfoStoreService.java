@@ -36,10 +36,7 @@ import static org.monkey.mmq.metadata.UtilsAndCommons.SYSTEM_RUN_TIME_STORE;
  * @author solley
  */
 @Service
-public class SystemInfoStoreService implements RecordListener<SystemInfoMateData> {
-
-    @Resource(name = "persistentConsistencyServiceDelegate")
-    private ConsistencyService consistencyService;
+public class SystemInfoStoreService {
 
     private SystemInfoMateData systemInfoMateData;
 
@@ -48,13 +45,7 @@ public class SystemInfoStoreService implements RecordListener<SystemInfoMateData
      */
     @PostConstruct
     public void init() {
-        try {
-            systemInfoMateData = new SystemInfoMateData("1.0.0", "MMQ",  System.currentTimeMillis());
-            consistencyService.listen(KeyBuilder.getSystemRunTimeStoreKey(), this);
-            consistencyService.put(SYSTEM_RUN_TIME_STORE, systemInfoMateData);
-        } catch (MmqException e) {
-            Loggers.BROKER_SERVER.error("listen subscribe service failed.", e);
-        }
+        systemInfoMateData = new SystemInfoMateData("1.0.0", "MMQ",  System.currentTimeMillis());
     }
 
     public SystemInfoMateData getSystemInfo() {
@@ -62,30 +53,6 @@ public class SystemInfoStoreService implements RecordListener<SystemInfoMateData
     }
 
     public void put(SystemInfoMateData systemInfoMateData) throws MmqException {
-        consistencyService.put(SYSTEM_RUN_TIME_STORE, systemInfoMateData);
-    }
-
-    public void addClient() {
-
-    }
-
-    @Override
-    public boolean interests(String key) {
-        return KeyBuilder.matchSystemRunTimeKey(key);
-    }
-
-    @Override
-    public boolean matchUnlistenKey(String key) {
-        return KeyBuilder.matchSystemRunTimeKey(key);
-    }
-
-    @Override
-    public void onChange(String key, SystemInfoMateData value) throws Exception {
-        systemInfoMateData = value;
-    }
-
-    @Override
-    public void onDelete(String key) throws Exception {
-        systemInfoMateData = null;
+        this.systemInfoMateData = systemInfoMateData;
     }
 }
