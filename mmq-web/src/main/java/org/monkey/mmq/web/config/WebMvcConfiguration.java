@@ -15,8 +15,12 @@
  */
 package org.monkey.mmq.web.config;
 
+import org.springframework.boot.web.server.ConfigurableWebServerFactory;
+import org.springframework.boot.web.server.ErrorPage;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -46,4 +50,11 @@ public class WebMvcConfiguration {
 		return new CorsFilter(urlBasedCorsConfigurationSource);
 	}
 
+	@Bean
+	public WebServerFactoryCustomizer<ConfigurableWebServerFactory> webServerFactoryCustomizer(){
+		return factory -> {
+			ErrorPage error404Page = new ErrorPage(HttpStatus.NOT_FOUND, "/index.html");
+			factory.addErrorPages(error404Page);
+		};
+	}
 }
