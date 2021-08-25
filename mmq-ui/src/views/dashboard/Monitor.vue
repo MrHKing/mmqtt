@@ -66,7 +66,7 @@
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
               <a-form-item label="节点">
-                <a-select size="large" placeholder="请选择节点" v-model="node">
+                <a-select size="large" placeholder="请选择节点" v-model="node" @change="nodeSelectChange">
                   <a-select-option v-for="item in nodeList" :key="item.address" :value="item.address">{{
                     item.address
                   }}</a-select-option>
@@ -76,12 +76,12 @@
           </a-row>
         </a-form>
       </div>
-      <a-tabs default-active-key="1">
-        <a-tab-pane key="1" tab="基本信息"> <SystemInfo :nodeUrl="node"></SystemInfo> </a-tab-pane>
-        <a-tab-pane key="2" tab="Tomact信息"> <TomcatInfo :nodeUrl="node"></TomcatInfo> </a-tab-pane>
-        <a-tab-pane key="3" tab="JVM信息"> <JvmInfo :nodeUrl="node"></JvmInfo> </a-tab-pane>
+      <a-tabs default-active-key="1" v-model="activeKey">
+        <a-tab-pane key="1" tab="基本信息"> <SystemInfo ref="systemInfo" :nodeUrl="node"></SystemInfo> </a-tab-pane>
+        <a-tab-pane key="2" tab="Tomact信息"> <TomcatInfo ref="tomcatInfo" :nodeUrl="node"></TomcatInfo> </a-tab-pane>
+        <a-tab-pane key="3" tab="JVM信息"> <JvmInfo ref="jvmInfo" :nodeUrl="node"></JvmInfo> </a-tab-pane>
         <a-tab-pane key="4" tab="HTTP追踪">
-          <HttpTrace :nodeUrl="node"></HttpTrace>
+          <HttpTrace ref="httpTrace" :nodeUrl="node"></HttpTrace>
         </a-tab-pane>
       </a-tabs>
     </a-card>
@@ -109,6 +109,7 @@ export default {
       dateTime: moment(new Date()).format('YYYY-MM-DD'),
       node: '',
       nodeList: [],
+      activeKey: '1',
       SystemInfoMateData: {
         clientCount: 0,
         systemRunTime: 0,
@@ -138,7 +139,17 @@ export default {
     })
   },
   methods: {
-
+    nodeSelectChange (node) {
+      if (this.activeKey === '1') {
+        this.$refs.systemInfo.loadTomcatInfo()
+      } else if (this.activeKey === '2') {
+        this.$refs.tomcatInfo.loadTomcatInfo()
+      } else if (this.activeKey === '3') {
+        this.$refs.jvmInfo.loadTomcatInfo()
+      } else {
+        this.$refs.httpTrace.fetch()
+      }
+    }
   }
 }
 </script>

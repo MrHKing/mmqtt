@@ -113,7 +113,7 @@ public class SessionStoreService implements RecordListener<ClientMateData> {
         clientStory.put(key, value);
 
         SystemInfoMateData systemInfoMateData = systemInfoStoreService.getSystemInfo();
-        systemInfoMateData.setClientCount(storage.size());
+        systemInfoMateData.setClientCount(clientStory.size());
         systemInfoStoreService.put(systemInfoMateData);
     }
 
