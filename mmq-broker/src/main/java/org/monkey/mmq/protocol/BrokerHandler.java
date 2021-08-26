@@ -42,7 +42,7 @@ public class BrokerHandler extends SimpleChannelInboundHandler<MqttMessage> {
 	@Override
 	public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
 		//此处对断网进行了处理
-		//protocolProcess.disConnect().processDisConnect(ctx.channel(), null);
+		protocolProcess.disConnect().processDisConnect(ctx.channel(), null);
 	}
 
 	@Override

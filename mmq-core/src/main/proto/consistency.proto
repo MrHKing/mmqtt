@@ -44,6 +44,11 @@ message InternalMessage {
   bool dup = 7;
 }
 
+message RejectClient {
+  string clientId = 1;
+  string address = 2;
+}
+
 message Response {
   bytes data = 1;
   string errMsg = 2;

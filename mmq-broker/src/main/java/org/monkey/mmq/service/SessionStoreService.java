@@ -21,12 +21,15 @@ package org.monkey.mmq.service;
  * @author solley
  */
 
+import io.netty.channel.Channel;
 import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.consistency.SerializeFactory;
 import org.monkey.mmq.core.consistency.Serializer;
+import org.monkey.mmq.core.entity.RejectClient;
 import org.monkey.mmq.core.exception.ErrorCode;
 import org.monkey.mmq.core.exception.KvStorageException;
 import org.monkey.mmq.core.exception.MmqException;
+import org.monkey.mmq.core.notify.NotifyCenter;
 import org.monkey.mmq.core.storage.kv.MemoryKvStorage;
 import org.monkey.mmq.core.utils.ByteUtils;
 import org.monkey.mmq.metadata.KeyBuilder;
@@ -36,6 +39,8 @@ import org.monkey.mmq.metadata.message.ClientMateData;
 import org.monkey.mmq.metadata.message.SessionMateData;
 import org.monkey.mmq.metadata.subscribe.SubscribeMateData;
 import org.monkey.mmq.metadata.system.SystemInfoMateData;
+import org.monkey.mmq.notifier.PublicEventType;
+import org.monkey.mmq.notifier.PublishEvent;
 import org.monkey.mmq.persistent.ConsistencyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -87,6 +92,19 @@ public class SessionStoreService implements RecordListener<ClientMateData> {
 
     public SessionMateData get(String clientId) {
         return storage.get(clientId);
+    }
+
+    public void rejectClient(String clientId) {
+        SessionMateData sessionMateData = this.get(clientId);
+        if (sessionMateData != null) {
+            sessionMateData.getChannel().close();
+        } else {
+            PublishEvent publishEvent = new PublishEvent();
+            publishEvent.setPublicEventType(PublicEventType.REJECT_CLIENT);
+            publishEvent.setRejectClient(RejectClient.newBuilder().setClientId(clientId).build());
+            NotifyCenter.publishEvent(publishEvent);
+        }
+
     }
 
     public boolean containsKey(String clientId) {

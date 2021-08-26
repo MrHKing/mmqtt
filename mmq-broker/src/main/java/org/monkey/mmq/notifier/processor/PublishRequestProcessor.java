@@ -61,9 +61,6 @@ public class PublishRequestProcessor implements RpcProcessor<InternalMessage> {
 
     @Override
     public void handleRequest(RpcContext rpcContext, InternalMessage message) {
-        // 本机发送的消息不处理
-        if (local.getAddress().equals(message.getAddress())) return;
-
         // 处理消息
         this.sendPublishMessage(message.getTopic(), MqttQoS.valueOf(message.getMqttQoS()), message.getMessageBytes().toByteArray(), message.getRetain(), message.getDup());
     }

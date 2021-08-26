@@ -41,6 +41,9 @@ public class MqttAuthServiceImpl implements IAuthService {
 	private static final String MMQ_BROKER_DEFAULT_PASSWORD = "mmq.broker.default.password";
 	private static final String DEFAULT_MMQ_BROKER_DEFAULT_PASSWORD = "admin@mmq";
 
+	private static final String MMQ_BROKER_DEFAULT_ANONYMOUS = "mmq.broker.default.anonymous";
+	private static final String DEFAULT_MMQ_BROKER_DEFAULT_ANONYMOUS = "true";
+
 	public String getUser() {
 		return EnvUtil.getProperty(MMQ_BROKER_DEFAULT_USER, DEFAULT_MMQ_BROKER_DEFAULT_USER);
 	}
@@ -49,8 +52,13 @@ public class MqttAuthServiceImpl implements IAuthService {
 		return EnvUtil.getProperty(MMQ_BROKER_DEFAULT_PASSWORD, DEFAULT_MMQ_BROKER_DEFAULT_PASSWORD);
 	}
 
+	public String getAnonymous() {
+		return EnvUtil.getProperty(MMQ_BROKER_DEFAULT_ANONYMOUS, DEFAULT_MMQ_BROKER_DEFAULT_ANONYMOUS);
+	}
+
 	@Override
 	public boolean checkValid(String username, String password) {
+		if ("true".equals(this.getAnonymous())) return true;
 		if (StrUtil.isBlank(username)) return false;
 		if (StrUtil.isBlank(password)) return false;
 

@@ -52,7 +52,7 @@
 
         <span slot="action" slot-scope="text, record">
           <template>
-            <a @click="handleEdit(record)">踢出</a>
+            <a @click="handleReject(record)">踢出</a>
           </template>
         </span>
       </s-table>
@@ -64,6 +64,7 @@
 import moment from 'moment'
 import { STable, Ellipsis } from '@/components'
 import { getClients } from '@/api/system'
+import { getAction } from '@/api/manage'
 
 const columns = [
   {
@@ -171,6 +172,16 @@ export default {
       this.queryParam = {
         date: moment(new Date())
       }
+    },
+    handleReject (record) {
+      getAction('/v1/system/rejectClient', { clinetId: record.clientId }).then(res => {
+        if (res.code === 200) {
+          this.$message.info('踢出成功！')
+          this.$refs.table.refresh(true)
+        } else {
+          this.$message.info(res.message)
+        }
+      })
     }
   }
 }

@@ -32,6 +32,7 @@ import org.monkey.mmq.core.cluster.ServerMemberManager;
 import org.monkey.mmq.core.common.Constants;
 import org.monkey.mmq.core.entity.InternalMessage;
 import org.monkey.mmq.core.entity.Log;
+import org.monkey.mmq.core.entity.RejectClient;
 import org.monkey.mmq.core.entity.Response;
 import org.monkey.mmq.core.env.EnvUtil;
 import org.monkey.mmq.core.notify.Event;
@@ -39,6 +40,7 @@ import org.monkey.mmq.core.notify.NotifyCenter;
 import org.monkey.mmq.core.notify.listener.Subscriber;
 import org.monkey.mmq.core.utils.InetUtils;
 import org.monkey.mmq.notifier.processor.PublishRequestProcessor;
+import org.monkey.mmq.notifier.processor.RejectClientProcessor;
 import org.monkey.mmq.service.MessageIdService;
 import org.monkey.mmq.service.SessionStoreService;
 import org.monkey.mmq.service.SubscribeStoreService;
@@ -73,16 +75,23 @@ public final class BroadcastManager extends Subscriber<PublishEvent> {
 
         // init rpc
         String localAddress = InetUtils.getSelfIP() + ":" + (this.memberManager.getSelf().getPort() + 10);
+
         GrpcRaftRpcFactory raftRpcFactory = (GrpcRaftRpcFactory) RpcFactoryHelper.rpcFactory();
         raftRpcFactory.registerProtobufSerializer(InternalMessage.class.getName(), InternalMessage.getDefaultInstance());
+        raftRpcFactory.registerProtobufSerializer(RejectClient.class.getName(), RejectClient.getDefaultInstance());
+
         MarshallerRegistry registry = raftRpcFactory.getMarshallerRegistry();
         registry.registerResponseInstance(InternalMessage.class.getName(), Response.getDefaultInstance());
+        registry.registerResponseInstance(RejectClient.class.getName(), Response.getDefaultInstance());
+
         rpcServer = raftRpcFactory.createRpcServer(PeerId.parsePeer(localAddress).getEndpoint());
         rpcServer.registerProcessor(new PublishRequestProcessor(
                 this.memberManager.getSelf(),
                 subscribeStoreService,
                 sessionStoreService,
                 messageIdService));
+        rpcServer.registerProcessor(new RejectClientProcessor(sessionStoreService));
+
         if (!this.rpcServer.init(null)) {
             Loggers.BROKER_NOTIFIER.error("Fail to init [BaseRpcServer].");
             throw new RuntimeException("Fail to init [BaseRpcServer].");
@@ -100,9 +109,21 @@ public final class BroadcastManager extends Subscriber<PublishEvent> {
     public void onEvent(PublishEvent event) {
         this.memberManager.allMembersWithoutSelf().forEach(member -> {
             try {
-                cliClientService.getRpcClient().invokeAsync(PeerId.parsePeer(member.getIp() + ":" + (member.getPort() + 10)).getEndpoint(), event.getInternalMessage(), (result, throwable) -> {
+                    switch (event.getPublicEventType()) {
 
-                }, 5000);
+                        case REJECT_CLIENT:
+                            cliClientService.getRpcClient()
+                                    .invokeAsync(PeerId.parsePeer(member.getIp() + ":" + (member.getPort() + 10)).getEndpoint(),
+                                            event.getRejectClient(), (result, throwable) -> {}, 5000);
+                            break;
+                        case PUBLISH_MESSAGE:
+                        default:
+                            cliClientService.getRpcClient()
+                                    .invokeAsync(PeerId.parsePeer(member.getIp() + ":" + (member.getPort() + 10)).getEndpoint(),
+                                            event.getInternalMessage(), (result, throwable) -> {}, 5000);
+                            break;
+                    }
+
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (RemotingException e) {

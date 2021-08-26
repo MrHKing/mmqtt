@@ -16,6 +16,7 @@
 package org.monkey.mmq.notifier;
 
 import org.monkey.mmq.core.entity.InternalMessage;
+import org.monkey.mmq.core.entity.RejectClient;
 import org.monkey.mmq.core.notify.Event;
 
 /**
@@ -25,7 +26,12 @@ import org.monkey.mmq.core.notify.Event;
  */
 public class PublishEvent extends Event {
 
+    public PublicEventType publicEventType;
+
     public InternalMessage message;
+
+
+    public RejectClient rejectClient;
 
     public InternalMessage getInternalMessage() {
         return message;
@@ -34,4 +40,21 @@ public class PublishEvent extends Event {
     public void setInternalMessage(InternalMessage message) {
         this.message = message;
     }
+
+    public PublicEventType getPublicEventType() {
+        return publicEventType;
+    }
+
+    public void setPublicEventType(PublicEventType publicEventType) {
+        this.publicEventType = publicEventType;
+    }
+
+    public RejectClient getRejectClient() {
+        return rejectClient;
+    }
+
+    public void setRejectClient(RejectClient rejectClient) {
+        this.rejectClient = rejectClient;
+    }
+
 }

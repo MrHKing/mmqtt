@@ -28,6 +28,7 @@ import org.monkey.mmq.core.utils.LoggerUtils;
 import org.monkey.mmq.metadata.message.DupPublishMessageMateData;
 import org.monkey.mmq.metadata.message.RetainMessageMateData;
 import org.monkey.mmq.metadata.subscribe.SubscribeMateData;
+import org.monkey.mmq.notifier.PublicEventType;
 import org.monkey.mmq.notifier.PublishEvent;
 import org.monkey.mmq.service.*;
 
@@ -65,8 +66,11 @@ public class Publish {
 			byte[] messageBytes = new byte[msg.payload().readableBytes()];
 			msg.payload().getBytes(msg.payload().readerIndex(), messageBytes);
 			PublishEvent publishEvent = new PublishEvent();
-			publishEvent.setInternalMessage(InternalMessage.newBuilder().setTopic(msg.variableHeader().topicName())
-					.setMqttQoS(msg.fixedHeader().qosLevel().value()).setMessageBytes(ByteString.copyFrom(messageBytes))
+			publishEvent.setPublicEventType(PublicEventType.PUBLISH_MESSAGE);
+			publishEvent.setInternalMessage(InternalMessage.newBuilder()
+					.setTopic(msg.variableHeader().topicName())
+					.setMqttQoS(msg.fixedHeader().qosLevel().value())
+					.setMessageBytes(ByteString.copyFrom(messageBytes))
 					.setDup(false).setRetain(false).build());
 			NotifyCenter.publishEvent(publishEvent);
 			this.sendPublishMessage(msg.variableHeader().topicName(), msg.fixedHeader().qosLevel(), messageBytes, false, false);
@@ -76,6 +80,7 @@ public class Publish {
 			byte[] messageBytes = new byte[msg.payload().readableBytes()];
 			msg.payload().getBytes(msg.payload().readerIndex(), messageBytes);
 			PublishEvent publishEvent = new PublishEvent();
+			publishEvent.setPublicEventType(PublicEventType.PUBLISH_MESSAGE);
 			publishEvent.setInternalMessage(InternalMessage.newBuilder().setTopic(msg.variableHeader().topicName())
 					.setMqttQoS(msg.fixedHeader().qosLevel().value()).setMessageBytes(ByteString.copyFrom(messageBytes))
 					.setDup(false).setRetain(false).build());
@@ -88,6 +93,7 @@ public class Publish {
 			byte[] messageBytes = new byte[msg.payload().readableBytes()];
 			msg.payload().getBytes(msg.payload().readerIndex(), messageBytes);
 			PublishEvent publishEvent = new PublishEvent();
+			publishEvent.setPublicEventType(PublicEventType.PUBLISH_MESSAGE);
 			publishEvent.setInternalMessage(InternalMessage.newBuilder().setTopic(msg.variableHeader().topicName())
 					.setMqttQoS(msg.fixedHeader().qosLevel().value()).setMessageBytes(ByteString.copyFrom(messageBytes))
 					.setDup(false).setRetain(false).build());
