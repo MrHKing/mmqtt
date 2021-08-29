@@ -24,11 +24,13 @@ import org.monkey.mmq.core.notify.NotifyCenter;
 import org.monkey.mmq.core.utils.StringUtils;
 import org.monkey.mmq.metadata.message.ClientMateData;
 import org.monkey.mmq.metadata.message.SessionMateData;
+import org.monkey.mmq.metadata.subscribe.SubscribeMateData;
 import org.monkey.mmq.metadata.system.SystemInfoMateData;
 import org.monkey.mmq.notifier.BroadcastManager;
 import org.monkey.mmq.notifier.PublicEventType;
 import org.monkey.mmq.notifier.PublishEvent;
 import org.monkey.mmq.service.SessionStoreService;
+import org.monkey.mmq.service.SubscribeStoreService;
 import org.monkey.mmq.service.SystemInfoStoreService;
 import org.monkey.mmq.core.consistency.model.ResponsePage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +42,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -56,6 +59,9 @@ public class SystemInfoController {
 
     @Autowired
     SessionStoreService sessionStoreService;
+
+    @Autowired
+    SubscribeStoreService subscribeStoreService;
 
     @Autowired
     @Qualifier("serverMemberManager")
@@ -88,6 +94,23 @@ public class SystemInfoController {
                 datas.size() / pageSize,
                 datas.size(),
                 datas.stream().filter(x -> x.getClientId().contains(clientId) && x.getAddress().contains(address))
+                        .skip(pageNo - 1).limit(pageSize).collect(Collectors.toList()));
+    }
+
+    /**
+     * Get system connect clients.
+     *
+     * @return system connect clients
+     */
+    @GetMapping("/subscribes")
+    public ResponsePage<SubscribeMateData> getSubscribes(@RequestParam int pageNo, @RequestParam int pageSize,
+                                                   @RequestParam(required = false, defaultValue = "") String clientId,
+                                                   @RequestParam(required = false, defaultValue = "") String topic) {
+        List<SubscribeMateData> subscribes = subscribeStoreService.getSubscribes();
+        return new ResponsePage<>(pageSize, pageNo,
+                subscribes.size() / pageSize,
+                subscribes.size(),
+                subscribes.stream().filter(x -> x.getClientId().contains(clientId) && x.getTopicFilter().contains(topic))
                         .skip(pageNo - 1).limit(pageSize).collect(Collectors.toList()));
     }
 

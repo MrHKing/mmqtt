@@ -3,6 +3,7 @@ import request from '@/utils/request'
 const systemApi = {
     Syteminfo: '/v1/system/info',
     Clients: '/v1/system/clients',
+    Subscribes: '/v1/system/subscribes',
     Nodes: '/v1/system/nodes'
 }
 
@@ -25,5 +26,13 @@ export function getNodes () {
     return request({
         url: systemApi.Nodes,
         method: 'get'
+    })
+}
+
+export function getSubscribes (parameter) {
+    return request({
+        url: systemApi.Subscribes,
+        method: 'get',
+        params: parameter
     })
 }

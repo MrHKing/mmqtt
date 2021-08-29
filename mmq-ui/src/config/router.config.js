@@ -37,12 +37,6 @@ export const asyncRouterMap = [
                         meta: { title: 'menu.dashboard.clients', keepAlive: false, permission: ['dashboard'] }
                     },
                     {
-                        path: '/dashboard/topics',
-                        name: 'topics',
-                        component: () => import('@/views/dashboard/Topics'),
-                        meta: { title: 'menu.dashboard.topics', keepAlive: true, permission: ['dashboard'] }
-                    },
-                    {
                         path: '/dashboard/subscription',
                         name: 'subscription',
                         component: () => import('@/views/dashboard/Subscription'),
@@ -55,16 +49,16 @@ export const asyncRouterMap = [
                 name: 'dashboard',
                 redirect: '/dashboard/workplace',
                 component: RouteView,
-                meta: { title: 'menu.ruleEngine', keepAlive: true, icon: bxAnaalyse, permission: ['dashboard'] },
-                children: [
-                    {
-                        path: '/dashboard/clients/:pageNo([1-9]\\d*)?',
-                        name: 'clients',
-                        component: () => import('@/views/dashboard/Clients'),
-                        meta: { title: 'menu.dashboard.clients', keepAlive: false, permission: ['dashboard'] }
-                    }
+                meta: { title: 'menu.ruleEngine', keepAlive: true, icon: bxAnaalyse, permission: ['dashboard'] }
+                // children: [
+                //     {
+                //         path: '/dashboard/clients/:pageNo([1-9]\\d*)?',
+                //         name: 'clients',
+                //         component: () => import('@/views/dashboard/Clients'),
+                //         meta: { title: 'menu.dashboard.clients', keepAlive: false, permission: ['dashboard'] }
+                //     }
 
-                ]
+                // ]
             }
             // other
             /*

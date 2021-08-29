@@ -75,6 +75,18 @@ public class SubscribeStoreService implements RecordListener<SubscribeMateData> 
         consistencyService.remove(UtilsAndCommons.SUBSCRIBE_STORE + "/" + topicFilter + "/" + clientId);
     }
 
+    public List<SubscribeMateData> getSubscribes() {
+        List<SubscribeMateData> subscribeStores = new ArrayList<SubscribeMateData>();
+        subscribes.forEach((topicFilter, map) -> {
+            subscribeStores.addAll(map.values());
+        });
+
+        subWildcard.forEach((topicFilter, map) -> {
+            subscribeStores.addAll(map.values());
+        });
+        return subscribeStores;
+    }
+
     @Async
     public void deleteForClient(String clientId) {
         try {
