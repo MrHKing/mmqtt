@@ -67,7 +67,7 @@ sh shutdown.sh
 ```
 
 ### Dashboard
-启动后访问 http://ip:8888/index.html
+启动后访问 http://ip:8888/dashboard/monitor
 
 默认账户：mmq
 
