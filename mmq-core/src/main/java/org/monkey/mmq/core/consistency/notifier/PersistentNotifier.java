@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.monkey.mmq.notifier;
+package org.monkey.mmq.core.consistency.notifier;
 
 
 import com.alipay.sofa.jraft.util.concurrent.ConcurrentHashSet;
@@ -22,9 +22,8 @@ import org.monkey.mmq.core.consistency.DataOperation;
 import org.monkey.mmq.core.notify.Event;
 import org.monkey.mmq.core.notify.listener.Subscriber;
 import org.monkey.mmq.core.utils.Loggers;
-import org.monkey.mmq.metadata.KeyBuilder;
-import org.monkey.mmq.metadata.Record;
-import org.monkey.mmq.metadata.RecordListener;
+import org.monkey.mmq.core.consistency.matedata.Record;
+import org.monkey.mmq.core.consistency.matedata.RecordListener;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

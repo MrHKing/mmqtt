@@ -19,12 +19,11 @@ package org.monkey.mmq.service;
 import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.metadata.KeyBuilder;
-import org.monkey.mmq.metadata.RecordListener;
+import org.monkey.mmq.core.consistency.matedata.RecordListener;
 import org.monkey.mmq.metadata.UtilsAndCommons;
 import org.monkey.mmq.metadata.message.DupPublishMessageMateData;
-import org.monkey.mmq.persistent.ConsistencyService;
+import org.monkey.mmq.core.consistency.persistent.ConsistencyService;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -43,7 +42,7 @@ import java.util.stream.Collectors;
 @Service
 public class DupPublishMessageStoreService implements RecordListener<DupPublishMessageMateData> {
 
-    @Resource(name = "persistentConsistencyServiceDelegate")
+    @Resource(name = "mqttPersistentConsistencyServiceDelegate")
     private ConsistencyService consistencyService;
 
     private Map<String, DupPublishMessageMateData> dupPublishMessageStoreMap = new ConcurrentHashMap<>();

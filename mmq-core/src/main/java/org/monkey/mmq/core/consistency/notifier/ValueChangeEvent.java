@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.monkey.mmq.notifier;
+package org.monkey.mmq.core.consistency.notifier;
 
 
 import org.monkey.mmq.core.consistency.DataOperation;
 import org.monkey.mmq.core.notify.Event;
-import org.monkey.mmq.metadata.Record;
+import org.monkey.mmq.core.consistency.matedata.Record;
 
 /**
  * The value changes events. //TODO Recipients need to implement the ability to receive batch events

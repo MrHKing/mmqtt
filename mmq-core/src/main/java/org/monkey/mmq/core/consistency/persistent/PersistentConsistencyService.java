@@ -13,26 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.monkey.mmq.metadata.message;
-
-import org.monkey.mmq.core.consistency.matedata.Record;
-
-import java.io.Serializable;
-import java.util.concurrent.atomic.AtomicInteger;
+package org.monkey.mmq.core.consistency.persistent;
 
 /**
- * 消息ID元数据
+ * A consistency service that guarantee CP consistency for the published data.
+ *
+ * <p>CP consistency is hereby defined as follows:
+ *
+ * <p>Once the writing operation returned client a success, the data within the operation is guaranteed to be
+ * successfully written to the cluster. And the data should be consistent between servers after some time without any
+ * outside interfere.
  *
  * @author solley
  */
-public class MessageIdMateData implements Record, Serializable {
-
-    /**
-     * Counter value
-     */
-    private final AtomicInteger value = new AtomicInteger(0);
-
-    public AtomicInteger getValue() {
-        return value;
-    }
+public interface PersistentConsistencyService extends ConsistencyService {
+    
 }

@@ -40,14 +40,11 @@ import org.monkey.mmq.codec.MqttWebSocketCodec;
 import org.monkey.mmq.config.BrokerProperties;
 import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.utils.LoggerUtils;
-import org.monkey.mmq.metadata.system.SystemInfoMateData;
-import org.monkey.mmq.persistent.ConsistencyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.annotation.Resource;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLEngine;
 import java.io.InputStream;

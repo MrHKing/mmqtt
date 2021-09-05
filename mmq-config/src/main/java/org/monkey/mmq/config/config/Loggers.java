@@ -13,26 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.monkey.mmq.metadata.message;
 
-import org.monkey.mmq.core.consistency.matedata.Record;
+package org.monkey.mmq.config.config;
 
-import java.io.Serializable;
-import java.util.concurrent.atomic.AtomicInteger;
+import ch.qos.logback.classic.Level;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * 消息ID元数据
+ * Loggers for core.
  *
  * @author solley
+ * @since 1.2.0
  */
-public class MessageIdMateData implements Record, Serializable {
+public class Loggers {
 
-    /**
-     * Counter value
-     */
-    private final AtomicInteger value = new AtomicInteger(0);
+    public static final Logger CONFIG_SERVER = LoggerFactory.getLogger("org.monkey.mmq.config");
 
-    public AtomicInteger getValue() {
-        return value;
+    public static void setLogLevel(String logName, String level) {
+        
+        switch (logName) {
+            case "broker-config":
+                ((ch.qos.logback.classic.Logger) CONFIG_SERVER).setLevel(Level.valueOf(level));
+                break;
+            default:
+                break;
+        }
+        
     }
 }

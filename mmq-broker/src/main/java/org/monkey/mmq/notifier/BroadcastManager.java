@@ -15,13 +15,9 @@
  */
 package org.monkey.mmq.notifier;
 
-import com.alipay.sofa.jraft.RaftGroupService;
-import com.alipay.sofa.jraft.RouteTable;
 import com.alipay.sofa.jraft.entity.PeerId;
 import com.alipay.sofa.jraft.error.RemotingException;
 import com.alipay.sofa.jraft.option.CliOptions;
-import com.alipay.sofa.jraft.rpc.InvokeCallback;
-import com.alipay.sofa.jraft.rpc.RaftRpcServerFactory;
 import com.alipay.sofa.jraft.rpc.RpcServer;
 import com.alipay.sofa.jraft.rpc.impl.GrpcRaftRpcFactory;
 import com.alipay.sofa.jraft.rpc.impl.MarshallerRegistry;
@@ -29,12 +25,10 @@ import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl;
 import com.alipay.sofa.jraft.util.RpcFactoryHelper;
 import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.cluster.ServerMemberManager;
-import org.monkey.mmq.core.common.Constants;
+import org.monkey.mmq.core.consistency.notifier.ValueChangeEvent;
 import org.monkey.mmq.core.entity.InternalMessage;
-import org.monkey.mmq.core.entity.Log;
 import org.monkey.mmq.core.entity.RejectClient;
 import org.monkey.mmq.core.entity.Response;
-import org.monkey.mmq.core.env.EnvUtil;
 import org.monkey.mmq.core.notify.Event;
 import org.monkey.mmq.core.notify.NotifyCenter;
 import org.monkey.mmq.core.notify.listener.Subscriber;
@@ -44,10 +38,7 @@ import org.monkey.mmq.notifier.processor.RejectClientProcessor;
 import org.monkey.mmq.service.MessageIdService;
 import org.monkey.mmq.service.SessionStoreService;
 import org.monkey.mmq.service.SubscribeStoreService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
 
 /**
  * 消息广播管理

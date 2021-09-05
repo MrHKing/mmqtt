@@ -13,41 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.monkey.mmq.metadata.message;
+package org.monkey.mmq.config.matedata.resources;
 
 import org.monkey.mmq.core.consistency.matedata.Record;
 
 import java.io.Serializable;
 
 /**
- * PUBREL重发消息存储元数据
- * @author Solley
+ * Health Controller.
+ *
+ * @author solley
  */
-public class DupPubRelMessageMateData implements Record, Serializable {
+public class ResourcesMateData implements Record, Serializable {
+    private static final long serialVersionUID = 1276156087085594264L;
 
-	private static final long serialVersionUID = -4111642532532950980L;
+    private String resourceID;
 
-	private String clientId;
+    private String description;
 
-	private int messageId;
+    public String getResourceID() {
+        return resourceID;
+    }
 
-	public String getClientId() {
-		return clientId;
-	}
+    public void setResourceID(String resourceID) {
+        this.resourceID = resourceID;
+    }
 
-	public DupPubRelMessageMateData setClientId(String clientId) {
-		this.clientId = clientId;
-		return this;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public int getMessageId() {
-		return messageId;
-	}
-
-	public DupPubRelMessageMateData setMessageId(int messageId) {
-		this.messageId = messageId;
-		return this;
-	}
-
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }

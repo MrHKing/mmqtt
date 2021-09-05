@@ -15,20 +15,11 @@
  */
 package org.monkey.mmq.service;
 
-import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.exception.MmqException;
-import org.monkey.mmq.metadata.KeyBuilder;
-import org.monkey.mmq.metadata.RecordListener;
-import org.monkey.mmq.metadata.UtilsAndCommons;
-import org.monkey.mmq.metadata.subscribe.SubscribeMateData;
 import org.monkey.mmq.metadata.system.SystemInfoMateData;
-import org.monkey.mmq.persistent.ConsistencyService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-
-import static org.monkey.mmq.metadata.UtilsAndCommons.SYSTEM_RUN_TIME_STORE;
 
 /**
  * 系统信息

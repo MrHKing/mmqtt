@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package org.monkey.mmq.persistent;
+package org.monkey.mmq.core.consistency.persistent;
 
+import org.monkey.mmq.core.consistency.matedata.Datum;
+import org.monkey.mmq.core.consistency.matedata.Record;
+import org.monkey.mmq.core.consistency.matedata.RecordListener;
 import org.monkey.mmq.core.exception.MmqException;
-import org.monkey.mmq.metadata.Datum;
-import org.monkey.mmq.metadata.Record;
-import org.monkey.mmq.metadata.RecordListener;
+
 
 import java.util.Optional;
 

@@ -14,16 +14,25 @@
  * limitations under the License.
  */
 
-package org.monkey.mmq.metadata;
+package org.monkey.mmq.config.matedata;
 
-import java.io.Serializable;
+
+import org.monkey.mmq.core.env.EnvUtil;
+
+import java.io.File;
 
 /**
- * Record to transfer and store in MMQ cluster.
+ * Naming utils and common values.
  *
  * @author solley
- * @since 1.0.0
  */
-public interface Record extends Serializable {
+@SuppressWarnings("PMD.ThreadPoolCreationle")
+public class UtilsAndCommons {
 
+    public static final String RESOURCES_STORE = "00-00---000-RESOURCES_STORE-000---00-00";
+
+    public static final String CIDR_REGEX = "[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}/[0-9]+";
+
+    public static final String DATA_BASE_DIR =
+            EnvUtil.getMmqHome() + File.separator + "data" + File.separator + "config";
 }

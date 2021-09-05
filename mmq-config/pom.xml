@@ -12,5 +12,10 @@
 
     <artifactId>mmq-config</artifactId>
 
-
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>mmq-core</artifactId>
+        </dependency>
+    </dependencies>
 </project>

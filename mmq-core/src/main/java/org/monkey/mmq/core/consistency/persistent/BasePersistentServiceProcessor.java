@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.monkey.mmq.persistent;
+package org.monkey.mmq.core.consistency.persistent;
 
 import com.google.protobuf.ByteString;
 import org.apache.commons.lang3.reflect.TypeUtils;
@@ -23,6 +23,11 @@ import org.monkey.mmq.core.consistency.DataOperation;
 import org.monkey.mmq.core.consistency.SerializeFactory;
 import org.monkey.mmq.core.consistency.Serializer;
 import org.monkey.mmq.core.consistency.cp.RequestProcessor4CP;
+import org.monkey.mmq.core.consistency.matedata.Datum;
+import org.monkey.mmq.core.consistency.matedata.Record;
+import org.monkey.mmq.core.consistency.matedata.RecordListener;
+import org.monkey.mmq.core.consistency.notifier.PersistentNotifier;
+import org.monkey.mmq.core.consistency.notifier.ValueChangeEvent;
 import org.monkey.mmq.core.consistency.snapshot.SnapshotOperation;
 import org.monkey.mmq.core.entity.ReadRequest;
 import org.monkey.mmq.core.entity.Response;
@@ -34,12 +39,7 @@ import org.monkey.mmq.core.notify.NotifyCenter;
 import org.monkey.mmq.core.storage.kv.KvStorage;
 import org.monkey.mmq.core.utils.ByteUtils;
 import org.monkey.mmq.core.utils.Loggers;
-import org.monkey.mmq.metadata.*;
-import org.monkey.mmq.notifier.PersistentNotifier;
-import org.monkey.mmq.notifier.ValueChangeEvent;
 
-import java.lang.reflect.Type;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -99,13 +99,13 @@ public abstract class BasePersistentServiceProcessor extends RequestProcessor4CP
     
     protected final int queueMaxSize = 16384;
     
-    public BasePersistentServiceProcessor() throws Exception {
-        this.kvStorage = new MqttKvStorage(Paths.get(UtilsAndCommons.DATA_BASE_DIR, "data").toString());
+    public BasePersistentServiceProcessor(String kvStorageBaseDir) throws Exception {
+        this.kvStorage = new MmqKvStorage(kvStorageBaseDir);
         this.serializer = SerializeFactory.getSerializer("Hessian");
         this.notifier = new PersistentNotifier(key -> {
             try {
                 byte[] data = kvStorage.get(ByteUtils.toBytes(key));
-                Datum datum = serializer.deserialize(data, getDatumTypeFromKey(key));
+                Datum datum = serializer.deserialize(data);
                 return null != datum ? datum.value : null;
             } catch (KvStorageException ex) {
                 throw new MmqRuntimeException(ex.getErrCode(), ex.getErrMsg());
@@ -170,7 +170,7 @@ public abstract class BasePersistentServiceProcessor extends RequestProcessor4CP
         final List<byte[]> values = request.getValues();
         for (int i = 0; i < keys.size(); i++) {
             final String key = new String(keys.get(i));
-            final Datum datum = serializer.deserialize(values.get(i), getDatumTypeFromKey(key));
+            final Datum datum = serializer.deserialize(values.get(i));
             final Record value = null != datum ? datum.value : null;
             final ValueChangeEvent event = ValueChangeEvent.builder().key(key).value(value)
                     .action(getDataOperationByOp(op)).build();
@@ -196,7 +196,7 @@ public abstract class BasePersistentServiceProcessor extends RequestProcessor4CP
     
     @Override
     public List<SnapshotOperation> loadSnapshotOperate() {
-            return Collections.singletonList(new MqttSnapshotOperation(this.kvStorage, lock));
+            return Collections.singletonList(new MmqSnapshotOperation(this.kvStorage, lock));
     }
     
     @Override
@@ -205,26 +205,7 @@ public abstract class BasePersistentServiceProcessor extends RequestProcessor4CP
         hasError = true;
         jRaftErrorMsg = error.getMessage();
     }
-    
-    protected Type getDatumTypeFromKey(String key) {
-        return TypeUtils.parameterize(Datum.class, getClassOfRecordFromKey(key));
-    }
-    
-    protected Class<? extends Record> getClassOfRecordFromKey(String key) {
-        if (KeyBuilder.matchRetainKey(key)) {
-            return org.monkey.mmq.metadata.message.RetainMessageMateData.class;
-        } else if (KeyBuilder.matchMessageIdKey(key)) {
-            return org.monkey.mmq.metadata.message.MessageIdMateData.class;
-        } else if (KeyBuilder.matchPubRelKey(key)) {
-            return org.monkey.mmq.metadata.message.DupPubRelMessageMateData.class;
-        } else if (KeyBuilder.matchPublishKey(key)) {
-            return org.monkey.mmq.metadata.message.DupPublishMessageMateData.class;
-        } else if (KeyBuilder.matchSubscribeKey(key)) {
-            return org.monkey.mmq.metadata.subscribe.SubscribeMateData.class;
-        }
-        return Record.class;
-    }
-    
+
     protected void notifierDatumIfAbsent(String key, RecordListener listener) throws MmqException {
         Datum datum = get(key);
         if (null != datum) {

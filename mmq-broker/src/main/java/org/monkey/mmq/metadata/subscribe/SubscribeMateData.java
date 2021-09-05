@@ -4,7 +4,7 @@
 
 package org.monkey.mmq.metadata.subscribe;
 
-import org.monkey.mmq.metadata.Record;
+import org.monkey.mmq.core.consistency.matedata.Record;
 
 import java.io.Serializable;
 

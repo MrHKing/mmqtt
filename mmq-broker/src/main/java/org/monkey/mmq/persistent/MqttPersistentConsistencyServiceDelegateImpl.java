@@ -17,18 +17,20 @@
 package org.monkey.mmq.persistent;
 
 
+import org.monkey.mmq.core.consistency.persistent.BasePersistentServiceProcessor;
+import org.monkey.mmq.core.consistency.persistent.PersistentConsistencyService;
+import org.monkey.mmq.core.consistency.persistent.PersistentServiceProcessor;
+import org.monkey.mmq.core.consistency.persistent.StandalonePersistentServiceProcessor;
 import org.monkey.mmq.core.distributed.ProtocolManager;
 import org.monkey.mmq.core.env.EnvUtil;
 import org.monkey.mmq.core.exception.MmqException;
-import org.monkey.mmq.metadata.Datum;
-import org.monkey.mmq.metadata.Record;
-import org.monkey.mmq.metadata.RecordListener;
+import org.monkey.mmq.core.consistency.matedata.Datum;
+import org.monkey.mmq.core.consistency.matedata.Record;
+import org.monkey.mmq.core.consistency.matedata.RecordListener;
 import org.monkey.mmq.metadata.UtilsAndCommons;
-import org.springframework.context.annotation.Bean;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 /**
@@ -36,14 +38,16 @@ import java.util.Optional;
  *
  * @author solley
  */
-@Component("persistentConsistencyServiceDelegate")
-public class PersistentConsistencyServiceDelegateImpl implements PersistentConsistencyService {
+@Component("mqttPersistentConsistencyServiceDelegate")
+public class MqttPersistentConsistencyServiceDelegateImpl implements PersistentConsistencyService {
 
     private final BasePersistentServiceProcessor persistentConsistencyService;
 
-    public PersistentConsistencyServiceDelegateImpl(ProtocolManager protocolManager)
-            throws Exception {
+    private final String baseDir;
 
+    public MqttPersistentConsistencyServiceDelegateImpl(ProtocolManager protocolManager)
+            throws Exception {
+        this.baseDir = Paths.get(UtilsAndCommons.DATA_BASE_DIR, "data").toString();
         this.persistentConsistencyService = createNewPersistentServiceProcessor(protocolManager);
         init();
     }
@@ -88,8 +92,8 @@ public class PersistentConsistencyServiceDelegateImpl implements PersistentConsi
     
     private BasePersistentServiceProcessor createNewPersistentServiceProcessor(ProtocolManager protocolManager) throws Exception {
         final BasePersistentServiceProcessor processor =
-                EnvUtil.getStandaloneMode() ? new StandalonePersistentServiceProcessor()
-                        : new PersistentServiceProcessor(protocolManager);
+                EnvUtil.getStandaloneMode() ? new StandalonePersistentServiceProcessor(this.baseDir)
+                        : new PersistentServiceProcessor(protocolManager, this.baseDir);
         processor.afterConstruct();
         return processor;
     }

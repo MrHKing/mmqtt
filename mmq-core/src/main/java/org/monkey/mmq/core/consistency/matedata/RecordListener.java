@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package org.monkey.mmq.metadata;
-
-import org.monkey.mmq.metadata.Record;
+package org.monkey.mmq.core.consistency.matedata;
 
 /**
  * Data listener public interface.

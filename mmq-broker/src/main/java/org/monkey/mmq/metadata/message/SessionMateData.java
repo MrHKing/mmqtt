@@ -18,7 +18,7 @@ package org.monkey.mmq.metadata.message;
 
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.MqttPublishMessage;
-import org.monkey.mmq.metadata.Record;
+import org.monkey.mmq.core.consistency.matedata.Record;
 
 import java.io.Serializable;
 

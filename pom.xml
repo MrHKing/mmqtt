@@ -308,7 +308,6 @@
         <module>mmq-broker</module>
         <module>mmq-auth</module>
         <module>mmq-device</module>
-        <module>mmq-bridge</module>
         <module>mmq-rule-engine</module>
         <module>mmq-config</module>
         <module>mmq-api</module>
@@ -362,11 +361,6 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>mmq-rule-engine</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>mmq-bridge</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

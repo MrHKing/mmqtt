@@ -13,19 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.monkey.mmq.persistent;
+
+package org.monkey.mmq.config.matedata;
 
 /**
- * A consistency service that guarantee CP consistency for the published data.
- *
- * <p>CP consistency is hereby defined as follows:
- *
- * <p>Once the writing operation returned client a success, the data within the operation is guaranteed to be
- * successfully written to the cluster. And the data should be consistent between servers after some time without any
- * outside interfere.
+ * Key operations for data.
  *
  * @author solley
+ * @since 1.0.0
  */
-public interface PersistentConsistencyService extends ConsistencyService {
-    
+public class KeyBuilder {
+
+    public static boolean matchResourcesKey(String key) {
+        return key.startsWith(UtilsAndCommons.RESOURCES_STORE);
+    }
+
+    public static String getResourcesKey() {
+        return UtilsAndCommons.RESOURCES_STORE;
+    }
 }

@@ -20,17 +20,14 @@ package org.monkey.mmq.service;
 import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.metadata.KeyBuilder;
-import org.monkey.mmq.metadata.RecordListener;
+import org.monkey.mmq.core.consistency.matedata.RecordListener;
 import org.monkey.mmq.metadata.UtilsAndCommons;
-import org.monkey.mmq.metadata.message.DupPubRelMessageMateData;
 import org.monkey.mmq.metadata.message.MessageIdMateData;
-import org.monkey.mmq.persistent.ConsistencyService;
+import org.monkey.mmq.core.consistency.persistent.ConsistencyService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 消息ID生成
@@ -46,7 +43,7 @@ public class MessageIdService implements RecordListener<MessageIdMateData> {
 
 	MessageIdMateData messageIdMateData = new MessageIdMateData();
 
-	@Resource(name = "persistentConsistencyServiceDelegate")
+	@Resource(name = "mqttPersistentConsistencyServiceDelegate")
 	private ConsistencyService consistencyService;
 
 	private int nextMsgId = MIN_MSG_ID - 1;

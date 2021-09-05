@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.monkey.mmq.persistent;
+package org.monkey.mmq.core.consistency.persistent;
 
 import com.alipay.sofa.jraft.util.CRC64;
 import org.monkey.mmq.core.consistency.snapshot.AbstractSnapshotOperation;
@@ -35,11 +35,11 @@ import java.util.zip.Checksum;
  *
  * @author solley
  */
-public class MqttSnapshotOperation extends AbstractSnapshotOperation {
+public class MmqSnapshotOperation extends AbstractSnapshotOperation {
 
-    private static final String NAMING_SNAPSHOT_SAVE = MqttSnapshotOperation.class.getSimpleName() + ".SAVE";
+    private static final String NAMING_SNAPSHOT_SAVE = MmqSnapshotOperation.class.getSimpleName() + ".SAVE";
 
-    private static final String NAMING_SNAPSHOT_LOAD = MqttSnapshotOperation.class.getSimpleName() + ".LOAD";
+    private static final String NAMING_SNAPSHOT_LOAD = MmqSnapshotOperation.class.getSimpleName() + ".LOAD";
 
     private final String snapshotDir = "naming_persistent";
 
@@ -47,7 +47,7 @@ public class MqttSnapshotOperation extends AbstractSnapshotOperation {
 
     private final KvStorage storage;
 
-    public MqttSnapshotOperation(KvStorage storage, ReentrantReadWriteLock lock) {
+    public MmqSnapshotOperation(KvStorage storage, ReentrantReadWriteLock lock) {
         super(lock);
         this.storage = storage;
     }

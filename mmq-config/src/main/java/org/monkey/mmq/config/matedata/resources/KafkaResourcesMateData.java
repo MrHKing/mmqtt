@@ -13,26 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.monkey.mmq.metadata.message;
-
-import org.monkey.mmq.core.consistency.matedata.Record;
-
-import java.io.Serializable;
-import java.util.concurrent.atomic.AtomicInteger;
+package org.monkey.mmq.config.matedata.resources;
 
 /**
- * 消息ID元数据
+ * Health Controller.
  *
  * @author solley
  */
-public class MessageIdMateData implements Record, Serializable {
+public class KafkaResourcesMateData extends ResourcesMateData {
 
-    /**
-     * Counter value
-     */
-    private final AtomicInteger value = new AtomicInteger(0);
 
-    public AtomicInteger getValue() {
-        return value;
-    }
 }

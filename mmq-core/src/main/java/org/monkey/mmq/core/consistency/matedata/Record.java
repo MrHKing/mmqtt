@@ -13,26 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.monkey.mmq.metadata.message;
 
-import org.monkey.mmq.core.consistency.matedata.Record;
+package org.monkey.mmq.core.consistency.matedata;
 
 import java.io.Serializable;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 消息ID元数据
+ * Record to transfer and store in MMQ cluster.
  *
  * @author solley
+ * @since 1.0.0
  */
-public class MessageIdMateData implements Record, Serializable {
+public interface Record extends Serializable {
 
-    /**
-     * Counter value
-     */
-    private final AtomicInteger value = new AtomicInteger(0);
-
-    public AtomicInteger getValue() {
-        return value;
-    }
 }

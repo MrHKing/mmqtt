@@ -21,43 +21,33 @@ package org.monkey.mmq.service;
  * @author solley
  */
 
-import io.netty.channel.Channel;
 import org.monkey.mmq.config.Loggers;
-import org.monkey.mmq.core.consistency.SerializeFactory;
-import org.monkey.mmq.core.consistency.Serializer;
 import org.monkey.mmq.core.entity.RejectClient;
-import org.monkey.mmq.core.exception.ErrorCode;
-import org.monkey.mmq.core.exception.KvStorageException;
 import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.core.notify.NotifyCenter;
-import org.monkey.mmq.core.storage.kv.MemoryKvStorage;
-import org.monkey.mmq.core.utils.ByteUtils;
 import org.monkey.mmq.metadata.KeyBuilder;
-import org.monkey.mmq.metadata.RecordListener;
+import org.monkey.mmq.core.consistency.matedata.RecordListener;
 import org.monkey.mmq.metadata.UtilsAndCommons;
 import org.monkey.mmq.metadata.message.ClientMateData;
 import org.monkey.mmq.metadata.message.SessionMateData;
-import org.monkey.mmq.metadata.subscribe.SubscribeMateData;
 import org.monkey.mmq.metadata.system.SystemInfoMateData;
 import org.monkey.mmq.notifier.PublicEventType;
 import org.monkey.mmq.notifier.PublishEvent;
-import org.monkey.mmq.persistent.ConsistencyService;
+import org.monkey.mmq.core.consistency.persistent.ConsistencyService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.net.InetSocketAddress;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 @Service
 public class SessionStoreService implements RecordListener<ClientMateData> {
 
-    @Resource(name = "persistentConsistencyServiceDelegate")
+    @Resource(name = "mqttPersistentConsistencyServiceDelegate")
     private ConsistencyService consistencyService;
 
     @Autowired

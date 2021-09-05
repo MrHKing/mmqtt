@@ -14,37 +14,79 @@
  * limitations under the License.
  */
 
-package org.monkey.mmq.persistent;
+package org.monkey.mmq.core.consistency.persistent;
 
 
 import com.google.protobuf.ByteString;
 import org.monkey.mmq.core.common.Constants;
+import org.monkey.mmq.core.consistency.ProtocolMetaData;
+import org.monkey.mmq.core.consistency.cp.CPProtocol;
+import org.monkey.mmq.core.consistency.cp.MetadataKey;
+import org.monkey.mmq.core.consistency.matedata.Datum;
+import org.monkey.mmq.core.consistency.matedata.Record;
+import org.monkey.mmq.core.consistency.matedata.RecordListener;
+import org.monkey.mmq.core.distributed.ProtocolManager;
 import org.monkey.mmq.core.entity.ReadRequest;
 import org.monkey.mmq.core.entity.Response;
 import org.monkey.mmq.core.entity.WriteRequest;
 import org.monkey.mmq.core.exception.ErrorCode;
 import org.monkey.mmq.core.exception.MmqException;
-import org.monkey.mmq.core.notify.NotifyCenter;
 import org.monkey.mmq.core.utils.ByteUtils;
-import org.monkey.mmq.metadata.Datum;
-import org.monkey.mmq.metadata.Record;
-import org.monkey.mmq.metadata.RecordListener;
+import org.monkey.mmq.core.utils.Loggers;
+import org.monkey.mmq.core.utils.StringUtils;
 
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
- * Persistent service manipulation layer in stand-alone mode.
+ * In cluster mode, start the Raft protocol.
  *
  * @author solley
  */
 @SuppressWarnings("PMD.ServiceOrDaoClassShouldEndWithImplRule")
-public class StandalonePersistentServiceProcessor extends BasePersistentServiceProcessor {
+public class PersistentServiceProcessor extends BasePersistentServiceProcessor {
     
-    public StandalonePersistentServiceProcessor() throws Exception {
+    private final CPProtocol protocol;
+    
+    /**
+     * Is there a leader node currently.
+     */
+    private volatile boolean hasLeader = false;
+    
+    public PersistentServiceProcessor(ProtocolManager protocolManager, String kvStorageBaseDir)
+            throws Exception {
+        super(kvStorageBaseDir);
+        this.protocol = protocolManager.getCpProtocol();
+    }
+    
+    @Override
+    public void afterConstruct() {
         super.afterConstruct();
-
+        String raftGroup = Constants.MQTT_PERSISTENT_SERVICE_GROUP;
+        this.protocol.protocolMetaData().subscribe(raftGroup, MetadataKey.LEADER_META_DATA, o -> {
+            if (!(o instanceof ProtocolMetaData.ValueItem)) {
+                return;
+            }
+            Object leader = ((ProtocolMetaData.ValueItem) o).getData();
+            hasLeader = StringUtils.isNotBlank(String.valueOf(leader));
+            Loggers.RAFT.info("Raft group {} has leader {}", raftGroup, leader);
+        });
+        this.protocol.addRequestProcessors(Collections.singletonList(this));
+        waitLeader();
+    }
+    
+    private void waitLeader() {
+        while (!hasLeader && !hasError) {
+            Loggers.RAFT.info("Waiting Jraft leader vote ...");
+            try {
+                TimeUnit.MILLISECONDS.sleep(500);
+            } catch (InterruptedException ignored) {
+            }
+        }
     }
     
     @Override
@@ -55,12 +97,12 @@ public class StandalonePersistentServiceProcessor extends BasePersistentServiceP
         final WriteRequest request = WriteRequest.newBuilder().setData(ByteString.copyFrom(serializer.serialize(req)))
                 .setGroup(Constants.MQTT_PERSISTENT_SERVICE_GROUP).setOperation(Op.Write.desc).build();
         try {
-            onApply(request);
+            protocol.write(request);
         } catch (Exception e) {
             throw new MmqException(ErrorCode.ProtoSubmitError.getCode(), e.getMessage());
         }
     }
-    
+
     @Override
     public void remove(String key) throws MmqException {
         final BatchWriteRequest req = new BatchWriteRequest();
@@ -68,7 +110,7 @@ public class StandalonePersistentServiceProcessor extends BasePersistentServiceP
         final WriteRequest request = WriteRequest.newBuilder().setData(ByteString.copyFrom(serializer.serialize(req)))
                 .setGroup(Constants.MQTT_PERSISTENT_SERVICE_GROUP).setOperation(Op.Delete.desc).build();
         try {
-            onApply(request);
+            protocol.write(request);
         } catch (Exception e) {
             throw new MmqException(ErrorCode.ProtoSubmitError.getCode(), e.getMessage());
         }
@@ -76,16 +118,17 @@ public class StandalonePersistentServiceProcessor extends BasePersistentServiceP
     
     @Override
     public Datum get(String key) throws MmqException {
-        final List<byte[]> keys = Collections.singletonList(ByteUtils.toBytes(key));
+        final List<byte[]> keys = new ArrayList<>(1);
+        keys.add(ByteUtils.toBytes(key));
         final ReadRequest req = ReadRequest.newBuilder().setGroup(Constants.MQTT_PERSISTENT_SERVICE_GROUP)
                 .setData(ByteString.copyFrom(serializer.serialize(keys))).build();
         try {
-            final Response resp = onRequest(req);
+            Response resp = protocol.getData(req);
             if (resp.getSuccess()) {
                 BatchReadResponse response = serializer
                         .deserialize(resp.getData().toByteArray(), BatchReadResponse.class);
                 final List<byte[]> rValues = response.getValues();
-                return rValues.isEmpty() ? null : serializer.deserialize(rValues.get(0), getDatumTypeFromKey(key));
+                return rValues.isEmpty() ? null : serializer.deserialize(rValues.get(0));
             }
             throw new MmqException(ErrorCode.ProtoReadError.getCode(), resp.getErrMsg());
         } catch (Throwable e) {
@@ -106,16 +149,20 @@ public class StandalonePersistentServiceProcessor extends BasePersistentServiceP
     
     @Override
     public boolean isAvailable() {
-        return !hasError;
+        return hasLeader && !hasError;
     }
     
     @Override
     public Optional<String> getErrorMsg() {
         String errorMsg;
-        if (hasError) {
+        if (hasLeader && hasError) {
             errorMsg = "The raft peer is in error: " + jRaftErrorMsg;
-        } else {
+        } else if (hasLeader && !hasError) {
             errorMsg = null;
+        } else if (!hasLeader && hasError) {
+            errorMsg = "Could not find leader! And the raft peer is in error: " + jRaftErrorMsg;
+        } else {
+            errorMsg = "Could not find leader!";
         }
         return Optional.ofNullable(errorMsg);
     }

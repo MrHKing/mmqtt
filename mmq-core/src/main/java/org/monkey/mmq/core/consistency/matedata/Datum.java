@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.monkey.mmq.metadata;
+package org.monkey.mmq.core.consistency.matedata;
 
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicLong;

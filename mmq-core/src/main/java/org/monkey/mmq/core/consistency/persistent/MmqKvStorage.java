@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.monkey.mmq.persistent;
+package org.monkey.mmq.core.consistency.persistent;
 
 import org.monkey.mmq.core.exception.ErrorCode;
 import org.monkey.mmq.core.exception.KvStorageException;
@@ -26,7 +26,6 @@ import org.monkey.mmq.core.storage.kv.MemoryKvStorage;
 import org.monkey.mmq.core.utils.Loggers;
 import org.monkey.mmq.core.utils.StringUtils;
 import org.monkey.mmq.core.utils.TimerContext;
-import org.monkey.mmq.metadata.KeyBuilder;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -39,9 +38,9 @@ import java.util.function.Function;
  *
  * @author solley
  */
-public class MqttKvStorage extends MemoryKvStorage {
+public class MmqKvStorage extends MemoryKvStorage {
 
-    private static final String LOAD_SNAPSHOT = MqttKvStorage.class.getSimpleName() + ".snapshotLoad";
+    private static final String LOAD_SNAPSHOT = MmqKvStorage.class.getSimpleName() + ".snapshotLoad";
 
     private static final String LABEL = "mqtt-persistent";
 
@@ -51,7 +50,7 @@ public class MqttKvStorage extends MemoryKvStorage {
 
     private final Map<String, KvStorage> mqttKvStorage;
 
-    public MqttKvStorage(final String baseDir) throws Exception {
+    public MmqKvStorage(final String baseDir) throws Exception {
         this.baseDir = baseDir;
         this.baseDirStorage = StorageFactory.createKvStorage(KvStorage.KvType.File, LABEL, baseDir);
         this.mqttKvStorage = new ConcurrentHashMap<>(16);

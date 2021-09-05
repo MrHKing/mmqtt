@@ -13,26 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.monkey.mmq.metadata.message;
+package org.monkey.mmq.config;
 
-import org.monkey.mmq.core.consistency.matedata.Record;
-
-import java.io.Serializable;
-import java.util.concurrent.atomic.AtomicInteger;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.ServletComponentScan;
 
 /**
- * 消息ID元数据
+ * Health Controller.
  *
  * @author solley
  */
-public class MessageIdMateData implements Record, Serializable {
-
-    /**
-     * Counter value
-     */
-    private final AtomicInteger value = new AtomicInteger(0);
-
-    public AtomicInteger getValue() {
-        return value;
+@SpringBootApplication(scanBasePackages = "org.monkey.mmq.config")
+@ServletComponentScan
+public class Config {
+    public static void main(String[] args) {
+        SpringApplication.run(Config.class, args);
     }
 }

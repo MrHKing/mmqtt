@@ -19,11 +19,11 @@ import cn.hutool.core.util.StrUtil;
 import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.metadata.KeyBuilder;
-import org.monkey.mmq.metadata.RecordListener;
+import org.monkey.mmq.core.consistency.matedata.RecordListener;
 import org.monkey.mmq.metadata.UtilsAndCommons;
 import org.monkey.mmq.metadata.subscribe.SubscribeMateData;
 import org.monkey.mmq.metadata.system.SystemInfoMateData;
-import org.monkey.mmq.persistent.ConsistencyService;
+import org.monkey.mmq.core.consistency.persistent.ConsistencyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -42,7 +42,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Service
 public class SubscribeStoreService implements RecordListener<SubscribeMateData> {
 
-    @Resource(name = "persistentConsistencyServiceDelegate")
+    @Resource(name = "mqttPersistentConsistencyServiceDelegate")
     private ConsistencyService consistencyService;
 
     @Autowired

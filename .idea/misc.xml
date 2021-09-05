@@ -12,6 +12,7 @@
     </option>
     <option name="ignoredFiles">
       <set>
+        <option value="$PROJECT_DIR$/mmq-bridge/pom.xml" />
         <option value="$PROJECT_DIR$/mmq-consistency/pom.xml" />
       </set>
     </option>
