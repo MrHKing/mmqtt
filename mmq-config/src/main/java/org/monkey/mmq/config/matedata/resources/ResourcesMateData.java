@@ -15,21 +15,43 @@
  */
 package org.monkey.mmq.config.matedata.resources;
 
+import org.monkey.mmq.config.matedata.ResourceEnum;
 import org.monkey.mmq.core.consistency.matedata.Record;
 
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * Health Controller.
  *
  * @author solley
  */
-public class ResourcesMateData implements Record, Serializable {
+public class ResourcesMateData<T> implements Record, Serializable {
     private static final long serialVersionUID = 1276156087085594264L;
 
     private String resourceID;
 
     private String description;
+
+    private ResourceEnum type;
+
+    private Map<String, Object> resource;
+
+    public ResourceEnum getType() {
+        return type;
+    }
+
+    public void setType(ResourceEnum type) {
+        this.type = type;
+    }
+
+    public Map<String, Object> getResource() {
+        return resource;
+    }
+
+    public void setResource(Map<String, Object> resource) {
+        this.resource = resource;
+    }
 
     public String getResourceID() {
         return resourceID;

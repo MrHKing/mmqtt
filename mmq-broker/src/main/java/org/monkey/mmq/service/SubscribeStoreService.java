@@ -65,14 +65,14 @@ public class SubscribeStoreService implements RecordListener<SubscribeMateData> 
     }
 
     public void put(String topicFilter, SubscribeMateData subscribeStore) throws MmqException {
-        String key = UtilsAndCommons.SUBSCRIBE_STORE + "/" + topicFilter + "/" + subscribeStore.getClientId();
+        String key = UtilsAndCommons.SUBSCRIBE_STORE + topicFilter + subscribeStore.getClientId();
         subscribeStore.setKey(key);
         consistencyService.put(key, subscribeStore);
     }
 
     @Async
     public void delete(String topicFilter, String clientId) throws MmqException {
-        consistencyService.remove(UtilsAndCommons.SUBSCRIBE_STORE + "/" + topicFilter + "/" + clientId);
+        consistencyService.remove(UtilsAndCommons.SUBSCRIBE_STORE + topicFilter + clientId);
     }
 
     public List<SubscribeMateData> getSubscribes() {

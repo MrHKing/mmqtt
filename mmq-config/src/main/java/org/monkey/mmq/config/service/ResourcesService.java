@@ -17,22 +17,28 @@ package org.monkey.mmq.config.service;
 
 import org.monkey.mmq.config.config.Loggers;
 import org.monkey.mmq.config.matedata.KeyBuilder;
+import org.monkey.mmq.config.matedata.UtilsAndCommons;
 import org.monkey.mmq.config.matedata.resources.ResourcesMateData;
 import org.monkey.mmq.core.consistency.matedata.RecordListener;
 import org.monkey.mmq.core.consistency.persistent.ConsistencyService;
+import org.monkey.mmq.core.env.EnvUtil;
 import org.monkey.mmq.core.exception.MmqException;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Health Controller.
+ * Resources Service
  *
  * @author solley
  */
+@Service
 public class ResourcesService implements RecordListener<ResourcesMateData> {
 
-
+    Map<String, ResourcesMateData> resourcesMateDataMap = new HashMap<>();
 
     @Resource(name = "configPersistentConsistencyServiceDelegate")
     private ConsistencyService consistencyService;
@@ -49,6 +55,30 @@ public class ResourcesService implements RecordListener<ResourcesMateData> {
         }
     }
 
+    public void save(String resourceID, ResourcesMateData resourcesMateData) {
+        try {
+            consistencyService.put(UtilsAndCommons.RESOURCES_STORE + resourceID, resourcesMateData);
+        } catch (MmqException e) {
+            Loggers.CONFIG_SERVER.error("save resources failed.", e);
+        }
+    }
+
+    public void delete(String resourceID) {
+        try {
+            consistencyService.remove(UtilsAndCommons.RESOURCES_STORE + resourceID);
+        } catch (MmqException e) {
+            Loggers.CONFIG_SERVER.error("delete resources failed.", e);
+        }
+    }
+
+    public Map<String, ResourcesMateData> getAllResources() {
+        return resourcesMateDataMap;
+    }
+
+    public ResourcesMateData getResourcesByResourceID(String resourceID) {
+        return resourcesMateDataMap.get(resourceID);
+    }
+
     @Override
     public boolean interests(String key) {
         return KeyBuilder.matchResourcesKey(key);
@@ -61,11 +91,11 @@ public class ResourcesService implements RecordListener<ResourcesMateData> {
 
     @Override
     public void onChange(String key, ResourcesMateData value) throws Exception {
-
+        resourcesMateDataMap.put(key, value);
     }
 
     @Override
     public void onDelete(String key) throws Exception {
-
+        resourcesMateDataMap.remove(key);
     }
 }

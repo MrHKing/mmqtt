@@ -1,6 +1,7 @@
 package org.monkey.mmq.web.config;
 
 import com.google.common.collect.Lists;
+import org.monkey.mmq.core.consistency.model.RestResult;
 import org.monkey.mmq.core.consistency.model.RestResultUtils;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
@@ -62,7 +63,7 @@ public class ReturnAdviceHandler implements ResponseBodyAdvice<Object> {
 			return mv;
 		}
 
-		if (RestResultUtils.class.isInstance(body)) {
+		if (RestResult.class.isInstance(body)) {
 			return body;
 		}
 

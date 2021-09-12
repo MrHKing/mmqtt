@@ -16,6 +16,7 @@
 
 package org.monkey.mmq.core.consistency.persistent;
 
+import com.google.common.collect.Lists;
 import org.monkey.mmq.core.exception.ErrorCode;
 import org.monkey.mmq.core.exception.KvStorageException;
 import org.monkey.mmq.core.exception.MmqException;
@@ -184,8 +185,17 @@ public class MmqKvStorage extends MemoryKvStorage {
     }
     
     @Override
-    public List<byte[]> allKeys() throws KvStorageException {
-        return super.allKeys();
+    public List<byte[]> allKeys() {
+        try {
+            if (super.allKeys().size() > 0) {
+                return super.allKeys();
+            }
+
+            KvStorage storage = createActualStorageIfAbsent(org.apache.commons.lang3.StringUtils.EMPTY);
+            return storage.allKeys();
+        } catch (Exception e) {
+            throw new MmqRuntimeException(MmqException.SERVER_ERROR, e);
+        }
     }
     
     @Override
@@ -200,8 +210,6 @@ public class MmqKvStorage extends MemoryKvStorage {
     
     private KvStorage createActualStorageIfAbsent(byte[] key) throws Exception {
         String keyString = new String(key);
-        //String namespace = KeyBuilder.getNamespace(keyString);
-        String mqtt = org.apache.commons.lang3.StringUtils.EMPTY;
         return createActualStorageIfAbsent(org.apache.commons.lang3.StringUtils.EMPTY);
     }
     

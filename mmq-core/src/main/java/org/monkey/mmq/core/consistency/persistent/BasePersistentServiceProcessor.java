@@ -40,11 +40,13 @@ import org.monkey.mmq.core.storage.kv.KvStorage;
 import org.monkey.mmq.core.utils.ByteUtils;
 import org.monkey.mmq.core.utils.Loggers;
 
+import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Function;
 
 /**
  * New service data persistence handler.
@@ -80,6 +82,8 @@ public abstract class BasePersistentServiceProcessor extends RequestProcessor4CP
     protected final KvStorage kvStorage;
     
     protected final Serializer serializer;
+
+    private final String raftGroup;
     
     /**
      * Whether an unrecoverable error occurred.
@@ -94,18 +98,22 @@ public abstract class BasePersistentServiceProcessor extends RequestProcessor4CP
     protected final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     
     protected final ReentrantReadWriteLock.ReadLock readLock = lock.readLock();
+
+    private Function<String, Class<? extends Record>> getClassOfRecordFromKey;
     
     protected final PersistentNotifier notifier;
     
     protected final int queueMaxSize = 16384;
     
-    public BasePersistentServiceProcessor(String kvStorageBaseDir) throws Exception {
+    public BasePersistentServiceProcessor(String kvStorageBaseDir, String raftGroup, Function<String, Class<? extends Record>> getClassOfRecordFromKey) throws Exception {
         this.kvStorage = new MmqKvStorage(kvStorageBaseDir);
-        this.serializer = SerializeFactory.getSerializer("Hessian");
+        this.raftGroup = raftGroup;
+        this.serializer = SerializeFactory.getSerializer("JSON");
+        this.getClassOfRecordFromKey = getClassOfRecordFromKey;
         this.notifier = new PersistentNotifier(key -> {
             try {
                 byte[] data = kvStorage.get(ByteUtils.toBytes(key));
-                Datum datum = serializer.deserialize(data);
+                Datum datum = serializer.deserialize(data, getDatumTypeFromKey(key));
                 return null != datum ? datum.value : null;
             } catch (KvStorageException ex) {
                 throw new MmqRuntimeException(ex.getErrCode(), ex.getErrMsg());
@@ -170,12 +178,16 @@ public abstract class BasePersistentServiceProcessor extends RequestProcessor4CP
         final List<byte[]> values = request.getValues();
         for (int i = 0; i < keys.size(); i++) {
             final String key = new String(keys.get(i));
-            final Datum datum = serializer.deserialize(values.get(i));
+            final Datum datum = serializer.deserialize(values.get(i), getDatumTypeFromKey(key));
             final Record value = null != datum ? datum.value : null;
             final ValueChangeEvent event = ValueChangeEvent.builder().key(key).value(value)
                     .action(getDataOperationByOp(op)).build();
             NotifyCenter.publishEvent(event);
         }
+    }
+
+    protected Type getDatumTypeFromKey(String key) {
+        return TypeUtils.parameterize(Datum.class, getClassOfRecordFromKey.apply(key));
     }
 
     private  DataOperation getDataOperationByOp(Op op) {
@@ -191,7 +203,7 @@ public abstract class BasePersistentServiceProcessor extends RequestProcessor4CP
     
     @Override
     public String group() {
-        return Constants.MQTT_PERSISTENT_SERVICE_GROUP;
+        return this.raftGroup;
     }
     
     @Override
@@ -216,7 +228,7 @@ public abstract class BasePersistentServiceProcessor extends RequestProcessor4CP
     /**
      * This notify should only notify once during startup.
      */
-    private void notifierAllServiceMeta(RecordListener listener) throws MmqException {
+    protected void notifierAllServiceMeta(RecordListener listener) throws MmqException {
         for (byte[] each : kvStorage.allKeys()) {
             String key = new String(each);
             if (listener.interests(key)) {

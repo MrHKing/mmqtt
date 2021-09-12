@@ -18,6 +18,7 @@ package org.monkey.mmq.core.consistency.persistent;
 
 
 import com.google.protobuf.ByteString;
+import org.apache.commons.lang3.reflect.TypeUtils;
 import org.monkey.mmq.core.common.Constants;
 import org.monkey.mmq.core.consistency.ProtocolMetaData;
 import org.monkey.mmq.core.consistency.cp.CPProtocol;
@@ -36,11 +37,13 @@ import org.monkey.mmq.core.utils.Loggers;
 import org.monkey.mmq.core.utils.StringUtils;
 
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 /**
  * In cluster mode, start the Raft protocol.
@@ -51,22 +54,28 @@ import java.util.concurrent.TimeUnit;
 public class PersistentServiceProcessor extends BasePersistentServiceProcessor {
     
     private final CPProtocol protocol;
+
+    private final String raftGroup;
+
+    private Function<String, Class<? extends Record>> getClassOfRecordFromKey;
     
     /**
      * Is there a leader node currently.
      */
     private volatile boolean hasLeader = false;
     
-    public PersistentServiceProcessor(ProtocolManager protocolManager, String kvStorageBaseDir)
+    public PersistentServiceProcessor(ProtocolManager protocolManager, String kvStorageBaseDir,
+                                      String raftGroup, Function<String, Class<? extends Record>> getClassOfRecordFromKey)
             throws Exception {
-        super(kvStorageBaseDir);
+        super(kvStorageBaseDir, raftGroup, getClassOfRecordFromKey);
+        this.raftGroup = raftGroup;
         this.protocol = protocolManager.getCpProtocol();
+        this.getClassOfRecordFromKey = getClassOfRecordFromKey;
     }
     
     @Override
     public void afterConstruct() {
         super.afterConstruct();
-        String raftGroup = Constants.MQTT_PERSISTENT_SERVICE_GROUP;
         this.protocol.protocolMetaData().subscribe(raftGroup, MetadataKey.LEADER_META_DATA, o -> {
             if (!(o instanceof ProtocolMetaData.ValueItem)) {
                 return;
@@ -95,7 +104,7 @@ public class PersistentServiceProcessor extends BasePersistentServiceProcessor {
         Datum datum = Datum.createDatum(key, value);
         req.append(ByteUtils.toBytes(key), serializer.serialize(datum));
         final WriteRequest request = WriteRequest.newBuilder().setData(ByteString.copyFrom(serializer.serialize(req)))
-                .setGroup(Constants.MQTT_PERSISTENT_SERVICE_GROUP).setOperation(Op.Write.desc).build();
+                .setGroup(this.raftGroup).setOperation(Op.Write.desc).build();
         try {
             protocol.write(request);
         } catch (Exception e) {
@@ -108,7 +117,7 @@ public class PersistentServiceProcessor extends BasePersistentServiceProcessor {
         final BatchWriteRequest req = new BatchWriteRequest();
         req.append(ByteUtils.toBytes(key), ByteUtils.EMPTY);
         final WriteRequest request = WriteRequest.newBuilder().setData(ByteString.copyFrom(serializer.serialize(req)))
-                .setGroup(Constants.MQTT_PERSISTENT_SERVICE_GROUP).setOperation(Op.Delete.desc).build();
+                .setGroup(this.raftGroup).setOperation(Op.Delete.desc).build();
         try {
             protocol.write(request);
         } catch (Exception e) {
@@ -120,7 +129,7 @@ public class PersistentServiceProcessor extends BasePersistentServiceProcessor {
     public Datum get(String key) throws MmqException {
         final List<byte[]> keys = new ArrayList<>(1);
         keys.add(ByteUtils.toBytes(key));
-        final ReadRequest req = ReadRequest.newBuilder().setGroup(Constants.MQTT_PERSISTENT_SERVICE_GROUP)
+        final ReadRequest req = ReadRequest.newBuilder().setGroup(this.raftGroup)
                 .setData(ByteString.copyFrom(serializer.serialize(keys))).build();
         try {
             Response resp = protocol.getData(req);
@@ -128,18 +137,22 @@ public class PersistentServiceProcessor extends BasePersistentServiceProcessor {
                 BatchReadResponse response = serializer
                         .deserialize(resp.getData().toByteArray(), BatchReadResponse.class);
                 final List<byte[]> rValues = response.getValues();
-                return rValues.isEmpty() ? null : serializer.deserialize(rValues.get(0));
+                return rValues.isEmpty() ? null : serializer.deserialize(rValues.get(0), getDatumTypeFromKey(key));
             }
             throw new MmqException(ErrorCode.ProtoReadError.getCode(), resp.getErrMsg());
         } catch (Throwable e) {
             throw new MmqException(ErrorCode.ProtoReadError.getCode(), e.getMessage());
         }
     }
+
+    protected Type getDatumTypeFromKey(String key) {
+        return TypeUtils.parameterize(Datum.class, getClassOfRecordFromKey.apply(key));
+    }
     
     @Override
     public void listen(String key, RecordListener listener) throws MmqException {
         notifier.registerListener(key, listener);
-        notifierDatumIfAbsent(key, listener);
+        notifierAllServiceMeta(listener);
     }
     
     @Override

@@ -17,7 +17,9 @@
 package org.monkey.mmq.config.persistent;
 
 
+import org.monkey.mmq.config.matedata.KeyBuilder;
 import org.monkey.mmq.config.matedata.UtilsAndCommons;
+import org.monkey.mmq.config.matedata.resources.ResourcesMateData;
 import org.monkey.mmq.core.consistency.matedata.Datum;
 import org.monkey.mmq.core.consistency.matedata.Record;
 import org.monkey.mmq.core.consistency.matedata.RecordListener;
@@ -32,6 +34,8 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Paths;
 import java.util.Optional;
+
+import static org.monkey.mmq.core.common.Constants.MQTT_PERSISTENT_CONFIG_GROUP;
 
 /**
  * Persistent consistency service delegate.
@@ -92,9 +96,18 @@ public class ConfigPersistentConsistencyServiceDelegateImpl implements Persisten
     
     private BasePersistentServiceProcessor createNewPersistentServiceProcessor(ProtocolManager protocolManager) throws Exception {
         final BasePersistentServiceProcessor processor =
-                EnvUtil.getStandaloneMode() ? new StandalonePersistentServiceProcessor(this.baseDir)
-                        : new PersistentServiceProcessor(protocolManager, this.baseDir);
+                EnvUtil.getStandaloneMode() ? new StandalonePersistentServiceProcessor(this.baseDir,
+                        MQTT_PERSISTENT_CONFIG_GROUP, this::getClassOfRecordFromKey)
+                        : new PersistentServiceProcessor(protocolManager, this.baseDir,
+                        MQTT_PERSISTENT_CONFIG_GROUP, this::getClassOfRecordFromKey);
         processor.afterConstruct();
         return processor;
+    }
+
+    protected Class<? extends Record> getClassOfRecordFromKey(String key) {
+        if (KeyBuilder.matchResourcesKey(key)) {
+            return ResourcesMateData.class;
+        }
+        return Record.class;
     }
 }

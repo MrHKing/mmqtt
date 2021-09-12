@@ -31,7 +31,7 @@ public class Constants {
     
     public static final String DEFAULT_GROUP = "DEFAULT_GROUP";
 
-    public static final String MQTT_PERSISTENT_SERVICE_GROUP = "mqtt_persistent_service";
+    public static final String MQTT_PERSISTENT_CONFIG_GROUP = "mqtt_persistent_config";
 
     public static final String MQTT_PERSISTENT_BROKER_GROUP = "mqtt_persistent_broker";
     

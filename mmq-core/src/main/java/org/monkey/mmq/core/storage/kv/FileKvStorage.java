@@ -16,6 +16,7 @@
 
 package org.monkey.mmq.core.storage.kv;
 
+import com.google.common.collect.Lists;
 import org.monkey.mmq.core.exception.ErrorCode;
 import org.monkey.mmq.core.exception.KvStorageException;
 import org.monkey.mmq.core.utils.ByteUtils;
@@ -176,16 +177,27 @@ public class FileKvStorage implements KvStorage {
     }
     
     @Override
-    public List<byte[]> allKeys() throws KvStorageException {
-        List<byte[]> result = new LinkedList<>();
+    public List<byte[]> allKeys() {
         File[] files = new File(baseDir).listFiles();
-        if (null != files) {
-            for (File each : files) {
-                if (each.isFile()) {
-                    result.add(ByteUtils.toBytes(each.getName()));
-                }
+        return getAllKeysRecursion(files);
+    }
+
+    private List<byte[]> getAllKeysRecursion(File[] files) {
+        List<byte[]> result = new LinkedList<>();
+
+        if (null == files) {
+            return Lists.newArrayList();
+        }
+
+        for (File each : files) {
+            if (each.isDirectory()) {
+                result.addAll(getAllKeysRecursion(each.listFiles()));
+            }
+            if (each.isFile()) {
+                result.add(ByteUtils.toBytes(each.getName()));
             }
         }
+
         return result;
     }
     

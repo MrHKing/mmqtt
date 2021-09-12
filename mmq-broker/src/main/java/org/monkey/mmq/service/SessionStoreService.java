@@ -77,7 +77,7 @@ public class SessionStoreService implements RecordListener<ClientMateData> {
         storage.put(clientId, sessionStore);
         InetSocketAddress ipSocket = (InetSocketAddress)sessionStore.getChannel().remoteAddress();
         String clientIp = ipSocket.getAddress().getHostAddress();
-        consistencyService.put(UtilsAndCommons.SESSION_STORE + "/" + clientId, new ClientMateData(clientId, sessionStore.getUser(), clientIp));
+        consistencyService.put(UtilsAndCommons.SESSION_STORE + clientId, new ClientMateData(clientId, sessionStore.getUser(), clientIp));
     }
 
     public SessionMateData get(String clientId) {
@@ -103,7 +103,7 @@ public class SessionStoreService implements RecordListener<ClientMateData> {
 
     public void delete(String clientId) throws MmqException {
         storage.remove(clientId);
-        consistencyService.remove(UtilsAndCommons.SESSION_STORE + "/" + clientId);
+        consistencyService.remove(UtilsAndCommons.SESSION_STORE + clientId);
     }
 
     @Override

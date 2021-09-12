@@ -17,6 +17,8 @@
 package org.monkey.mmq.persistent;
 
 
+import org.monkey.mmq.metadata.KeyBuilder;
+import org.monkey.mmq.core.common.Constants;
 import org.monkey.mmq.core.consistency.persistent.BasePersistentServiceProcessor;
 import org.monkey.mmq.core.consistency.persistent.PersistentConsistencyService;
 import org.monkey.mmq.core.consistency.persistent.PersistentServiceProcessor;
@@ -28,6 +30,9 @@ import org.monkey.mmq.core.consistency.matedata.Datum;
 import org.monkey.mmq.core.consistency.matedata.Record;
 import org.monkey.mmq.core.consistency.matedata.RecordListener;
 import org.monkey.mmq.metadata.UtilsAndCommons;
+import org.monkey.mmq.metadata.message.*;
+import org.monkey.mmq.metadata.subscribe.SubscribeMateData;
+import org.monkey.mmq.metadata.system.SystemInfoMateData;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Paths;
@@ -92,9 +97,30 @@ public class MqttPersistentConsistencyServiceDelegateImpl implements PersistentC
     
     private BasePersistentServiceProcessor createNewPersistentServiceProcessor(ProtocolManager protocolManager) throws Exception {
         final BasePersistentServiceProcessor processor =
-                EnvUtil.getStandaloneMode() ? new StandalonePersistentServiceProcessor(this.baseDir)
-                        : new PersistentServiceProcessor(protocolManager, this.baseDir);
+                EnvUtil.getStandaloneMode() ? new StandalonePersistentServiceProcessor(this.baseDir,
+                        Constants.MQTT_PERSISTENT_BROKER_GROUP, this::getClassOfRecordFromKey)
+                        : new PersistentServiceProcessor(protocolManager, this.baseDir,
+                        Constants.MQTT_PERSISTENT_BROKER_GROUP, this::getClassOfRecordFromKey);
         processor.afterConstruct();
         return processor;
+    }
+
+    protected Class<? extends Record> getClassOfRecordFromKey(String key) {
+        if (KeyBuilder.matchSessionStoreKey(key)) {
+            return ClientMateData.class;
+        } else if (KeyBuilder.matchSystemRunTimeKey(key)) {
+            return SystemInfoMateData.class;
+        } else if (KeyBuilder.matchSubscribeKey(key)) {
+            return SubscribeMateData.class;
+        } else if (KeyBuilder.matchPublishKey(key)) {
+            return DupPublishMessageMateData.class;
+        } else if (KeyBuilder.matchPubRelKey(key)) {
+            return DupPubRelMessageMateData.class;
+        } else if (KeyBuilder.matchMessageIdKey(key)) {
+            return MessageIdMateData.class;
+        } else if (KeyBuilder.matchRetainKey(key)) {
+            return RetainMessageMateData.class;
+        }
+        return Record.class;
     }
 }

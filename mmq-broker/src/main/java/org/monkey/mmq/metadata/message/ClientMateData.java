@@ -37,6 +37,10 @@ public class ClientMateData implements Record, Serializable {
 
     private String address;
 
+    public ClientMateData() {
+
+    }
+
     public ClientMateData(String clientId, String user, String address) {
         this.clientId = clientId;
         this.user = user;

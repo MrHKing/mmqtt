@@ -18,6 +18,7 @@ package org.monkey.mmq.core.consistency.persistent;
 
 
 import com.google.protobuf.ByteString;
+import org.apache.commons.lang3.reflect.TypeUtils;
 import org.monkey.mmq.core.common.Constants;
 import org.monkey.mmq.core.consistency.matedata.Datum;
 import org.monkey.mmq.core.consistency.matedata.Record;
@@ -30,9 +31,11 @@ import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.core.utils.ByteUtils;
 
 
+import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * Persistent service manipulation layer in stand-alone mode.
@@ -41,11 +44,17 @@ import java.util.Optional;
  */
 @SuppressWarnings("PMD.ServiceOrDaoClassShouldEndWithImplRule")
 public class StandalonePersistentServiceProcessor extends BasePersistentServiceProcessor {
-    
-    public StandalonePersistentServiceProcessor(String kvStorageBaseDir) throws Exception {
-        super(kvStorageBaseDir);
-        super.afterConstruct();
 
+    private Function<String, Class<? extends Record>> getClassOfRecordFromKey;
+
+    private final String raftGroup;
+
+    public StandalonePersistentServiceProcessor(String kvStorageBaseDir, String raftGroup,
+                                                Function<String, Class<? extends Record>> getClassOfRecordFromKey) throws Exception {
+        super(kvStorageBaseDir, raftGroup, getClassOfRecordFromKey);
+        super.afterConstruct();
+        this.raftGroup = raftGroup;
+        this.getClassOfRecordFromKey = getClassOfRecordFromKey;
     }
     
     @Override
@@ -54,31 +63,18 @@ public class StandalonePersistentServiceProcessor extends BasePersistentServiceP
         Datum datum = Datum.createDatum(key, value);
         req.append(ByteUtils.toBytes(key), serializer.serialize(datum));
         final WriteRequest request = WriteRequest.newBuilder().setData(ByteString.copyFrom(serializer.serialize(req)))
-                .setGroup(Constants.MQTT_PERSISTENT_SERVICE_GROUP).setOperation(Op.Write.desc).build();
+                .setGroup(this.raftGroup).setOperation(Op.Write.desc).build();
         try {
             onApply(request);
         } catch (Exception e) {
             throw new MmqException(ErrorCode.ProtoSubmitError.getCode(), e.getMessage());
         }
     }
-    
-    @Override
-    public void remove(String key) throws MmqException {
-        final BatchWriteRequest req = new BatchWriteRequest();
-        req.append(ByteUtils.toBytes(key), ByteUtils.EMPTY);
-        final WriteRequest request = WriteRequest.newBuilder().setData(ByteString.copyFrom(serializer.serialize(req)))
-                .setGroup(Constants.MQTT_PERSISTENT_SERVICE_GROUP).setOperation(Op.Delete.desc).build();
-        try {
-            onApply(request);
-        } catch (Exception e) {
-            throw new MmqException(ErrorCode.ProtoSubmitError.getCode(), e.getMessage());
-        }
-    }
-    
+
     @Override
     public Datum get(String key) throws MmqException {
         final List<byte[]> keys = Collections.singletonList(ByteUtils.toBytes(key));
-        final ReadRequest req = ReadRequest.newBuilder().setGroup(Constants.MQTT_PERSISTENT_SERVICE_GROUP)
+        final ReadRequest req = ReadRequest.newBuilder().setGroup(this.raftGroup)
                 .setData(ByteString.copyFrom(serializer.serialize(keys))).build();
         try {
             final Response resp = onRequest(req);
@@ -86,7 +82,7 @@ public class StandalonePersistentServiceProcessor extends BasePersistentServiceP
                 BatchReadResponse response = serializer
                         .deserialize(resp.getData().toByteArray(), BatchReadResponse.class);
                 final List<byte[]> rValues = response.getValues();
-                return rValues.isEmpty() ? null : serializer.deserialize(rValues.get(0));
+                return rValues.isEmpty() ? null : serializer.deserialize(rValues.get(0),  getDatumTypeFromKey(key));
             }
             throw new MmqException(ErrorCode.ProtoReadError.getCode(), resp.getErrMsg());
         } catch (Throwable e) {
@@ -95,9 +91,26 @@ public class StandalonePersistentServiceProcessor extends BasePersistentServiceP
     }
     
     @Override
+    public void remove(String key) throws MmqException {
+        final BatchWriteRequest req = new BatchWriteRequest();
+        req.append(ByteUtils.toBytes(key), ByteUtils.EMPTY);
+        final WriteRequest request = WriteRequest.newBuilder().setData(ByteString.copyFrom(serializer.serialize(req)))
+                .setGroup(this.raftGroup).setOperation(Op.Delete.desc).build();
+        try {
+            onApply(request);
+        } catch (Exception e) {
+            throw new MmqException(ErrorCode.ProtoSubmitError.getCode(), e.getMessage());
+        }
+    }
+
+    protected Type getDatumTypeFromKey(String key) {
+        return TypeUtils.parameterize(Datum.class, getClassOfRecordFromKey.apply(key));
+    }
+    
+    @Override
     public void listen(String key, RecordListener listener) throws MmqException {
         notifier.registerListener(key, listener);
-        notifierDatumIfAbsent(key, listener);
+        notifierAllServiceMeta(listener);
     }
     
     @Override
