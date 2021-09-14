@@ -20,11 +20,13 @@ import org.monkey.mmq.config.matedata.resources.ResourcesMateData;
 import org.monkey.mmq.config.service.ResourcesService;
 import org.monkey.mmq.core.consistency.model.RestResultUtils;
 import org.monkey.mmq.core.utils.PasswordEncoderUtil;
+import org.monkey.mmq.core.utils.StringUtils;
 import org.monkey.mmq.metadata.system.SystemInfoMateData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author solley
@@ -56,7 +58,7 @@ public class ResourcesController {
     @DeleteMapping
     public Object deleteResource(@RequestParam String resourceID) {
         resourcesService.delete(resourceID);
-        return RestResultUtils.success("delete user ok!");
+        return RestResultUtils.success("delete resource ok!", null);
     }
 
     /**
@@ -67,7 +69,17 @@ public class ResourcesController {
      */
     @PostMapping
     public Object saveResource(@RequestBody ResourcesMateData resourcesMateData) {
+        if (StringUtils.isEmpty(resourcesMateData.getResourceID())) resourcesMateData.setResourceID(getResourceID());
         resourcesService.save(resourcesMateData.getResourceID(), resourcesMateData);
-        return RestResultUtils.success("create resource ok!");
+        return RestResultUtils.success("create resource ok!", null);
+    }
+
+    /**
+     * 胡德资源id
+     * @return
+     */
+    private String getResourceID() {
+        UUID uuid = UUID.randomUUID();
+        return uuid.toString().replace("-","");
     }
 }

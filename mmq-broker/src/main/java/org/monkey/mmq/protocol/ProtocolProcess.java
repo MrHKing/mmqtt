@@ -21,6 +21,7 @@ import org.monkey.mmq.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 /**
  * 协议处理
@@ -71,74 +72,74 @@ public class ProtocolProcess {
 
 	private PubComp pubComp;
 
-	public Connect connect() {
+	public Mono<Connect> connect() {
 		if (connect == null) {
 			connect = new Connect(sessionStoreService, subscribeStoreService, dupPublishMessageStoreService, dupPubRelMessageStoreService, authService);
 		}
-		return connect;
+		return Mono.just(connect);
 	}
 
-	public Subscribe subscribe() {
+	public Mono<Subscribe> subscribe() {
 		if (subscribe == null) {
 			subscribe = new Subscribe(subscribeStoreService, messageIdService, messageStoreService);
 		}
-		return subscribe;
+		return Mono.just(subscribe);
 	}
 
-	public UnSubscribe unSubscribe() {
+	public Mono<UnSubscribe> unSubscribe() {
 		if (unSubscribe == null) {
 			unSubscribe = new UnSubscribe(subscribeStoreService);
 		}
-		return unSubscribe;
+		return Mono.just(unSubscribe);
 	}
 
-	public Publish publish() {
+	public Mono<Publish> publish() {
 		if (publish == null) {
 			publish = new Publish(sessionStoreService, subscribeStoreService, messageIdService, messageStoreService, dupPublishMessageStoreService);
 		}
-		return publish;
+		return Mono.just(publish);
 	}
 
-	public DisConnect disConnect() {
+	public Mono<DisConnect> disConnect() {
 		if (disConnect == null) {
 			disConnect = new DisConnect(sessionStoreService, subscribeStoreService, dupPublishMessageStoreService, dupPubRelMessageStoreService);
 		}
-		return disConnect;
+		return Mono.just(disConnect);
 	}
 
-	public PingReq pingReq() {
+	public Mono<PingReq> pingReq() {
 		if (pingReq == null) {
 			pingReq = new PingReq();
 		}
-		return pingReq;
+		return Mono.just(pingReq);
 	}
 
-	public PubRel pubRel() {
+	public Mono<PubRel> pubRel() {
 		if (pubRel == null) {
 			pubRel = new PubRel();
 		}
-		return pubRel;
+		return Mono.just(pubRel);
 	}
 
-	public PubAck pubAck() {
+	public Mono<PubAck> pubAck() {
 		if (pubAck == null) {
 			pubAck = new PubAck(messageIdService, dupPublishMessageStoreService);
 		}
-		return pubAck;
+		return Mono.just(pubAck);
 	}
 
-	public PubRec pubRec() {
+	public Mono<PubRec> pubRec() {
 		if (pubRec == null) {
 			pubRec = new PubRec(dupPublishMessageStoreService, dupPubRelMessageStoreService);
 		}
-		return pubRec;
+		return Mono.just(pubRec);
 	}
 
-	public PubComp pubComp() {
+	public Mono<PubComp> pubComp() {
 		if (pubComp == null) {
 			pubComp = new PubComp(messageIdService, dupPubRelMessageStoreService);
 		}
-		return pubComp;
+		return Mono.just(pubComp);
 	}
 
 	public SessionStoreService getSessionStoreService() {

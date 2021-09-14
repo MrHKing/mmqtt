@@ -6,5 +6,6 @@ export default {
     'menu.dashboard.topics': 'Topics',
     'menu.dashboard.clients': 'clients',
     'menu.dashboard.subscription': 'Subscription',
-    'menu.ruleEngine': 'RuleEngine'
+    'menu.ruleEngine': 'RuleEngine',
+    'menu.ruleEngine.resources': 'Resources'
 }

@@ -46,19 +46,18 @@ export const asyncRouterMap = [
             },
             {
                 path: '/ruleEngine',
-                name: 'dashboard',
-                redirect: '/dashboard/workplace',
+                name: 'ruleEngine',
                 component: RouteView,
-                meta: { title: 'menu.ruleEngine', keepAlive: true, icon: bxAnaalyse, permission: ['dashboard'] }
-                // children: [
-                //     {
-                //         path: '/dashboard/clients/:pageNo([1-9]\\d*)?',
-                //         name: 'clients',
-                //         component: () => import('@/views/dashboard/Clients'),
-                //         meta: { title: 'menu.dashboard.clients', keepAlive: false, permission: ['dashboard'] }
-                //     }
+                meta: { title: 'menu.ruleEngine', keepAlive: true, icon: bxAnaalyse, permission: ['ruleEngine'] },
+                children: [
+                    {
+                        path: '/ruleEngine/resources',
+                        name: 'resources',
+                        component: () => import('@/views/ruleEngine/Resources'),
+                        meta: { title: 'menu.ruleEngine.resources', keepAlive: true, permission: ['ruleEngine'] }
+                    }
 
-                // ]
+                ]
             }
             // other
             /*

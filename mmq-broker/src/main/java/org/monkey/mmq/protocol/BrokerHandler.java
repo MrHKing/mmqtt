@@ -23,6 +23,7 @@ import io.netty.handler.codec.mqtt.*;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.AttributeKey;
+import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.metadata.message.SessionMateData;
 
 import java.io.IOException;
@@ -42,49 +43,91 @@ public class BrokerHandler extends SimpleChannelInboundHandler<MqttMessage> {
 	@Override
 	public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
 		//此处对断网进行了处理
-		protocolProcess.disConnect().processDisConnect(ctx.channel(), null);
+		protocolProcess.disConnect().subscribe(x -> {
+			try {
+				x.processDisConnect(ctx.channel(), null);
+			} catch (MmqException e) {
+				e.printStackTrace();
+			}
+		});
 	}
 
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, MqttMessage msg) throws Exception {
 		switch (msg.fixedHeader().messageType()) {
 			case CONNECT:
-				protocolProcess.connect().processConnect(ctx.channel(), (MqttConnectMessage) msg);
+				protocolProcess.connect().subscribe(x -> {
+					try {
+						x.processConnect(ctx.channel(), (MqttConnectMessage) msg);
+					} catch (MmqException e) {
+						e.printStackTrace();
+					}
+				});
 				break;
 			case CONNACK:
 				break;
 			case PUBLISH:
-				protocolProcess.publish().processPublish(ctx.channel(), (MqttPublishMessage) msg);
+				protocolProcess.publish().subscribe(x -> {
+					try {
+						x.processPublish(ctx.channel(), (MqttPublishMessage) msg);
+					} catch (MmqException e) {
+						e.printStackTrace();
+					}
+				});
 				break;
 			case PUBACK:
-				protocolProcess.pubAck().processPubAck(ctx.channel(), (MqttMessageIdVariableHeader) msg.variableHeader());
+				protocolProcess.pubAck().subscribe(x -> {
+					try {
+						x.processPubAck(ctx.channel(), (MqttMessageIdVariableHeader) msg.variableHeader());
+					} catch (MmqException e) {
+						e.printStackTrace();
+					}
+				});
 				break;
 			case PUBREC:
-				protocolProcess.pubRec().processPubRec(ctx.channel(), (MqttMessageIdVariableHeader) msg.variableHeader());
+				protocolProcess.pubRec().subscribe(x -> {
+					try {
+						x.processPubRec(ctx.channel(), (MqttMessageIdVariableHeader) msg.variableHeader());
+					} catch (MmqException e) {
+						e.printStackTrace();
+					}
+				});
 				break;
 			case PUBREL:
-				protocolProcess.pubRel().processPubRel(ctx.channel(), (MqttMessageIdVariableHeader) msg.variableHeader());
+				protocolProcess.pubRel().subscribe(x -> x.processPubRel(ctx.channel(), (MqttMessageIdVariableHeader) msg.variableHeader()));
 				break;
 			case PUBCOMP:
-				protocolProcess.pubComp().processPubComp(ctx.channel(), (MqttMessageIdVariableHeader) msg.variableHeader());
+				protocolProcess.pubComp().subscribe(x -> {
+					try {
+						x.processPubComp(ctx.channel(), (MqttMessageIdVariableHeader) msg.variableHeader());
+					} catch (MmqException e) {
+						e.printStackTrace();
+					}
+				});
 				break;
 			case SUBSCRIBE:
-				protocolProcess.subscribe().processSubscribe(ctx.channel(), (MqttSubscribeMessage) msg);
+				protocolProcess.subscribe().subscribe(x -> x.processSubscribe(ctx.channel(), (MqttSubscribeMessage) msg));
 				break;
 			case SUBACK:
 				break;
 			case UNSUBSCRIBE:
-				protocolProcess.unSubscribe().processUnSubscribe(ctx.channel(), (MqttUnsubscribeMessage) msg);
+				protocolProcess.unSubscribe().subscribe(x -> x.processUnSubscribe(ctx.channel(), (MqttUnsubscribeMessage) msg));
 				break;
 			case UNSUBACK:
 				break;
 			case PINGREQ:
-				protocolProcess.pingReq().processPingReq(ctx.channel(), msg);
+				protocolProcess.pingReq().subscribe(x -> x.processPingReq(ctx.channel(), msg));
 				break;
 			case PINGRESP:
 				break;
 			case DISCONNECT:
-				protocolProcess.disConnect().processDisConnect(ctx.channel(), msg);
+				protocolProcess.disConnect().subscribe(x -> {
+					try {
+						x.processDisConnect(ctx.channel(), msg);
+					} catch (MmqException e) {
+						e.printStackTrace();
+					}
+				});
 				break;
 			default:
 				break;
@@ -112,7 +155,13 @@ public class BrokerHandler extends SimpleChannelInboundHandler<MqttMessage> {
 				if (this.protocolProcess.getSessionStoreService().containsKey(clientId)) {
 					SessionMateData sessionStore = this.protocolProcess.getSessionStoreService().get(clientId);
 					if (sessionStore.getWillMessage() != null) {
-						this.protocolProcess.publish().processPublish(ctx.channel(), sessionStore.getWillMessage());
+						this.protocolProcess.publish().subscribe(x -> {
+							try {
+								x.processPublish(ctx.channel(), sessionStore.getWillMessage());
+							} catch (MmqException e) {
+								e.printStackTrace();
+							}
+						});
 					}
 				}
 				ctx.close();
