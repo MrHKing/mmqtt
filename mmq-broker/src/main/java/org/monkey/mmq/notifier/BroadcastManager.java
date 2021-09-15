@@ -24,6 +24,8 @@ import com.alipay.sofa.jraft.rpc.impl.MarshallerRegistry;
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl;
 import com.alipay.sofa.jraft.util.RpcFactoryHelper;
 import org.monkey.mmq.config.Loggers;
+import org.monkey.mmq.config.driver.MysqlDriver;
+import org.monkey.mmq.config.service.ResourcesService;
 import org.monkey.mmq.core.cluster.ServerMemberManager;
 import org.monkey.mmq.core.consistency.notifier.ValueChangeEvent;
 import org.monkey.mmq.core.entity.InternalMessage;
@@ -38,7 +40,11 @@ import org.monkey.mmq.notifier.processor.RejectClientProcessor;
 import org.monkey.mmq.service.MessageIdService;
 import org.monkey.mmq.service.SessionStoreService;
 import org.monkey.mmq.service.SubscribeStoreService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 
 /**
  * 消息广播管理
@@ -122,6 +128,7 @@ public final class BroadcastManager extends Subscriber<PublishEvent> {
             }
         });
 
+        // 规则引擎
     }
 
     @Override

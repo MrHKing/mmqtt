@@ -63,6 +63,8 @@ public class PublishRequestProcessor implements RpcProcessor<InternalMessage> {
     public void handleRequest(RpcContext rpcContext, InternalMessage message) {
         // 处理消息
         this.sendPublishMessage(message.getTopic(), MqttQoS.valueOf(message.getMqttQoS()), message.getMessageBytes().toByteArray(), message.getRetain(), message.getDup());
+
+        // 规则引擎
     }
 
     @Override
