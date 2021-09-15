@@ -36,7 +36,7 @@
                 v-decorator="[
                   'resource.ip',
                   {
-                    rules: [{ required: true, message: '请输入IP' }],
+                    rules: [{ required: type === 'MYSQL' ? true : false, message: '请输入IP' }],
                   },
                 ]"
                 placeholder="请输入IP"
@@ -49,10 +49,38 @@
                 v-decorator="[
                   'resource.port',
                   {
-                    rules: [{ required: true, message: '请输入端口' }],
+                    rules: [{ required: type === 'MYSQL' ? true : false, message: '请输入端口' }],
                   },
                 ]"
                 placeholder="请输入端口"
+              />
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item label="Mysql账户">
+              <a-input
+                v-decorator="[
+                  'resource.username',
+                  {
+                    rules: [{ required: type === 'MYSQL' ? true : false, message: '请输入Mysql账户' }],
+                  },
+                ]"
+                placeholder="请输入Mysql账户"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="Mysql密码">
+              <a-input-password
+                v-decorator="[
+                  'resource.password',
+                  {
+                    rules: [{ required: type === 'MYSQL' ? true : false, message: '请输入Mysql密码' }],
+                  },
+                ]"
+                placeholder="请输入Mysql密码"
               />
             </a-form-item>
           </a-col>
@@ -64,7 +92,7 @@
                 v-decorator="[
                   'resource.databaseName',
                   {
-                    rules: [{ required: true, message: '请输入要连接的数据库' }],
+                    rules: [{ required: type === 'MYSQL' ? true : false, message: '请输入要连接的数据库' }],
                   },
                 ]"
                 placeholder="请输入要连接的数据库"
@@ -72,6 +100,126 @@
             </a-form-item>
           </a-col>
           <a-col :span="12"> </a-col>
+        </a-row>
+      </div>
+      <div v-show="type === 'POSTGRESQL'">
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item label="IP">
+              <a-input
+                v-decorator="[
+                  'resource.ip',
+                  {
+                    rules: [{ required: type === 'POSTGRESQL' ? true : false, message: '请输入IP' }],
+                  },
+                ]"
+                placeholder="请输入IP"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="PORT">
+              <a-input
+                v-decorator="[
+                  'resource.port',
+                  {
+                    rules: [{ required: type === 'POSTGRESQL' ? true : false, message: '请输入端口' }],
+                  },
+                ]"
+                placeholder="请输入端口"
+              />
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item label="Postgresql账户">
+              <a-input
+                v-decorator="[
+                  'resource.username',
+                  {
+                    rules: [{ required: type === 'POSTGRESQL' ? true : false, message: '请输入Postgresql账户' }],
+                  },
+                ]"
+                placeholder="请输入Postgresql账户"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="Postgresql密码">
+              <a-input-password
+                v-decorator="[
+                  'resource.password',
+                  {
+                    rules: [{ required: type === 'POSTGRESQL' ? true : false, message: '请输入Postgresql密码' }],
+                  },
+                ]"
+                placeholder="请输入Postgresql密码"
+              />
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item label="数据库">
+              <a-input
+                v-decorator="[
+                  'resource.databaseName',
+                  {
+                    rules: [{ required: type === 'POSTGRESQL' ? true : false, message: '请输入要连接的数据库' }],
+                  },
+                ]"
+                placeholder="请输入要连接的数据库"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12"> </a-col>
+        </a-row>
+      </div>
+      <div v-show="type === 'KAFKA'">
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item label="Kafka服务">
+              <a-input
+                v-decorator="[
+                  'resource.server',
+                  {
+                    rules: [{ required: type === 'KAFKA' ? true : false, message: '请输入Kafka服务' }],
+                  },
+                ]"
+                placeholder="请输入Kafka服务"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12"> </a-col>
+        </a-row>
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item label="Kafka账户">
+              <a-input
+                v-decorator="[
+                  'resource.username',
+                  {
+                    rules: [{ required: false, message: '请输入Kafka账户' }],
+                  },
+                ]"
+                placeholder="请输入Kafka账户"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="Kafka密码">
+              <a-input-password
+                v-decorator="[
+                  'resource.password',
+                  {
+                    rules: [{ required: false, message: '请输入Kafka密码' }],
+                  },
+                ]"
+                placeholder="请输入Kafka密码"
+              />
+            </a-form-item>
+          </a-col>
         </a-row>
       </div>
       <a-row :gutter="16">
@@ -147,11 +295,48 @@ export default {
                 resource: {
                   ip: record.resource.ip,
                   port: record.resource.port,
-                  databaseName: record.resource.databaseName
+                  databaseName: record.resource.databaseName,
+                  password: record.resource.password,
+                  username: record.resource.username
                 }
 
               })
           })
+          break
+        case 'POSTGRESQL':
+          this.$nextTick(() => {
+            this.form.setFieldsValue(
+              {
+                resourceID: record.resourceID,
+                type: type,
+                description: record.description,
+                resource: {
+                  ip: record.resource.ip,
+                  port: record.resource.port,
+                  databaseName: record.resource.databaseName,
+                  password: record.resource.password,
+                  username: record.resource.username
+                }
+              })
+          })
+          break
+        case 'TDENGINE':
+          break
+        case 'KAFKA':
+          this.$nextTick(() => {
+            this.form.setFieldsValue(
+              {
+                resourceID: record.resourceID,
+                type: type,
+                description: record.description,
+                resource: {
+                  server: record.resource.server,
+                  password: record.resource.password,
+                  username: record.resource.username
+                }
+              })
+          })
+          break
       }
     },
     typeChange (value) {

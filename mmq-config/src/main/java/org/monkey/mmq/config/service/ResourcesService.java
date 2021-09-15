@@ -16,13 +16,16 @@
 package org.monkey.mmq.config.service;
 
 import org.monkey.mmq.config.config.Loggers;
+import org.monkey.mmq.config.driver.MysqlDriver;
 import org.monkey.mmq.config.matedata.KeyBuilder;
+import org.monkey.mmq.config.matedata.ResourceEnum;
 import org.monkey.mmq.config.matedata.UtilsAndCommons;
 import org.monkey.mmq.config.matedata.resources.ResourcesMateData;
 import org.monkey.mmq.core.consistency.matedata.RecordListener;
 import org.monkey.mmq.core.consistency.persistent.ConsistencyService;
-import org.monkey.mmq.core.env.EnvUtil;
 import org.monkey.mmq.core.exception.MmqException;
+import org.monkey.mmq.core.utils.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -37,6 +40,9 @@ import java.util.Map;
  */
 @Service
 public class ResourcesService implements RecordListener<ResourcesMateData> {
+
+    @Autowired
+    MysqlDriver mysqlDriver;
 
     Map<String, ResourcesMateData> resourcesMateDataMap = new HashMap<>();
 
@@ -92,6 +98,17 @@ public class ResourcesService implements RecordListener<ResourcesMateData> {
     @Override
     public void onChange(String key, ResourcesMateData value) throws Exception {
         resourcesMateDataMap.put(key, value);
+        if (ResourceEnum.MYSQL.equals(value.getType())) {
+            if (StringUtils.isEmpty(value.getResource().get("ip").toString())) return;
+            if (StringUtils.isEmpty(value.getResource().get("databaseName").toString())) return;
+            if (StringUtils.isEmpty(value.getResource().get("username").toString())) return;
+            if (StringUtils.isEmpty(value.getResource().get("password").toString())) return;
+            mysqlDriver.initDataSource(value.getResource().get("ip").toString(),
+                    Integer.parseInt(value.getResource().get("port").toString()),
+                    value.getResource().get("databaseName").toString(),
+                    value.getResource().get("username").toString(),
+                    value.getResource().get("password").toString());
+        }
     }
 
     @Override

@@ -50,6 +50,10 @@ export default {
       switch (type) {
         case 'MYSQL':
           return ' ip:' + resource.ip + ' port:' + resource.port + ' 数据库名称:' + resource.databaseName
+        case 'POSTGRESQL':
+          return ' ip:' + resource.ip + ' port:' + resource.port + ' 数据库名称:' + resource.databaseName
+        case 'KAFKA':
+          return ' Kafka服务:' + resource.server
         default:
           return ''
       }

@@ -6,13 +6,13 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="mmq-rule-engine" />
+        <module name="mmq-config" />
         <module name="mmq-web" />
         <module name="mmq-broker" />
         <module name="mmq-device" />
         <module name="mmq-auth" />
         <module name="mmq-core" />
-        <module name="mmq-config" />
+        <module name="mmq-rule-engine" />
         <module name="mmq-api" />
       </profile>
     </annotationProcessing>
