@@ -17,31 +17,26 @@ package org.monkey.mmq.config.driver;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import org.monkey.mmq.core.utils.StringUtils;
-import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.Map;
 
 /**
  * @author solley
  */
-@Component
-public class MysqlDriver implements ResourceDriver<Connection>{
+public class PostgresqlDriver implements ResourceDriver<Connection>{
     private static DruidDataSource dataSource;
-    /*8.X版本连接器写法*/
-    static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
+    static final String JDBC_DRIVER = "org.postgresql.Driver";
 
     @Override
-    public void init(Map<String, Object> resource) {
+    public void init(Map resource) {
         if (StringUtils.isEmpty(resource.get("ip").toString())) return;
         if (StringUtils.isEmpty(resource.get("databaseName").toString())) return;
         if (StringUtils.isEmpty(resource.get("username").toString())) return;
         if (StringUtils.isEmpty(resource.get("password").toString())) return;
         dataSource = new DruidDataSource(); // 创建Druid连接池
         dataSource.setDriverClassName(JDBC_DRIVER); // 设置连接池的数据库驱动
-        dataSource.setUrl(String.format("jdbc:mysql://%s:%s/%s?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT",
+        dataSource.setUrl(String.format("jdbc:postgresql://%s:%s/%s?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT",
                 resource.get("ip").toString(),
                 resource.get("port").toString(),
                 resource.get("databaseName").toString())); // 设置数据库的连接地址

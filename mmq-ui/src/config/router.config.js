@@ -55,6 +55,18 @@ export const asyncRouterMap = [
                         name: 'resources',
                         component: () => import('@/views/ruleEngine/Resources'),
                         meta: { title: 'menu.ruleEngine.resources', keepAlive: true, permission: ['ruleEngine'] }
+                    },
+                    {
+                        path: '/ruleEngine/ruleEngine',
+                        name: 'ruleEngine',
+                        component: () => import('@/views/ruleEngine/RuleEngine'),
+                        meta: { title: 'menu.ruleEngine.ruleEngine', keepAlive: true, permission: ['ruleEngine'] }
+                    },
+                    {
+                        path: '/ruleEngine/RuleEngineModel',
+                        name: 'RuleEngineModel',
+                        component: () => import('@/views/ruleEngine/modules/RuleEngineModel'),
+                        hidden: true
                     }
 
                 ]

@@ -7,5 +7,6 @@ export default {
     'menu.dashboard.clients': 'clients',
     'menu.dashboard.subscription': 'Subscription',
     'menu.ruleEngine': 'RuleEngine',
-    'menu.ruleEngine.resources': 'Resources'
+    'menu.ruleEngine.resources': 'Resources',
+    'menu.ruleEngine.ruleEngine': 'RuleEngine'
 }

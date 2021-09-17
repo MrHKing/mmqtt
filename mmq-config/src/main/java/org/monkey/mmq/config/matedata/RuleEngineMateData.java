@@ -13,52 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.monkey.mmq.config.matedata.resources;
+package org.monkey.mmq.config.matedata;
 
-import org.monkey.mmq.config.matedata.ResourceEnum;
 import org.monkey.mmq.core.consistency.matedata.Record;
 
 import java.io.Serializable;
-import java.util.Map;
+import java.util.List;
 
 /**
- * Health Controller.
- *
  * @author solley
  */
-public class ResourcesMateData<T> implements Record, Serializable {
-    private static final long serialVersionUID = 1276156087085594264L;
+public class RuleEngineMateData implements Record, Serializable {
 
-    private String resourceID;
+    private String ruleId;
+
+    private String Sql;
 
     private String description;
 
-    private ResourceEnum type;
+    private Boolean enable;
 
-    private Map<String, Object> resource;
+    private List<ResourcesMateData> resourcesMateDatas;
 
-    public ResourceEnum getType() {
-        return type;
+    public String getRuleId() {
+        return ruleId;
     }
 
-    public void setType(ResourceEnum type) {
-        this.type = type;
+    public void setRuleId(String id) {
+        this.ruleId = id;
     }
 
-    public Map<String, Object> getResource() {
-        return resource;
+    public String getSql() {
+        return Sql;
     }
 
-    public void setResource(Map<String, Object> resource) {
-        this.resource = resource;
-    }
-
-    public String getResourceID() {
-        return resourceID;
-    }
-
-    public void setResourceID(String resourceID) {
-        this.resourceID = resourceID;
+    public void setSql(String sql) {
+        Sql = sql;
     }
 
     public String getDescription() {
@@ -67,5 +57,21 @@ public class ResourcesMateData<T> implements Record, Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<ResourcesMateData> getResourcesMateDatas() {
+        return resourcesMateDatas;
+    }
+
+    public void setResourcesMateDatas(List<ResourcesMateData> resourcesMateDatas) {
+        this.resourcesMateDatas = resourcesMateDatas;
+    }
+
+    public Boolean getEnable() {
+        return enable;
+    }
+
+    public void setEnable(Boolean enable) {
+        this.enable = enable;
     }
 }

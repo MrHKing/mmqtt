@@ -5,13 +5,8 @@
         <a-form layout="inline">
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
-              <a-form-item label="设备ID">
-                <a-input v-model="queryParam.clientId" placeholder="" />
-              </a-form-item>
-            </a-col>
-            <a-col :md="8" :sm="24">
-              <a-form-item label="设备IP">
-                <a-input v-model="queryParam.address" placeholder="" />
+              <a-form-item label="规则ID">
+                <a-input v-model="queryParam.ruleId" placeholder="" />
               </a-form-item>
             </a-col>
             <template v-if="advanced"> </template>
@@ -32,7 +27,7 @@
         </a-form>
       </div>
 
-      <div class="table-operator"></div>
+      <div class="table-operator"><a-button type="primary" @click="handleSave({})">添加</a-button></div>
       <s-table
         ref="table"
         size="default"
@@ -46,13 +41,19 @@
         <span slot="serial" slot-scope="text, record, index">
           {{ index + 1 }}
         </span>
-        <!-- <span slot="status" slot-scope="text">
-          <a-badge :status="text | statusTypeFilter" :text="text | statusFilter" />
-        </span> -->
-
+        <span slot="enable" slot-scope="record">
+          <a-tag v-show="record.enable" color="red"> 启用 </a-tag>
+          <a-tag v-show="!record.enable" color="green"> 停止 </a-tag>
+        </span>
         <span slot="action" slot-scope="text, record">
           <template>
-            <a @click="handleReject(record)">踢出</a>
+            <a @click="handleEnable(record)">{{ record.enable ? '启动' : '停止' }}</a>
+            <a-divider type="vertical" />
+            <a @click="handleSave(record)">编辑</a>
+            <a-divider type="vertical" />
+            <a-popconfirm v-if="dataSource.length" title="Sure to delete?" @confirm="() => handleDelete(record)">
+              <a href="javascript:;">删除</a>
+            </a-popconfirm>
           </template>
         </span>
       </s-table>
@@ -62,8 +63,7 @@
 
 <script>
 import { STable, Ellipsis } from '@/components'
-import { getClients } from '@/api/system'
-import { getAction } from '@/api/manage'
+import { getAction, postAction, deleteAction } from '@/api/manage'
 
 const columns = [
   {
@@ -71,20 +71,17 @@ const columns = [
     scopedSlots: { customRender: 'serial' }
   },
   {
-    title: '客户端Id',
+    title: '规则Id',
     dataIndex: 'clientId'
   },
   {
-    title: '用户',
-    dataIndex: 'user'
+    title: '是否启用',
+    dataIndex: 'enable',
+    scopedSlots: { customRender: 'enable' }
   },
   {
-    title: '地址',
-    dataIndex: 'address'
-  },
-  {
-    title: '连接时间',
-    dataIndex: 'connectTiem',
+    title: '说明',
+    dataIndex: 'description',
     sorter: true
   },
   {
@@ -95,27 +92,8 @@ const columns = [
   }
 ]
 
-const statusMap = {
-  0: {
-    status: 'default',
-    text: '关闭'
-  },
-  1: {
-    status: 'processing',
-    text: '运行中'
-  },
-  2: {
-    status: 'success',
-    text: '已上线'
-  },
-  3: {
-    status: 'error',
-    text: '异常'
-  }
-}
-
 export default {
-  name: 'Clients',
+  name: 'RuleEngine',
   components: {
     STable,
     Ellipsis
@@ -131,21 +109,13 @@ export default {
       loadData: parameter => {
         const requestParameters = Object.assign({}, parameter, this.queryParam)
         console.log('loadData request parameters:', requestParameters)
-        return getClients(requestParameters)
+        return getAction('/v1/ruleEngine/ruleEngines', requestParameters)
           .then(res => {
             return res.data
           })
       },
       selectedRowKeys: [],
       selectedRows: []
-    }
-  },
-  filters: {
-    statusFilter (type) {
-      return statusMap[type].text
-    },
-    statusTypeFilter (type) {
-      return statusMap[type].status
     }
   },
   created () {
@@ -170,8 +140,9 @@ export default {
     resetSearchForm () {
       this.queryParam = {}
     },
-    handleReject (record) {
-      getAction('/v1/system/rejectClient', { clinetId: record.clientId }).then(res => {
+    handleEnable (record) {
+      record.enable = !record.enable
+      postAction('/v1/ruleEngine', record).then(res => {
         if (res.code === 200) {
           this.$message.info('踢出成功！')
           this.$refs.table.refresh(true)
@@ -179,6 +150,20 @@ export default {
           this.$message.info(res.message)
         }
       })
+    },
+    hanldeDelete (record) {
+      console.log(record)
+      deleteAction('/v1/ruleEngine', { resourceID: record.resourceID }).then(res => {
+        if (res.code === 200) {
+          this.$message.info(res.message)
+          this.$refs.table.refresh(true)
+        } else {
+          this.$message.info(res.message)
+        }
+      })
+    },
+    handleSave (record) {
+      this.$router.push({ name: 'RuleEngineModel', params: { id: '123' } })
     }
   }
 }

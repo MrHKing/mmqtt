@@ -19,7 +19,7 @@ package org.monkey.mmq.config.persistent;
 
 import org.monkey.mmq.config.matedata.KeyBuilder;
 import org.monkey.mmq.config.matedata.UtilsAndCommons;
-import org.monkey.mmq.config.matedata.resources.ResourcesMateData;
+import org.monkey.mmq.config.matedata.ResourcesMateData;
 import org.monkey.mmq.core.consistency.matedata.Datum;
 import org.monkey.mmq.core.consistency.matedata.Record;
 import org.monkey.mmq.core.consistency.matedata.RecordListener;

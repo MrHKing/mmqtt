@@ -31,6 +31,8 @@ public class UtilsAndCommons {
 
     public static final String RESOURCES_STORE = "00-00---000-RESOURCES_STORE-000---00-00";
 
+    public static final String RULE_ENGINE_STORE = "00-00---000-RULE_ENGINE_STORE-000---00-00";
+
     public static final String DATA_BASE_DIR =
             EnvUtil.getMmqHome() + File.separator + "data" + File.separator + "config";
 }

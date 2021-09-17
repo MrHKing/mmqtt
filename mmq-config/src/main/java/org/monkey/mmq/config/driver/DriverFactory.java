@@ -13,30 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.monkey.mmq.config.driver;
 
-package org.monkey.mmq.config.matedata;
+import org.monkey.mmq.config.matedata.ResourceEnum;
+import org.monkey.mmq.core.utils.ApplicationUtils;
 
 /**
- * Key operations for data.
- *
  * @author solley
- * @since 1.0.0
  */
-public class KeyBuilder {
-
-    public static boolean matchResourcesKey(String key) {
-        return key.startsWith(UtilsAndCommons.RESOURCES_STORE);
-    }
-
-    public static boolean matchRuleEngineKey(String key) {
-        return key.startsWith(UtilsAndCommons.RULE_ENGINE_STORE);
-    }
-
-    public static String getResourcesKey() {
-        return UtilsAndCommons.RESOURCES_STORE;
-    }
-
-    public static String getRuleEngineKey() {
-        return UtilsAndCommons.RULE_ENGINE_STORE;
+public class DriverFactory {
+    public static ResourceDriver getResourceDriverByEnum(ResourceEnum resourceEnum) {
+        return (ResourceDriver) ApplicationUtils.getBean(resourceEnum.getName());
     }
 }

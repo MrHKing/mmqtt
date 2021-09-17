@@ -19,8 +19,8 @@ import org.monkey.mmq.config.config.Loggers;
 import org.monkey.mmq.config.driver.DriverFactory;
 import org.monkey.mmq.config.driver.MysqlDriver;
 import org.monkey.mmq.config.matedata.KeyBuilder;
+import org.monkey.mmq.config.matedata.RuleEngineMateData;
 import org.monkey.mmq.config.matedata.UtilsAndCommons;
-import org.monkey.mmq.config.matedata.ResourcesMateData;
 import org.monkey.mmq.core.consistency.matedata.RecordListener;
 import org.monkey.mmq.core.consistency.persistent.ConsistencyService;
 import org.monkey.mmq.core.exception.MmqException;
@@ -33,17 +33,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Resources Service
+ * RuleEngine Service
  *
  * @author solley
  */
 @Service
-public class ResourcesService implements RecordListener<ResourcesMateData> {
+public class RuleEngineService implements RecordListener<RuleEngineMateData> {
 
     @Autowired
     MysqlDriver mysqlDriver;
 
-    Map<String, ResourcesMateData> resourcesMateDataMap = new HashMap<>();
+    Map<String, RuleEngineMateData> ruleEngineMateDataMap = new HashMap<>();
 
     @Resource(name = "configPersistentConsistencyServiceDelegate")
     private ConsistencyService consistencyService;
@@ -54,54 +54,53 @@ public class ResourcesService implements RecordListener<ResourcesMateData> {
     @PostConstruct
     public void init() {
         try {
-            consistencyService.listen(KeyBuilder.getResourcesKey(), this);
+            consistencyService.listen(KeyBuilder.getRuleEngineKey(), this);
         } catch (MmqException e) {
-            Loggers.CONFIG_SERVER.error("listen resources service failed.", e);
+            Loggers.CONFIG_SERVER.error("listen ruleEngine service failed.", e);
         }
     }
 
-    public void save(String resourceID, ResourcesMateData resourcesMateData) {
+    public void save(String ruleId, RuleEngineMateData ruleEngineMateData) {
         try {
-            consistencyService.put(UtilsAndCommons.RESOURCES_STORE + resourceID, resourcesMateData);
+            consistencyService.put(UtilsAndCommons.RULE_ENGINE_STORE + ruleId, ruleEngineMateData);
         } catch (MmqException e) {
-            Loggers.CONFIG_SERVER.error("save resources failed.", e);
+            Loggers.CONFIG_SERVER.error("save ruleEngine failed.", e);
         }
     }
 
-    public void delete(String resourceID) {
+    public void delete(String ruleId) {
         try {
-            consistencyService.remove(UtilsAndCommons.RESOURCES_STORE + resourceID);
+            consistencyService.remove(UtilsAndCommons.RULE_ENGINE_STORE + ruleId);
         } catch (MmqException e) {
-            Loggers.CONFIG_SERVER.error("delete resources failed.", e);
+            Loggers.CONFIG_SERVER.error("delete ruleEngine failed.", e);
         }
     }
 
-    public Map<String, ResourcesMateData> getAllResources() {
-        return resourcesMateDataMap;
+    public Map<String, RuleEngineMateData> getAllRuleEngine() {
+        return ruleEngineMateDataMap;
     }
 
-    public ResourcesMateData getResourcesByResourceID(String resourceID) {
-        return resourcesMateDataMap.get(resourceID);
+    public RuleEngineMateData getRuleEngineByRuleId(String ruleId) {
+        return ruleEngineMateDataMap.get(ruleId);
     }
 
     @Override
     public boolean interests(String key) {
-        return KeyBuilder.matchResourcesKey(key);
+        return KeyBuilder.matchRuleEngineKey(key);
     }
 
     @Override
     public boolean matchUnlistenKey(String key) {
-        return KeyBuilder.matchResourcesKey(key);
+        return KeyBuilder.matchRuleEngineKey(key);
     }
 
     @Override
-    public void onChange(String key, ResourcesMateData value) throws Exception {
-        resourcesMateDataMap.put(key, value);
-        DriverFactory.getResourceDriverByEnum(value.getType()).init(value.getResource());
+    public void onChange(String key, RuleEngineMateData value) throws Exception {
+        ruleEngineMateDataMap.put(key, value);
     }
 
     @Override
     public void onDelete(String key) throws Exception {
-        resourcesMateDataMap.remove(key);
+        ruleEngineMateDataMap.remove(key);
     }
 }

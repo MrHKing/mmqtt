@@ -15,13 +15,10 @@
  */
 package org.monkey.mmq.web.controller;
 
-import org.monkey.mmq.auth.model.User;
-import org.monkey.mmq.config.matedata.resources.ResourcesMateData;
+import org.monkey.mmq.config.matedata.ResourcesMateData;
 import org.monkey.mmq.config.service.ResourcesService;
 import org.monkey.mmq.core.consistency.model.RestResultUtils;
-import org.monkey.mmq.core.utils.PasswordEncoderUtil;
 import org.monkey.mmq.core.utils.StringUtils;
-import org.monkey.mmq.metadata.system.SystemInfoMateData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -62,7 +59,7 @@ public class ResourcesController {
     }
 
     /**
-     * Create a new user.
+     * Create a new resources.
      *
      * @param resourcesMateData
      * @return ok if create succeed
@@ -75,7 +72,7 @@ public class ResourcesController {
     }
 
     /**
-     * 胡德资源id
+     * 获得资源id
      * @return
      */
     private String getResourceID() {
