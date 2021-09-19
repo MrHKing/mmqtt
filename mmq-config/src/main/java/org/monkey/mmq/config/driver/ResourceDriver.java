@@ -5,7 +5,7 @@ import java.util.Map;
 
 public interface ResourceDriver<T> {
 
-    void init(Map<String, Object> resource);
+    void addDriver(String resourceId, Map<String, Object> resource);
 
-    T getDriver() throws Exception;
+    T getDriver(String resourceId) throws Exception;
 }

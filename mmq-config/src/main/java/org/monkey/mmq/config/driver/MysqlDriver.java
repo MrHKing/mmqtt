@@ -23,23 +23,27 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author solley
  */
 @Component
 public class MysqlDriver implements ResourceDriver<Connection>{
-    private static DruidDataSource dataSource;
-    /*8.X版本连接器写法*/
+
+    private ConcurrentHashMap<String, DruidDataSource> dataSources;
+
     static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
 
     @Override
-    public void init(Map<String, Object> resource) {
+    public void addDriver(String resourceId, Map<String, Object> resource) {
+        if (dataSources.get(resourceId) != null) return;
         if (StringUtils.isEmpty(resource.get("ip").toString())) return;
         if (StringUtils.isEmpty(resource.get("databaseName").toString())) return;
         if (StringUtils.isEmpty(resource.get("username").toString())) return;
         if (StringUtils.isEmpty(resource.get("password").toString())) return;
-        dataSource = new DruidDataSource(); // 创建Druid连接池
+
+        DruidDataSource dataSource = new DruidDataSource(); // 创建Druid连接池
         dataSource.setDriverClassName(JDBC_DRIVER); // 设置连接池的数据库驱动
         dataSource.setUrl(String.format("jdbc:mysql://%s:%s/%s?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT",
                 resource.get("ip").toString(),
@@ -50,11 +54,13 @@ public class MysqlDriver implements ResourceDriver<Connection>{
         dataSource.setInitialSize(8); // 设置连接池的初始大小
         dataSource.setMinIdle(1); // 设置连接池大小的下限
         dataSource.setMaxActive(20); // 设置连接池大小的上限
+        dataSources.put(resourceId, dataSource);
     }
 
     @Override
-    public Connection getDriver() throws Exception {
-        if (dataSource == null) return null;
-        return dataSource.getConnection();
+    public Connection getDriver(String resourceId) throws Exception {
+        if (dataSources == null) return null;
+        if (dataSources.get(resourceId) == null) return null;
+        return dataSources.get(resourceId).getConnection();
     }
 }

@@ -20,21 +20,26 @@ import org.monkey.mmq.core.utils.StringUtils;
 
 import java.sql.Connection;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author solley
  */
 public class PostgresqlDriver implements ResourceDriver<Connection>{
-    private static DruidDataSource dataSource;
+
+    private ConcurrentHashMap<String, DruidDataSource> dataSources;
+
     static final String JDBC_DRIVER = "org.postgresql.Driver";
 
     @Override
-    public void init(Map resource) {
+    public void addDriver(String resourceId, Map resource) {
+        if (dataSources.get(resourceId) != null) return;
         if (StringUtils.isEmpty(resource.get("ip").toString())) return;
         if (StringUtils.isEmpty(resource.get("databaseName").toString())) return;
         if (StringUtils.isEmpty(resource.get("username").toString())) return;
         if (StringUtils.isEmpty(resource.get("password").toString())) return;
-        dataSource = new DruidDataSource(); // 创建Druid连接池
+
+        DruidDataSource dataSource = new DruidDataSource(); // 创建Druid连接池
         dataSource.setDriverClassName(JDBC_DRIVER); // 设置连接池的数据库驱动
         dataSource.setUrl(String.format("jdbc:postgresql://%s:%s/%s?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT",
                 resource.get("ip").toString(),
@@ -45,11 +50,13 @@ public class PostgresqlDriver implements ResourceDriver<Connection>{
         dataSource.setInitialSize(8); // 设置连接池的初始大小
         dataSource.setMinIdle(1); // 设置连接池大小的下限
         dataSource.setMaxActive(20); // 设置连接池大小的上限
+        dataSources.put(resourceId, dataSource);
     }
 
     @Override
-    public Connection getDriver() throws Exception {
-        if (dataSource == null) return null;
-        return dataSource.getConnection();
+    public Connection getDriver(String resourceId) throws Exception {
+        if (dataSources == null) return null;
+        if (dataSources.get(resourceId) == null) return null;
+        return dataSources.get(resourceId).getConnection();
     }
 }

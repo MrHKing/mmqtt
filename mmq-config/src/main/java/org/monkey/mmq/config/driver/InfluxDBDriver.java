@@ -22,12 +22,12 @@ import java.util.Map;
  */
 public class InfluxDBDriver implements ResourceDriver{
     @Override
-    public void init(Map resource) {
+    public void addDriver(String resourceId, Map resource) {
 
     }
 
     @Override
-    public Object getDriver() throws Exception {
+    public Object getDriver(String resourceId) throws Exception {
         return null;
     }
 }

@@ -97,7 +97,7 @@ public class ResourcesService implements RecordListener<ResourcesMateData> {
     @Override
     public void onChange(String key, ResourcesMateData value) throws Exception {
         resourcesMateDataMap.put(key, value);
-        DriverFactory.getResourceDriverByEnum(value.getType()).init(value.getResource());
+        DriverFactory.getResourceDriverByEnum(value.getType()).addDriver(key, value.getResource());
     }
 
     @Override
