@@ -65,6 +65,7 @@ export const asyncRouterMap = [
                     {
                         path: '/ruleEngine/RuleEngineModel',
                         name: 'RuleEngineModel',
+                        props: true,
                         component: () => import('@/views/ruleEngine/modules/RuleEngineModel'),
                         hidden: true
                     }

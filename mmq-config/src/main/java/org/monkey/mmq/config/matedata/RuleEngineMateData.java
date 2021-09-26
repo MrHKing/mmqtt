@@ -27,13 +27,23 @@ public class RuleEngineMateData implements Record, Serializable {
 
     private String ruleId;
 
-    private String Sql;
+    private String name;
+
+    private String sql;
 
     private String description;
 
     private Boolean enable;
 
     private List<ResourcesMateData> resourcesMateDatas;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public String getRuleId() {
         return ruleId;
@@ -44,11 +54,11 @@ public class RuleEngineMateData implements Record, Serializable {
     }
 
     public String getSql() {
-        return Sql;
+        return sql;
     }
 
     public void setSql(String sql) {
-        Sql = sql;
+        this.sql = sql;
     }
 
     public String getDescription() {

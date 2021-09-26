@@ -187,9 +187,9 @@ public class MmqKvStorage extends MemoryKvStorage {
     @Override
     public List<byte[]> allKeys() {
         try {
-            if (super.allKeys().size() > 0) {
-                return super.allKeys();
-            }
+//            if (super.allKeys().size() > 0) {
+//                return super.allKeys();
+//            }
 
             KvStorage storage = createActualStorageIfAbsent(org.apache.commons.lang3.StringUtils.EMPTY);
             return storage.allKeys();

@@ -72,18 +72,18 @@ const columns = [
   },
   {
     title: '规则Id',
-    dataIndex: 'clientId'
-  },
-  {
-    title: '是否启用',
-    dataIndex: 'enable',
-    scopedSlots: { customRender: 'enable' }
+    dataIndex: 'ruleId'
   },
   {
     title: '说明',
     dataIndex: 'description',
     sorter: true
   },
+  //   {
+  //     title: '是否启用',
+  //     dataIndex: 'enable',
+  //     scopedSlots: { customRender: 'enable' }
+  //   },
   {
     title: '操作',
     dataIndex: 'action',
@@ -103,6 +103,7 @@ export default {
     return {
       // 高级搜索 展开/关闭
       advanced: false,
+      dataSource: [],
       // 查询参数
       queryParam: {},
       // 加载数据方法 必须为 Promise 对象
@@ -111,6 +112,7 @@ export default {
         console.log('loadData request parameters:', requestParameters)
         return getAction('/v1/ruleEngine/ruleEngines', requestParameters)
           .then(res => {
+            this.dataSource = res.data.data
             return res.data
           })
       },
@@ -163,7 +165,7 @@ export default {
       })
     },
     handleSave (record) {
-      this.$router.push({ name: 'RuleEngineModel', params: { id: '123' } })
+      this.$router.push({ name: 'RuleEngineModel', params: { id: record.ruleId } })
     }
   }
 }

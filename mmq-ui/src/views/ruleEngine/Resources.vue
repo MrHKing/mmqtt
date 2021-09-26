@@ -49,11 +49,11 @@ export default {
     loadData () {
       return getAction('/v1/resources/resources', {})
         .then(res => {
-          this.data = []
-          this.data.push({})
-          res.data.forEach(resource => {
-            this.data.push(resource)
-          })
+          this.data = res.data
+          this.data.unshift({})
+          //   res.data.forEach(resource => {
+          //     this.data.push(resource)
+          //   })
           console.log(this.data)
         })
     },

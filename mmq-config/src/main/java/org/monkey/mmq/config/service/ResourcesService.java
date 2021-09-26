@@ -81,7 +81,7 @@ public class ResourcesService implements RecordListener<ResourcesMateData> {
     }
 
     public ResourcesMateData getResourcesByResourceID(String resourceID) {
-        return resourcesMateDataMap.get(resourceID);
+        return resourcesMateDataMap.get(UtilsAndCommons.RESOURCES_STORE +resourceID);
     }
 
     @Override

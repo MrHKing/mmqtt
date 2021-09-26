@@ -81,7 +81,7 @@ public class RuleEngineService implements RecordListener<RuleEngineMateData> {
     }
 
     public RuleEngineMateData getRuleEngineByRuleId(String ruleId) {
-        return ruleEngineMateDataMap.get(ruleId);
+        return ruleEngineMateDataMap.get(UtilsAndCommons.RULE_ENGINE_STORE + ruleId);
     }
 
     @Override

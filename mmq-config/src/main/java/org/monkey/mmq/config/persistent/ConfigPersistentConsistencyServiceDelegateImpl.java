@@ -18,6 +18,7 @@ package org.monkey.mmq.config.persistent;
 
 
 import org.monkey.mmq.config.matedata.KeyBuilder;
+import org.monkey.mmq.config.matedata.RuleEngineMateData;
 import org.monkey.mmq.config.matedata.UtilsAndCommons;
 import org.monkey.mmq.config.matedata.ResourcesMateData;
 import org.monkey.mmq.core.consistency.matedata.Datum;
@@ -107,6 +108,8 @@ public class ConfigPersistentConsistencyServiceDelegateImpl implements Persisten
     protected Class<? extends Record> getClassOfRecordFromKey(String key) {
         if (KeyBuilder.matchResourcesKey(key)) {
             return ResourcesMateData.class;
+        } else if (KeyBuilder.matchRuleEngineKey(key)) {
+            return RuleEngineMateData.class;
         }
         return Record.class;
     }

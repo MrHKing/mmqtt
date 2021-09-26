@@ -58,6 +58,11 @@ public class RuleEngineController {
                         .skip(pageNo - 1).limit(pageSize).collect(Collectors.toList()));
     }
 
+    @GetMapping
+    public Object getRuleEngine(@RequestParam String ruleId) {
+        return ruleEngineService.getRuleEngineByRuleId(ruleId);
+    }
+
     /**
      * Delete an existed ruleEngines.
      *
