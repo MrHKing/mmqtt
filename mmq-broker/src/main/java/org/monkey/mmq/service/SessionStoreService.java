@@ -53,9 +53,9 @@ public class SessionStoreService implements RecordListener<ClientMateData> {
     @Autowired
     private SystemInfoStoreService systemInfoStoreService;
 
-    private final Map<String, SessionMateData> storage = new ConcurrentSkipListMap<>();
+    private final Map<String, SessionMateData> storage = new ConcurrentHashMap<>();
 
-    private final Map<String, ClientMateData> clientStory = new ConcurrentSkipListMap<>();
+    private final Map<String, ClientMateData> clientStory = new ConcurrentHashMap<>();
 
     /**
      * Init
