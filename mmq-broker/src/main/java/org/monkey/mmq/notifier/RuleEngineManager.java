@@ -16,6 +16,7 @@
 package org.monkey.mmq.notifier;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.config.driver.MysqlDriver;
 import org.monkey.mmq.config.matedata.RuleEngineMateData;
 import org.monkey.mmq.config.service.RuleEngineService;
@@ -84,7 +85,7 @@ public final class RuleEngineManager extends Subscriber<RuleEngineEvent> {
                                             String sql = resource.getResource().get("sql").toString();
                                             connection.createStatement().execute(sql);
                                         } catch (Exception e) {
-                                            e.printStackTrace();
+                                            Loggers.BROKER_SERVER.error(e.getMessage());
                                         }
                                         break;
                                     case TDENGINE:
