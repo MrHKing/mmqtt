@@ -13,23 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.monkey.mmq.web;
+package org.monkey.mmq.notifier;
 
-import org.monkey.mmq.core.env.EnvUtil;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.servlet.ServletComponentScan;
+import org.monkey.mmq.config.matedata.RuleEngineMateData;
+import org.monkey.mmq.core.entity.InternalMessage;
+import org.monkey.mmq.core.notify.Event;
 
 /**
- * Health Controller.
- *
  * @author solley
  */
-@SpringBootApplication(scanBasePackages = "org.monkey.mmq")
-@ServletComponentScan
-public class Mmq {
-    public static void main(String[] args) {
-        EnvUtil.setIsStandalone(true);
-        SpringApplication.run(Mmq.class, args);
+public class RuleEngineEvent extends Event {
+
+    InternalMessage message;
+
+    public InternalMessage getMessage() {
+        return message;
+    }
+
+    public void setMessage(InternalMessage message) {
+        this.message = message;
     }
 }

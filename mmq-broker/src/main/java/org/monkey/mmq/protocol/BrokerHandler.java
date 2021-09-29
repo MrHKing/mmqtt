@@ -23,6 +23,7 @@ import io.netty.handler.codec.mqtt.*;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.AttributeKey;
+import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.metadata.message.SessionMateData;
 
@@ -60,7 +61,7 @@ public class BrokerHandler extends SimpleChannelInboundHandler<MqttMessage> {
 					try {
 						x.processConnect(ctx.channel(), (MqttConnectMessage) msg);
 					} catch (MmqException e) {
-						e.printStackTrace();
+						Loggers.BROKER_SERVER.error(e.getErrMsg());
 					}
 				});
 				break;
@@ -71,7 +72,7 @@ public class BrokerHandler extends SimpleChannelInboundHandler<MqttMessage> {
 					try {
 						x.processPublish(ctx.channel(), (MqttPublishMessage) msg);
 					} catch (MmqException e) {
-						e.printStackTrace();
+						Loggers.BROKER_SERVER.error(e.getErrMsg());
 					}
 				});
 				break;
@@ -80,7 +81,7 @@ public class BrokerHandler extends SimpleChannelInboundHandler<MqttMessage> {
 					try {
 						x.processPubAck(ctx.channel(), (MqttMessageIdVariableHeader) msg.variableHeader());
 					} catch (MmqException e) {
-						e.printStackTrace();
+						Loggers.BROKER_SERVER.error(e.getErrMsg());
 					}
 				});
 				break;
@@ -89,7 +90,7 @@ public class BrokerHandler extends SimpleChannelInboundHandler<MqttMessage> {
 					try {
 						x.processPubRec(ctx.channel(), (MqttMessageIdVariableHeader) msg.variableHeader());
 					} catch (MmqException e) {
-						e.printStackTrace();
+						Loggers.BROKER_SERVER.error(e.getErrMsg());
 					}
 				});
 				break;
@@ -101,7 +102,7 @@ public class BrokerHandler extends SimpleChannelInboundHandler<MqttMessage> {
 					try {
 						x.processPubComp(ctx.channel(), (MqttMessageIdVariableHeader) msg.variableHeader());
 					} catch (MmqException e) {
-						e.printStackTrace();
+						Loggers.BROKER_SERVER.error(e.getErrMsg());
 					}
 				});
 				break;
@@ -125,7 +126,7 @@ public class BrokerHandler extends SimpleChannelInboundHandler<MqttMessage> {
 					try {
 						x.processDisConnect(ctx.channel(), msg);
 					} catch (MmqException e) {
-						e.printStackTrace();
+						Loggers.BROKER_SERVER.error(e.getErrMsg());
 					}
 				});
 				break;

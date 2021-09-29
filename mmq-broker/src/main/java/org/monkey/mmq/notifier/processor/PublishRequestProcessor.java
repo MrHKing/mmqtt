@@ -24,7 +24,9 @@ import org.monkey.mmq.core.cluster.Member;
 import org.monkey.mmq.core.cluster.ServerMemberManager;
 import org.monkey.mmq.core.entity.InternalMessage;
 import org.monkey.mmq.core.entity.ReadRequest;
+import org.monkey.mmq.core.notify.NotifyCenter;
 import org.monkey.mmq.metadata.subscribe.SubscribeMateData;
+import org.monkey.mmq.notifier.RuleEngineEvent;
 import org.monkey.mmq.service.MessageIdService;
 import org.monkey.mmq.service.SessionStoreService;
 import org.monkey.mmq.service.SubscribeStoreService;
@@ -65,6 +67,9 @@ public class PublishRequestProcessor implements RpcProcessor<InternalMessage> {
         this.sendPublishMessage(message.getTopic(), MqttQoS.valueOf(message.getMqttQoS()), message.getMessageBytes().toByteArray(), message.getRetain(), message.getDup());
 
         // 规则引擎
+        RuleEngineEvent ruleEngineEvent = new RuleEngineEvent();
+        ruleEngineEvent.setMessage(message);
+        NotifyCenter.publishEvent(ruleEngineEvent);
     }
 
     @Override

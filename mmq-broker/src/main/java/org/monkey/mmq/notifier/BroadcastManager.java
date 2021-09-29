@@ -98,7 +98,7 @@ public final class BroadcastManager extends Subscriber<PublishEvent> {
         cliClientService = new CliClientServiceImpl();
         cliClientService.init(new CliOptions());
 
-        NotifyCenter.registerToPublisher(ValueChangeEvent.class, queueMaxSize);
+        NotifyCenter.registerToPublisher(PublishEvent.class, queueMaxSize);
         NotifyCenter.registerSubscriber(this);
     }
 
@@ -129,6 +129,9 @@ public final class BroadcastManager extends Subscriber<PublishEvent> {
         });
 
         // 规则引擎
+        RuleEngineEvent ruleEngineEvent = new RuleEngineEvent();
+        ruleEngineEvent.setMessage(event.getInternalMessage());
+        NotifyCenter.publishEvent(ruleEngineEvent);
     }
 
     @Override

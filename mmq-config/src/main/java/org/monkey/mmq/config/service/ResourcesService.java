@@ -18,6 +18,7 @@ package org.monkey.mmq.config.service;
 import org.monkey.mmq.config.config.Loggers;
 import org.monkey.mmq.config.driver.DriverFactory;
 import org.monkey.mmq.config.driver.MysqlDriver;
+import org.monkey.mmq.config.driver.ResourceDriver;
 import org.monkey.mmq.config.matedata.KeyBuilder;
 import org.monkey.mmq.config.matedata.UtilsAndCommons;
 import org.monkey.mmq.config.matedata.ResourcesMateData;
@@ -39,9 +40,6 @@ import java.util.Map;
  */
 @Service
 public class ResourcesService implements RecordListener<ResourcesMateData> {
-
-    @Autowired
-    MysqlDriver mysqlDriver;
 
     Map<String, ResourcesMateData> resourcesMateDataMap = new HashMap<>();
 
@@ -97,7 +95,7 @@ public class ResourcesService implements RecordListener<ResourcesMateData> {
     @Override
     public void onChange(String key, ResourcesMateData value) throws Exception {
         resourcesMateDataMap.put(key, value);
-        DriverFactory.getResourceDriverByEnum(value.getType()).addDriver(key, value.getResource());
+        DriverFactory.getResourceDriverByEnum(value.getType()).addDriver(value.getResourceID(), value.getResource());
     }
 
     @Override

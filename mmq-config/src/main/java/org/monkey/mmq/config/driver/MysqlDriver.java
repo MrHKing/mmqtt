@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class MysqlDriver implements ResourceDriver<Connection>{
 
-    private ConcurrentHashMap<String, DruidDataSource> dataSources;
+    private ConcurrentHashMap<String, DruidDataSource> dataSources = new ConcurrentHashMap<>();
 
     static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
 

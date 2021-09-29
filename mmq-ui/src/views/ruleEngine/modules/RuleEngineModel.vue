@@ -44,11 +44,11 @@
           <p style="background: rgba(55, 54, 61, 0.2); padding: 10px 5px">SELECT * FROM "topic/#"</p>
           <p>2.查询专门字段SQL:</p>
           <p style="background: rgba(55, 54, 61, 0.2); padding: 10px 5px">
-            SELECT payload.value, payload.deviceName FROM "topic/#"
+            SELECT this.payload.value, this.payload.deviceName FROM "topic/#"
           </p>
           <p>3.条件查询SQL:</p>
           <p style="background: rgba(55, 54, 61, 0.2); padding: 10px 5px">
-            SELECT payload.value, payload.deviceName FROM "topic/#" WHERE payload.deviceName like 'abc%'
+            SELECT this.payload.value, this.payload.deviceName FROM "topic/#" WHERE this.payload.deviceName like 'abc%'
           </p>
         </a-card>
       </a-col>
@@ -174,7 +174,7 @@ export default {
       ruleEngine: {
         ruleId: '',
         name: '',
-        sql: 'SELECT \n   payload.msg as msg \nFROM \n   "t/#" \nWHERE \n   msg = ' + '\'hello\'',
+        sql: 'SELECT \n   this.payload.msg as msg \nFROM \n   "t/#" \nWHERE \n   this.payload.msg = ' + '\'hello\'',
         description: '',
         enable: true,
         resourcesMateDatas: [{}]

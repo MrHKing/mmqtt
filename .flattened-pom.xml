@@ -80,6 +80,7 @@
     <hutool.version>4.1.6</hutool.version>
     <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
     <sonar-maven-plugin.version>3.0.2</sonar-maven-plugin.version>
+    <druid-version>1.2.6</druid-version>
     <dependency-mediator-maven-plugin.version>1.0.2</dependency-mediator-maven-plugin.version>
     <clirr-maven-plugin.version>2.7</clirr-maven-plugin.version>
     <maven.compiler.source>1.8</maven.compiler.source>
@@ -363,6 +364,11 @@
         <groupId>org.hswebframework</groupId>
         <artifactId>hsweb-utils</artifactId>
         <version>${hsweb-utils.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.alibaba</groupId>
+        <artifactId>druid</artifactId>
+        <version>${druid-version}</version>
       </dependency>
       <dependency>
         <groupId>com.alipay.sofa</groupId>

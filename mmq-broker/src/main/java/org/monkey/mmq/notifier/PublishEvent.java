@@ -30,7 +30,6 @@ public class PublishEvent extends Event {
 
     public InternalMessage message;
 
-
     public RejectClient rejectClient;
 
     public InternalMessage getInternalMessage() {
