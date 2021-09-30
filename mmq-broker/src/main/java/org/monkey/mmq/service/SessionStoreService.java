@@ -25,6 +25,7 @@ import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.entity.RejectClient;
 import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.core.notify.NotifyCenter;
+import org.monkey.mmq.core.utils.StringUtils;
 import org.monkey.mmq.metadata.KeyBuilder;
 import org.monkey.mmq.core.consistency.matedata.RecordListener;
 import org.monkey.mmq.metadata.UtilsAndCommons;
@@ -99,6 +100,7 @@ public class SessionStoreService implements RecordListener<ClientMateData> {
     }
 
     public boolean containsKey(String clientId) {
+        if (StringUtils.isEmpty(clientId)) return false;
         return storage.containsKey(clientId);
     }
 

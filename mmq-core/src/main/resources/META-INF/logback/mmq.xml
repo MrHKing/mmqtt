@@ -229,6 +229,11 @@
         <level value="INFO"/>
         <appender-ref ref="alipay-jraft"/>
     </logger>
+
+    <logger name="io.netty.handler" additivity="false">
+        <level value="INFO"/>
+        <appender-ref ref="CONSOLE"/>
+    </logger>
     
     <springProfile name="standalone">
         
