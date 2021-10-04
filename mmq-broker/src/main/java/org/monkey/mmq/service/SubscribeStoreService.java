@@ -17,6 +17,7 @@ package org.monkey.mmq.service;
 
 import cn.hutool.core.util.StrUtil;
 import org.monkey.mmq.config.Loggers;
+import org.monkey.mmq.core.cluster.ServerMemberManager;
 import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.metadata.KeyBuilder;
 import org.monkey.mmq.core.consistency.matedata.RecordListener;
@@ -52,6 +53,12 @@ public class SubscribeStoreService implements RecordListener<SubscribeMateData> 
 
     private Map<String, ConcurrentHashMap<String, SubscribeMateData>> subWildcard = new ConcurrentHashMap<>();
 
+    private final ServerMemberManager memberManager;
+
+    public SubscribeStoreService(ServerMemberManager memberManager) {
+        this.memberManager = memberManager;
+    }
+
     /**
      * Init
      */
@@ -67,6 +74,8 @@ public class SubscribeStoreService implements RecordListener<SubscribeMateData> 
     public void put(String topicFilter, SubscribeMateData subscribeStore) throws MmqException {
         String key = UtilsAndCommons.SUBSCRIBE_STORE + topicFilter + subscribeStore.getClientId();
         subscribeStore.setKey(key);
+        subscribeStore.setNodeIp(memberManager.getSelf().getIp());
+        subscribeStore.setNodePort(memberManager.getSelf().getPort());
         consistencyService.put(key, subscribeStore);
     }
 

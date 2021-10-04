@@ -132,11 +132,10 @@
             <groupId>com.alipay.sofa</groupId>
             <artifactId>jraft-core</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>com.alipay.sofa</groupId>
-            <artifactId>rpc-grpc-impl</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.alipay.sofa</groupId>-->
+<!--            <artifactId>rpc-grpc-impl</artifactId>-->
+<!--        </dependency>-->
         <!-- JRaft dependency end -->
 
         <dependency>

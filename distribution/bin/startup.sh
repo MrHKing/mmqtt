@@ -107,6 +107,7 @@ else
 fi
 
 JAVA_OPT="${JAVA_OPT} -Dmmq.home=${BASE_DIR}"
+JAVA_OPT="${JAVA_OPT} -Dmmq.home=${BASE_DIR}"
 JAVA_OPT="${JAVA_OPT} -jar ${BASE_DIR}/target/${SERVER}.jar"
 JAVA_OPT="${JAVA_OPT} ${JAVA_OPT_EXT}"
 JAVA_OPT="${JAVA_OPT} --spring.config.additional-location=${CUSTOM_SEARCH_LOCATIONS}"

@@ -23,7 +23,6 @@ import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.core.utils.LoggerUtils;
 import org.monkey.mmq.service.DupPubRelMessageStoreService;
-import org.monkey.mmq.service.MessageIdService;
 
 /**
  * PUBCOMP连接处理
@@ -31,12 +30,9 @@ import org.monkey.mmq.service.MessageIdService;
  */
 public class PubComp {
 
-	private MessageIdService messageIdService;
-
 	private DupPubRelMessageStoreService dupPubRelMessageStoreService;
 
-	public PubComp(MessageIdService messageIdService, DupPubRelMessageStoreService dupPubRelMessageStoreService) {
-		this.messageIdService = messageIdService;
+	public PubComp(DupPubRelMessageStoreService dupPubRelMessageStoreService) {
 		this.dupPubRelMessageStoreService = dupPubRelMessageStoreService;
 	}
 

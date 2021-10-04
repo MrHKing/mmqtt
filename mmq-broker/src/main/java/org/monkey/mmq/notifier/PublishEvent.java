@@ -32,6 +32,26 @@ public class PublishEvent extends Event {
 
     public RejectClient rejectClient;
 
+    private String nodeIp;
+
+    private int nodePort;
+
+    public String getNodeIp() {
+        return nodeIp;
+    }
+
+    public void setNodeIp(String nodeIp) {
+        this.nodeIp = nodeIp;
+    }
+
+    public int getNodePort() {
+        return nodePort;
+    }
+
+    public void setNodePort(int nodePort) {
+        this.nodePort = nodePort;
+    }
+
     public InternalMessage getInternalMessage() {
         return message;
     }

@@ -15,6 +15,10 @@
  */
 package org.monkey.mmq.notifier.processor;
 
+import com.alipay.remoting.AsyncContext;
+import com.alipay.remoting.BizContext;
+import com.alipay.remoting.rpc.protocol.AsyncUserProcessor;
+import com.alipay.remoting.rpc.protocol.SyncUserProcessor;
 import com.alipay.sofa.jraft.rpc.RpcContext;
 import com.alipay.sofa.jraft.rpc.RpcProcessor;
 import io.netty.buffer.Unpooled;
@@ -25,9 +29,9 @@ import org.monkey.mmq.core.cluster.ServerMemberManager;
 import org.monkey.mmq.core.entity.InternalMessage;
 import org.monkey.mmq.core.entity.ReadRequest;
 import org.monkey.mmq.core.notify.NotifyCenter;
+import org.monkey.mmq.metadata.message.SessionMateData;
 import org.monkey.mmq.metadata.subscribe.SubscribeMateData;
 import org.monkey.mmq.notifier.RuleEngineEvent;
-import org.monkey.mmq.service.MessageIdService;
 import org.monkey.mmq.service.SessionStoreService;
 import org.monkey.mmq.service.SubscribeStoreService;
 
@@ -39,7 +43,7 @@ import java.util.List;
  *
  * @author solley
  */
-public class PublishRequestProcessor implements RpcProcessor<InternalMessage> {
+public class PublishRequestProcessor extends AsyncUserProcessor<InternalMessage> {
 
     private static final String INTEREST_NAME = InternalMessage.class.getName();
 
@@ -49,22 +53,20 @@ public class PublishRequestProcessor implements RpcProcessor<InternalMessage> {
 
     private final SessionStoreService sessionStoreService;
 
-    private final MessageIdService messageIdService;
-
     public PublishRequestProcessor(Member local,
                                    SubscribeStoreService subscribeStoreService,
-                                   SessionStoreService sessionStoreService,
-                                   MessageIdService messageIdService) {
+                                   SessionStoreService sessionStoreService) {
         this.local = local;
         this.subscribeStoreService = subscribeStoreService;
         this.sessionStoreService = sessionStoreService;
-        this.messageIdService = messageIdService;
     }
 
     @Override
-    public void handleRequest(RpcContext rpcContext, InternalMessage message) {
+    public void handleRequest(BizContext bizContext, AsyncContext asyncContext, InternalMessage message) {
         // 处理消息
-        this.sendPublishMessage(message.getTopic(), MqttQoS.valueOf(message.getMqttQoS()), message.getMessageBytes().toByteArray(), message.getRetain(), message.getDup());
+        this.sendPublishMessage(message.getTopic(), MqttQoS.valueOf(message.getMqttQoS()),
+                message.getMessageBytes().toByteArray(), message.getRetain(),
+                message.getDup(), message.getMessageId());
 
         // 规则引擎
         RuleEngineEvent ruleEngineEvent = new RuleEngineEvent();
@@ -73,11 +75,16 @@ public class PublishRequestProcessor implements RpcProcessor<InternalMessage> {
     }
 
     @Override
+    public boolean processInIOThread() {
+        return true;
+    }
+
+    @Override
     public String interest() {
         return INTEREST_NAME;
     }
 
-    private void sendPublishMessage(String topic, MqttQoS mqttQoS, byte[] messageBytes, boolean retain, boolean dup) {
+    private void sendPublishMessage(String topic, MqttQoS mqttQoS, byte[] messageBytes, boolean retain, boolean dup, int messageId) {
         List<SubscribeMateData> subscribeStores = subscribeStoreService.search(topic);
         subscribeStores.forEach(subscribeStore -> {
             if (sessionStoreService.containsKey(subscribeStore.getClientId())) {
@@ -88,23 +95,30 @@ public class PublishRequestProcessor implements RpcProcessor<InternalMessage> {
                             new MqttFixedHeader(MqttMessageType.PUBLISH, dup, respQoS, retain, 0),
                             new MqttPublishVariableHeader(topic, 0), Unpooled.buffer().writeBytes(messageBytes));
                     Loggers.BROKER_NOTIFIER.debug("PUBLISH - clientId: {}, topic: {}, Qos: {}", subscribeStore.getClientId(), topic, respQoS.value());
-                    sessionStoreService.get(subscribeStore.getClientId()).getChannel().writeAndFlush(publishMessage);
+                    SessionMateData sessionStore = sessionStoreService.get(subscribeStore.getClientId());
+                    if (sessionStore != null) {
+                        sessionStore.getChannel().writeAndFlush(publishMessage);
+                    }
                 }
                 if (respQoS == MqttQoS.AT_LEAST_ONCE) {
-                    int messageId = messageIdService.getNextMessageId();
                     MqttPublishMessage publishMessage = (MqttPublishMessage) MqttMessageFactory.newMessage(
                             new MqttFixedHeader(MqttMessageType.PUBLISH, dup, respQoS, retain, 0),
                             new MqttPublishVariableHeader(topic, messageId), Unpooled.buffer().writeBytes(messageBytes));
                     Loggers.BROKER_NOTIFIER.debug("PUBLISH - clientId: {}, topic: {}, Qos: {}, messageId: {}", subscribeStore.getClientId(), topic, respQoS.value(), messageId);
-                    sessionStoreService.get(subscribeStore.getClientId()).getChannel().writeAndFlush(publishMessage);
+                    SessionMateData sessionStore = sessionStoreService.get(subscribeStore.getClientId());
+                    if (sessionStore != null) {
+                        sessionStore.getChannel().writeAndFlush(publishMessage);
+                    }
                 }
                 if (respQoS == MqttQoS.EXACTLY_ONCE) {
-                    int messageId = messageIdService.getNextMessageId();
                     MqttPublishMessage publishMessage = (MqttPublishMessage) MqttMessageFactory.newMessage(
                             new MqttFixedHeader(MqttMessageType.PUBLISH, dup, respQoS, retain, 0),
                             new MqttPublishVariableHeader(topic, messageId), Unpooled.buffer().writeBytes(messageBytes));
                     Loggers.BROKER_NOTIFIER.debug("PUBLISH - clientId: {}, topic: {}, Qos: {}, messageId: {}", subscribeStore.getClientId(), topic, respQoS.value(), messageId);
-                    sessionStoreService.get(subscribeStore.getClientId()).getChannel().writeAndFlush(publishMessage);
+                    SessionMateData sessionStore = sessionStoreService.get(subscribeStore.getClientId());
+                    if (sessionStore != null) {
+                        sessionStore.getChannel().writeAndFlush(publishMessage);
+                    }
                 }
             }
         });

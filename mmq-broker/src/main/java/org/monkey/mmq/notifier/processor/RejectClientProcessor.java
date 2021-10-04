@@ -15,6 +15,8 @@
  */
 package org.monkey.mmq.notifier.processor;
 
+import com.alipay.remoting.BizContext;
+import com.alipay.remoting.rpc.protocol.SyncUserProcessor;
 import com.alipay.sofa.jraft.rpc.RpcContext;
 import com.alipay.sofa.jraft.rpc.RpcProcessor;
 import org.monkey.mmq.core.cluster.Member;
@@ -28,7 +30,7 @@ import org.monkey.mmq.service.SessionStoreService;
  *
  * @author solley
  */
-public class RejectClientProcessor implements RpcProcessor<RejectClient> {
+public class RejectClientProcessor extends SyncUserProcessor<RejectClient> {
 
     private static final String INTEREST_NAME = RejectClient.class.getName();
 
@@ -38,11 +40,12 @@ public class RejectClientProcessor implements RpcProcessor<RejectClient> {
         this.sessionStoreService = sessionStoreService;
     }
 
-   @Override
-    public void handleRequest(RpcContext rpcContext, RejectClient rejectClient) {
-       SessionMateData sessionMateData = sessionStoreService.get(rejectClient.getClientId());
-       if (sessionMateData == null) return;
-       sessionMateData.getChannel().close();
+    @Override
+    public Object handleRequest(BizContext bizContext, RejectClient rejectClient) throws Exception {
+        SessionMateData sessionMateData = sessionStoreService.get(rejectClient.getClientId());
+        if (sessionMateData == null) return null;
+        sessionMateData.getChannel().close();
+        return null;
     }
 
     @Override

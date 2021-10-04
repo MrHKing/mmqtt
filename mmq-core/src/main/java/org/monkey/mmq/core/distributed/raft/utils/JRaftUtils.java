@@ -25,8 +25,6 @@ import com.alipay.sofa.jraft.entity.PeerId;
 import com.alipay.sofa.jraft.option.NodeOptions;
 import com.alipay.sofa.jraft.rpc.RaftRpcServerFactory;
 import com.alipay.sofa.jraft.rpc.RpcServer;
-import com.alipay.sofa.jraft.rpc.impl.GrpcRaftRpcFactory;
-import com.alipay.sofa.jraft.rpc.impl.MarshallerRegistry;
 import com.alipay.sofa.jraft.util.RpcFactoryHelper;
 import org.monkey.mmq.core.cluster.ServerMemberManager;
 import org.monkey.mmq.core.consistency.SerializeFactory;
@@ -55,23 +53,23 @@ import java.util.stream.Collectors;
 public class JRaftUtils {
     
     public static RpcServer initRpcServer(JRaftServer server, PeerId peerId) {
-        GrpcRaftRpcFactory raftRpcFactory = (GrpcRaftRpcFactory) RpcFactoryHelper.rpcFactory();
-        raftRpcFactory.registerProtobufSerializer(Log.class.getName(), Log.getDefaultInstance());
-        raftRpcFactory.registerProtobufSerializer(GetRequest.class.getName(), GetRequest.getDefaultInstance());
-        raftRpcFactory.registerProtobufSerializer(WriteRequest.class.getName(), WriteRequest.getDefaultInstance());
-        raftRpcFactory.registerProtobufSerializer(ReadRequest.class.getName(), ReadRequest.getDefaultInstance());
-        raftRpcFactory.registerProtobufSerializer(Response.class.getName(), Response.getDefaultInstance());
+//        GrpcRaftRpcFactory raftRpcFactory = (GrpcRaftRpcFactory) RpcFactoryHelper.rpcFactory();
+//        raftRpcFactory.registerProtobufSerializer(Log.class.getName(), Log.getDefaultInstance());
+//        raftRpcFactory.registerProtobufSerializer(GetRequest.class.getName(), GetRequest.getDefaultInstance());
+//        raftRpcFactory.registerProtobufSerializer(WriteRequest.class.getName(), WriteRequest.getDefaultInstance());
+//        raftRpcFactory.registerProtobufSerializer(ReadRequest.class.getName(), ReadRequest.getDefaultInstance());
+//        raftRpcFactory.registerProtobufSerializer(Response.class.getName(), Response.getDefaultInstance());
+//
+//        MarshallerRegistry registry = raftRpcFactory.getMarshallerRegistry();
+//        registry.registerResponseInstance(Log.class.getName(), Response.getDefaultInstance());
+//        registry.registerResponseInstance(GetRequest.class.getName(), Response.getDefaultInstance());
+//
+//        registry.registerResponseInstance(WriteRequest.class.getName(), Response.getDefaultInstance());
+//        registry.registerResponseInstance(ReadRequest.class.getName(), Response.getDefaultInstance());
         
-        MarshallerRegistry registry = raftRpcFactory.getMarshallerRegistry();
-        registry.registerResponseInstance(Log.class.getName(), Response.getDefaultInstance());
-        registry.registerResponseInstance(GetRequest.class.getName(), Response.getDefaultInstance());
-    
-        registry.registerResponseInstance(WriteRequest.class.getName(), Response.getDefaultInstance());
-        registry.registerResponseInstance(ReadRequest.class.getName(), Response.getDefaultInstance());
-        
-        final RpcServer rpcServer = raftRpcFactory.createRpcServer(peerId.getEndpoint());
-        RaftRpcServerFactory.addRaftRequestProcessors(rpcServer, RaftExecutor.getRaftCoreExecutor(),
-                RaftExecutor.getRaftCliServiceExecutor());
+        final RpcServer rpcServer = RaftRpcServerFactory.createRaftRpcServer(peerId.getEndpoint());
+//        RaftRpcServerFactory.addRaftRequestProcessors(rpcServer, RaftExecutor.getRaftCoreExecutor(),
+//                RaftExecutor.getRaftCliServiceExecutor());
         
         // Deprecated
         rpcServer.registerProcessor(new MmqLogProcessor(server, SerializeFactory.getDefault()));

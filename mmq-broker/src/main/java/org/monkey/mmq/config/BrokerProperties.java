@@ -71,14 +71,14 @@ public class BrokerProperties {
 	private boolean useEpoll = false;
 
 	/**
-	 * Sokcet参数, 存放已完成三次握手请求的队列最大长度, 默认511长度
+	 * Sokcet参数, 存放已完成三次握手请求的队列最大长度, 默认1024长度
 	 */
-	private int soBacklog = 511;
+	private int soBacklog = 1024;
 
 	/**
 	 * Socket参数, 是否开启心跳保活机制, 默认开启
 	 */
-	private boolean soKeepAlive = true;
+	private boolean soKeepAlive = false;
 
 	public int getPort() {
 		return Integer.valueOf(EnvUtil.getProperty(MMQ_BROKER_PORT_PROPERTY, DEFAULT_MMQ_BROKER_PORT));

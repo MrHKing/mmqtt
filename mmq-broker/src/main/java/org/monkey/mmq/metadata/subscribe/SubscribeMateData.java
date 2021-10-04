@@ -22,6 +22,10 @@ public class SubscribeMateData implements Record, Serializable {
 
 	private String key;
 
+	private String nodeIp;
+
+	private int nodePort;
+
 	private int mqttQoS;
 
 	public SubscribeMateData() {
@@ -32,6 +36,22 @@ public class SubscribeMateData implements Record, Serializable {
 		this.clientId = clientId;
 		this.topicFilter = topicFilter;
 		this.mqttQoS = mqttQoS;
+	}
+
+	public String getNodeIp() {
+		return nodeIp;
+	}
+
+	public void setNodeIp(String nodeIp) {
+		this.nodeIp = nodeIp;
+	}
+
+	public int getNodePort() {
+		return nodePort;
+	}
+
+	public void setNodePort(int nodePort) {
+		this.nodePort = nodePort;
 	}
 
 	public String getClientId() {

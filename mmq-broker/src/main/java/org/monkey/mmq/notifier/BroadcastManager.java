@@ -15,12 +15,12 @@
  */
 package org.monkey.mmq.notifier;
 
+import com.alipay.remoting.rpc.RpcClient;
+import com.alipay.remoting.rpc.RpcServer;
 import com.alipay.sofa.jraft.entity.PeerId;
 import com.alipay.sofa.jraft.error.RemotingException;
 import com.alipay.sofa.jraft.option.CliOptions;
-import com.alipay.sofa.jraft.rpc.RpcServer;
-import com.alipay.sofa.jraft.rpc.impl.GrpcRaftRpcFactory;
-import com.alipay.sofa.jraft.rpc.impl.MarshallerRegistry;
+import com.alipay.sofa.jraft.rpc.RaftRpcServerFactory;
 import com.alipay.sofa.jraft.rpc.impl.cli.CliClientServiceImpl;
 import com.alipay.sofa.jraft.util.RpcFactoryHelper;
 import org.monkey.mmq.config.Loggers;
@@ -35,9 +35,9 @@ import org.monkey.mmq.core.notify.Event;
 import org.monkey.mmq.core.notify.NotifyCenter;
 import org.monkey.mmq.core.notify.listener.Subscriber;
 import org.monkey.mmq.core.utils.InetUtils;
+import org.monkey.mmq.core.utils.StringUtils;
 import org.monkey.mmq.notifier.processor.PublishRequestProcessor;
 import org.monkey.mmq.notifier.processor.RejectClientProcessor;
-import org.monkey.mmq.service.MessageIdService;
 import org.monkey.mmq.service.SessionStoreService;
 import org.monkey.mmq.service.SubscribeStoreService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +54,7 @@ import java.sql.PreparedStatement;
 @Component
 public final class BroadcastManager extends Subscriber<PublishEvent> {
 
-    private final int queueMaxSize = 60000;
+    private final int queueMaxSize = 10;
 
     private final RpcServer rpcServer;
 
@@ -62,41 +62,36 @@ public final class BroadcastManager extends Subscriber<PublishEvent> {
 
 //    private final RaftGroupService raftGroupService;
 
-    private final CliClientServiceImpl cliClientService;
+    private final RpcClient client;
 
     public BroadcastManager(ServerMemberManager memberManager,
                             SubscribeStoreService subscribeStoreService,
-                            SessionStoreService sessionStoreService,
-                            MessageIdService messageIdService) {
+                            SessionStoreService sessionStoreService) {
         this.memberManager = memberManager;
 
         // init rpc
-        String localAddress = InetUtils.getSelfIP() + ":" + (this.memberManager.getSelf().getPort() + 10);
+//        String localAddress = InetUtils.getSelfIP() + ":" + (this.memberManager.getSelf().getPort() + 10);
 
-        GrpcRaftRpcFactory raftRpcFactory = (GrpcRaftRpcFactory) RpcFactoryHelper.rpcFactory();
-        raftRpcFactory.registerProtobufSerializer(InternalMessage.class.getName(), InternalMessage.getDefaultInstance());
-        raftRpcFactory.registerProtobufSerializer(RejectClient.class.getName(), RejectClient.getDefaultInstance());
+//        GrpcRaftRpcFactory raftRpcFactory = (GrpcRaftRpcFactory) RpcFactoryHelper.rpcFactory();
+//        raftRpcFactory.registerProtobufSerializer(InternalMessage.class.getName(), InternalMessage.getDefaultInstance());
+//        raftRpcFactory.registerProtobufSerializer(RejectClient.class.getName(), RejectClient.getDefaultInstance());
+//
+//        MarshallerRegistry registry = raftRpcFactory.getMarshallerRegistry();
+//        registry.registerResponseInstance(InternalMessage.class.getName(), Response.getDefaultInstance());
+//        registry.registerResponseInstance(RejectClient.class.getName(), Response.getDefaultInstance());
 
-        MarshallerRegistry registry = raftRpcFactory.getMarshallerRegistry();
-        registry.registerResponseInstance(InternalMessage.class.getName(), Response.getDefaultInstance());
-        registry.registerResponseInstance(RejectClient.class.getName(), Response.getDefaultInstance());
-
-        rpcServer = raftRpcFactory.createRpcServer(PeerId.parsePeer(localAddress).getEndpoint());
-        rpcServer.registerProcessor(new PublishRequestProcessor(
+        rpcServer = new RpcServer(this.memberManager.getSelf().getPort() + 10);
+        rpcServer.registerUserProcessor(new PublishRequestProcessor(
                 this.memberManager.getSelf(),
                 subscribeStoreService,
-                sessionStoreService,
-                messageIdService));
-        rpcServer.registerProcessor(new RejectClientProcessor(sessionStoreService));
+                sessionStoreService));
+        rpcServer.registerUserProcessor(new RejectClientProcessor(sessionStoreService));
+        rpcServer.startup();
 
-        if (!this.rpcServer.init(null)) {
-            Loggers.BROKER_NOTIFIER.error("Fail to init [BaseRpcServer].");
-            throw new RuntimeException("Fail to init [BaseRpcServer].");
-        }
         //raftGroupService = new RaftGroupService(Constants.MQTT_PERSISTENT_BROKER_GROUP, localPeerId, copy, rpcServer, true);
 
-        cliClientService = new CliClientServiceImpl();
-        cliClientService.init(new CliOptions());
+        client = new RpcClient();
+        client.startup();
 
         NotifyCenter.registerToPublisher(PublishEvent.class, queueMaxSize);
         NotifyCenter.registerSubscriber(this);
@@ -104,29 +99,27 @@ public final class BroadcastManager extends Subscriber<PublishEvent> {
 
     @Override
     public void onEvent(PublishEvent event) {
-        this.memberManager.allMembersWithoutSelf().forEach(member -> {
-            try {
-                    switch (event.getPublicEventType()) {
+        if (event == null) return;
+        if (StringUtils.isEmpty(event.getNodeIp())) return;
 
-                        case REJECT_CLIENT:
-                            cliClientService.getRpcClient()
-                                    .invokeAsync(PeerId.parsePeer(member.getIp() + ":" + (member.getPort() + 10)).getEndpoint(),
-                                            event.getRejectClient(), (result, throwable) -> {}, 5000);
-                            break;
-                        case PUBLISH_MESSAGE:
-                        default:
-                            cliClientService.getRpcClient()
-                                    .invokeAsync(PeerId.parsePeer(member.getIp() + ":" + (member.getPort() + 10)).getEndpoint(),
-                                            event.getInternalMessage(), (result, throwable) -> {}, 5000);
-                            break;
-                    }
+        try {
+                switch (event.getPublicEventType()) {
+                    case REJECT_CLIENT:
+                        client.oneway(event.getNodeIp() + ":" + (event.getNodePort() + 10),
+                                        event.getRejectClient());
+                        break;
+                    case PUBLISH_MESSAGE:
+                    default:
+                        client.oneway(event.getNodeIp() + ":" + (event.getNodePort() + 10),
+                                        event.getInternalMessage());
+                        break;
+                }
 
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (RemotingException e) {
-                e.printStackTrace();
-            }
-        });
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (com.alipay.remoting.exception.RemotingException e) {
+            e.printStackTrace();
+        }
 
         // 规则引擎
         RuleEngineEvent ruleEngineEvent = new RuleEngineEvent();

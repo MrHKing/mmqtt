@@ -23,7 +23,6 @@ import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.core.utils.LoggerUtils;
 import org.monkey.mmq.service.DupPublishMessageStoreService;
-import org.monkey.mmq.service.MessageIdService;
 
 /**
  * PUBACK连接处理
@@ -31,12 +30,9 @@ import org.monkey.mmq.service.MessageIdService;
  */
 public class PubAck {
 
-	private MessageIdService messageIdService;
-
 	private DupPublishMessageStoreService dupPublishMessageStoreService;
 
-	public PubAck(MessageIdService messageIdService, DupPublishMessageStoreService dupPublishMessageStoreService) {
-		this.messageIdService = messageIdService;
+	public PubAck(DupPublishMessageStoreService dupPublishMessageStoreService) {
 		this.dupPublishMessageStoreService = dupPublishMessageStoreService;
 	}
 

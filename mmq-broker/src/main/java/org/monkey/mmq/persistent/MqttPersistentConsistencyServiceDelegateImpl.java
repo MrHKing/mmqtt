@@ -116,8 +116,6 @@ public class MqttPersistentConsistencyServiceDelegateImpl implements PersistentC
             return DupPublishMessageMateData.class;
         } else if (KeyBuilder.matchPubRelKey(key)) {
             return DupPubRelMessageMateData.class;
-        } else if (KeyBuilder.matchMessageIdKey(key)) {
-            return MessageIdMateData.class;
         } else if (KeyBuilder.matchRetainKey(key)) {
             return RetainMessageMateData.class;
         }

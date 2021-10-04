@@ -42,6 +42,7 @@ message InternalMessage {
   bytes messageBytes = 5;
   bool retain = 6;
   bool dup = 7;
+  int32 messageId = 8;
 }
 
 message RejectClient {

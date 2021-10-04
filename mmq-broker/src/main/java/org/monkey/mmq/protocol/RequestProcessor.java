@@ -13,26 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.monkey.mmq.metadata.message;
+package org.monkey.mmq.protocol;
 
-import org.monkey.mmq.core.consistency.matedata.Record;
-
-import java.io.Serializable;
-import java.util.concurrent.atomic.AtomicInteger;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.mqtt.MqttMessage;
 
 /**
- * 消息ID元数据
- *
  * @author solley
  */
-public class MessageIdMateData implements Record, Serializable {
-
-    /**
-     * Counter value
-     */
-    private final AtomicInteger value = new AtomicInteger(0);
-
-    public AtomicInteger getValue() {
-        return value;
-    }
+public interface RequestProcessor {
+    void processRequest(ChannelHandlerContext ctx, MqttMessage mqttMessage);
 }

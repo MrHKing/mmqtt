@@ -141,7 +141,11 @@ public class BrokerServer {
 					channelPipeline.addLast("broker", new BrokerHandler(protocolProcess));
 				}
 			})
-			.option(ChannelOption.SO_BACKLOG, brokerProperties.getSoBacklog())
+			.option(ChannelOption.SO_BACKLOG,512)
+//			.childOption(ChannelOption.TCP_NODELAY, false)
+//			.childOption(ChannelOption.SO_SNDBUF, 65536)
+//			.option(ChannelOption.SO_RCVBUF, 65536)
+//			.option(ChannelOption.SO_REUSEADDR, true)
 			.childOption(ChannelOption.SO_KEEPALIVE, brokerProperties.isSoKeepAlive());
 		channel = sb.bind(brokerProperties.getPort()).sync().channel();
 	}
@@ -181,7 +185,11 @@ public class BrokerServer {
 					channelPipeline.addLast("broker", new BrokerHandler(protocolProcess));
 				}
 			})
-			.option(ChannelOption.SO_BACKLOG, brokerProperties.getSoBacklog())
+			.option(ChannelOption.SO_BACKLOG, 512)
+//			.childOption(ChannelOption.TCP_NODELAY, false)
+//			.childOption(ChannelOption.SO_SNDBUF, 65536)
+//			.option(ChannelOption.SO_RCVBUF, 65536)
+//			.option(ChannelOption.SO_REUSEADDR, true)
 			.childOption(ChannelOption.SO_KEEPALIVE, brokerProperties.isSoKeepAlive());
 		websocketChannel = sb.bind(brokerProperties.getWebsocketPort()).sync().channel();
 	}

@@ -114,4 +114,5 @@ server.tomcat.basedir=
 # mmq.core.protocol.raft.data.read_index_type=ReadOnlySafe
 ### rpc request timeout, default 5 seconds
 # mmq.core.protocol.raft.data.rpc_request_timeout_ms=5000
+grpc.default_rpc_server_processor_pool_size = 100
 

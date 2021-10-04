@@ -27,7 +27,6 @@ import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.core.utils.LoggerUtils;
 import org.monkey.mmq.metadata.message.RetainMessageMateData;
 import org.monkey.mmq.metadata.subscribe.SubscribeMateData;
-import org.monkey.mmq.service.MessageIdService;
 import org.monkey.mmq.service.RetainMessageStoreService;
 import org.monkey.mmq.service.SubscribeStoreService;
 
@@ -42,13 +41,10 @@ public class Subscribe {
 
 	private SubscribeStoreService subscribeStoreService;
 
-	private MessageIdService messageIdService;
-
 	private RetainMessageStoreService retainMessageStoreService;
 
-	public Subscribe(SubscribeStoreService subscribeStoreService, MessageIdService messageIdService, RetainMessageStoreService retainMessageStoreService) {
+	public Subscribe(SubscribeStoreService subscribeStoreService,  RetainMessageStoreService retainMessageStoreService) {
 		this.subscribeStoreService = subscribeStoreService;
-		this.messageIdService = messageIdService;
 		this.retainMessageStoreService = retainMessageStoreService;
 	}
 
@@ -78,7 +74,7 @@ public class Subscribe {
 			topicSubscriptions.forEach(topicSubscription -> {
 				String topicFilter = topicSubscription.topicName();
 				MqttQoS mqttQoS = topicSubscription.qualityOfService();
-				this.sendRetainMessage(channel, topicFilter, mqttQoS);
+				this.sendRetainMessage(channel, topicFilter, mqttQoS, msg.variableHeader().messageId());
 			});
 		} else {
 			channel.close();
@@ -104,7 +100,7 @@ public class Subscribe {
 		return true;
 	}
 
-	private void sendRetainMessage(Channel channel, String topicFilter, MqttQoS mqttQoS) {
+	private void sendRetainMessage(Channel channel, String topicFilter, MqttQoS mqttQoS, int packetId) {
 		List<RetainMessageMateData> retainMessageStores = retainMessageStoreService.search(topicFilter);
 		retainMessageStores.forEach(retainMessageStore -> {
 			MqttQoS respQoS = retainMessageStore.getMqttQoS() > mqttQoS.value() ? mqttQoS : MqttQoS.valueOf(retainMessageStore.getMqttQoS());
@@ -116,19 +112,17 @@ public class Subscribe {
 				channel.writeAndFlush(publishMessage);
 			}
 			if (respQoS == MqttQoS.AT_LEAST_ONCE) {
-				int messageId = messageIdService.getNextMessageId();
 				MqttPublishMessage publishMessage = (MqttPublishMessage) MqttMessageFactory.newMessage(
 					new MqttFixedHeader(MqttMessageType.PUBLISH, false, respQoS, false, 0),
-					new MqttPublishVariableHeader(retainMessageStore.getTopic(), messageId), Unpooled.buffer().writeBytes(retainMessageStore.getMessageBytes()));
-				LoggerUtils.printIfDebugEnabled(Loggers.BROKER_PROTOCOL,"PUBLISH - clientId: {}, topic: {}, Qos: {}, messageId: {}", (String) channel.attr(AttributeKey.valueOf("clientId")).get(), retainMessageStore.getTopic(), respQoS.value(), messageId);
+					new MqttPublishVariableHeader(retainMessageStore.getTopic(), packetId), Unpooled.buffer().writeBytes(retainMessageStore.getMessageBytes()));
+				LoggerUtils.printIfDebugEnabled(Loggers.BROKER_PROTOCOL,"PUBLISH - clientId: {}, topic: {}, Qos: {}, messageId: {}", (String) channel.attr(AttributeKey.valueOf("clientId")).get(), retainMessageStore.getTopic(), respQoS.value(), packetId);
 				channel.writeAndFlush(publishMessage);
 			}
 			if (respQoS == MqttQoS.EXACTLY_ONCE) {
-				int messageId = messageIdService.getNextMessageId();
 				MqttPublishMessage publishMessage = (MqttPublishMessage) MqttMessageFactory.newMessage(
 					new MqttFixedHeader(MqttMessageType.PUBLISH, false, respQoS, false, 0),
-					new MqttPublishVariableHeader(retainMessageStore.getTopic(), messageId), Unpooled.buffer().writeBytes(retainMessageStore.getMessageBytes()));
-				LoggerUtils.printIfDebugEnabled(Loggers.BROKER_PROTOCOL,"PUBLISH - clientId: {}, topic: {}, Qos: {}, messageId: {}", (String) channel.attr(AttributeKey.valueOf("clientId")).get(), retainMessageStore.getTopic(), respQoS.value(), messageId);
+					new MqttPublishVariableHeader(retainMessageStore.getTopic(), packetId), Unpooled.buffer().writeBytes(retainMessageStore.getMessageBytes()));
+				LoggerUtils.printIfDebugEnabled(Loggers.BROKER_PROTOCOL,"PUBLISH - clientId: {}, topic: {}, Qos: {}, messageId: {}", (String) channel.attr(AttributeKey.valueOf("clientId")).get(), retainMessageStore.getTopic(), respQoS.value(), packetId);
 				channel.writeAndFlush(publishMessage);
 			}
 		});

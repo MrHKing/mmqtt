@@ -22,6 +22,7 @@ package org.monkey.mmq.service;
  */
 
 import org.monkey.mmq.config.Loggers;
+import org.monkey.mmq.core.cluster.ServerMemberManager;
 import org.monkey.mmq.core.entity.RejectClient;
 import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.core.notify.NotifyCenter;
@@ -83,6 +84,7 @@ public class SessionStoreService implements RecordListener<ClientMateData> {
     }
 
     public SessionMateData get(String clientId) {
+        if (StringUtils.isEmpty(clientId)) return null;
         return storage.get(clientId);
     }
 

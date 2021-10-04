@@ -376,10 +376,6 @@
         <version>${jraft-core.version}</version>
         <exclusions>
           <exclusion>
-            <artifactId>bolt</artifactId>
-            <groupId>com.alipay.sofa</groupId>
-          </exclusion>
-          <exclusion>
             <artifactId>log4j-api</artifactId>
             <groupId>org.apache.logging.log4j</groupId>
           </exclusion>
@@ -396,11 +392,6 @@
             <groupId>org.apache.logging.log4j</groupId>
           </exclusion>
         </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>com.alipay.sofa</groupId>
-        <artifactId>rpc-grpc-impl</artifactId>
-        <version>${rpc-grpc-impl.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

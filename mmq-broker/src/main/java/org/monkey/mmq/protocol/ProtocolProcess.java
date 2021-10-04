@@ -23,6 +23,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+import javax.annotation.PostConstruct;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 /**
  * 协议处理
  * @author Solley
@@ -41,9 +47,6 @@ public class ProtocolProcess {
 	private IAuthService authService;
 
 	@Autowired
-	private MessageIdService messageIdService;
-
-	@Autowired
 	private RetainMessageStoreService messageStoreService;
 
 	@Autowired
@@ -51,6 +54,56 @@ public class ProtocolProcess {
 
 	@Autowired
 	private DupPubRelMessageStoreService dupPubRelMessageStoreService;
+
+
+
+	private ExecutorService connectExecutor;
+	private ExecutorService pubExecutor;
+	private ExecutorService subExecutor;
+	private ExecutorService pingExecutor;
+
+	private LinkedBlockingQueue<Runnable> connectQueue;
+	private LinkedBlockingQueue<Runnable> pubQueue;
+	private LinkedBlockingQueue<Runnable> subQueue;
+	private LinkedBlockingQueue<Runnable> pingQueue;
+
+	@PostConstruct
+	public void init() {
+		this.connectQueue = new LinkedBlockingQueue<>(100000);
+		this.pubQueue = new LinkedBlockingQueue<>(100000);
+		this.subQueue = new LinkedBlockingQueue<>(100000);
+		this.pingQueue = new LinkedBlockingQueue<>(10000);
+
+		int coreThreadNum = Runtime.getRuntime().availableProcessors();
+		this.connectExecutor = new ThreadPoolExecutor(coreThreadNum * 2,
+				coreThreadNum * 2,
+				60000,
+				TimeUnit.MILLISECONDS,
+				connectQueue,
+				new ThreadFactoryImpl("ConnectThread"),
+				new RejectHandler("connect", 100000));
+		this.pubExecutor = new ThreadPoolExecutor(coreThreadNum * 2,
+				coreThreadNum * 2,
+				60000,
+				TimeUnit.MILLISECONDS,
+				pubQueue,
+				new ThreadFactoryImpl("PubThread"),
+				new RejectHandler("pub", 100000));
+		this.subExecutor = new ThreadPoolExecutor(coreThreadNum * 2,
+				coreThreadNum * 2,
+				60000,
+				TimeUnit.MILLISECONDS,
+				subQueue,
+				new ThreadFactoryImpl("SubThread"),
+				new RejectHandler("sub", 100000));
+		this.pingExecutor = new ThreadPoolExecutor(coreThreadNum,
+				coreThreadNum,
+				60000,
+				TimeUnit.MILLISECONDS,
+				pingQueue,
+				new ThreadFactoryImpl("PingThread"),
+				new RejectHandler("heartbeat", 100000));
+	}
 
 	private Connect connect;
 
@@ -72,74 +125,90 @@ public class ProtocolProcess {
 
 	private PubComp pubComp;
 
-	public Mono<Connect> connect() {
+	public ExecutorService getConnectExecutor() {
+		return connectExecutor;
+	}
+
+	public ExecutorService getPubExecutor() {
+		return pubExecutor;
+	}
+
+	public ExecutorService getSubExecutor() {
+		return subExecutor;
+	}
+
+	public ExecutorService getPingExecutor() {
+		return pingExecutor;
+	}
+
+	public Connect connect() {
 		if (connect == null) {
 			connect = new Connect(sessionStoreService, subscribeStoreService, dupPublishMessageStoreService, dupPubRelMessageStoreService, authService);
 		}
-		return Mono.just(connect);
+		return connect;
 	}
 
-	public Mono<Subscribe> subscribe() {
+	public Subscribe subscribe() {
 		if (subscribe == null) {
-			subscribe = new Subscribe(subscribeStoreService, messageIdService, messageStoreService);
+			subscribe = new Subscribe(subscribeStoreService, messageStoreService);
 		}
-		return Mono.just(subscribe);
+		return subscribe;
 	}
 
-	public Mono<UnSubscribe> unSubscribe() {
+	public UnSubscribe unSubscribe() {
 		if (unSubscribe == null) {
 			unSubscribe = new UnSubscribe(subscribeStoreService);
 		}
-		return Mono.just(unSubscribe);
+		return unSubscribe;
 	}
 
-	public Mono<Publish> publish() {
+	public Publish publish() {
 		if (publish == null) {
-			publish = new Publish(sessionStoreService, subscribeStoreService, messageIdService, messageStoreService, dupPublishMessageStoreService);
+			publish = new Publish(sessionStoreService, subscribeStoreService, messageStoreService, dupPublishMessageStoreService);
 		}
-		return Mono.just(publish);
+		return publish;
 	}
 
-	public Mono<DisConnect> disConnect() {
+	public DisConnect disConnect() {
 		if (disConnect == null) {
 			disConnect = new DisConnect(sessionStoreService, subscribeStoreService, dupPublishMessageStoreService, dupPubRelMessageStoreService);
 		}
-		return Mono.just(disConnect);
+		return disConnect;
 	}
 
-	public Mono<PingReq> pingReq() {
+	public PingReq pingReq() {
 		if (pingReq == null) {
 			pingReq = new PingReq();
 		}
-		return Mono.just(pingReq);
+		return pingReq;
 	}
 
-	public Mono<PubRel> pubRel() {
+	public PubRel pubRel() {
 		if (pubRel == null) {
 			pubRel = new PubRel();
 		}
-		return Mono.just(pubRel);
+		return pubRel;
 	}
 
-	public Mono<PubAck> pubAck() {
+	public PubAck pubAck() {
 		if (pubAck == null) {
-			pubAck = new PubAck(messageIdService, dupPublishMessageStoreService);
+			pubAck = new PubAck(dupPublishMessageStoreService);
 		}
-		return Mono.just(pubAck);
+		return pubAck;
 	}
 
-	public Mono<PubRec> pubRec() {
+	public PubRec pubRec() {
 		if (pubRec == null) {
 			pubRec = new PubRec(dupPublishMessageStoreService, dupPubRelMessageStoreService);
 		}
-		return Mono.just(pubRec);
+		return pubRec;
 	}
 
-	public Mono<PubComp> pubComp() {
+	public PubComp pubComp() {
 		if (pubComp == null) {
-			pubComp = new PubComp(messageIdService, dupPubRelMessageStoreService);
+			pubComp = new PubComp(dupPubRelMessageStoreService);
 		}
-		return Mono.just(pubComp);
+		return pubComp;
 	}
 
 	public SessionStoreService getSessionStoreService() {
