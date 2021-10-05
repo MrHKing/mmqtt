@@ -53,6 +53,14 @@ cp cluster.conf.example cluster.conf
 ```
 
 ```bash
+#每个节点都需要配置其他节点的地址,如下：
+#example
+192.168.31.9:7777
+192.168.31.9:8848
+192.168.31.9:8888
+```
+
+```bash
 cd mmq\bin
 #windows start
 startup.cmd
