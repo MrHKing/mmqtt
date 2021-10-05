@@ -75,7 +75,7 @@ sh shutdown.sh
 
 ## 测试
 
-[wiki] (https://github.com/MrHKing/mmq/wiki)
+[wiki](https://github.com/MrHKing/mmq/wiki)
 
 ## MQTT 规范
 
