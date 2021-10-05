@@ -18,16 +18,19 @@ package org.monkey.mmq.service;
 
 import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.exception.MmqException;
+import org.monkey.mmq.core.utils.StringUtils;
 import org.monkey.mmq.metadata.KeyBuilder;
 import org.monkey.mmq.core.consistency.matedata.RecordListener;
 import org.monkey.mmq.metadata.UtilsAndCommons;
 import org.monkey.mmq.metadata.message.DupPubRelMessageMateData;
 import org.monkey.mmq.core.consistency.persistent.ConsistencyService;
+import org.monkey.mmq.metadata.message.DupPublishMessageMateData;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,76 +43,45 @@ import java.util.stream.Collectors;
  * @author solley
  */
 @Service
-public class DupPubRelMessageStoreService implements RecordListener<DupPubRelMessageMateData>  {
+public class DupPubRelMessageStoreService {
 
-    @Resource(name = "mqttPersistentConsistencyServiceDelegate")
-    private ConsistencyService consistencyService;
-
-    private Map<String, DupPubRelMessageMateData> dupPubRelMessageMateDataMap = new ConcurrentHashMap<>();
+    private Map<String, Map<Integer, DupPubRelMessageMateData>> dupPubRelMessageMateDataMap = new ConcurrentHashMap<>();
 
     /**
      * Init
      */
     @PostConstruct
     public void init() {
-        try {
-            consistencyService.listen(KeyBuilder.getPubRelStoreKey(), this);
-        } catch (MmqException e) {
-            Loggers.BROKER_SERVER.error("listen subscribe service failed.", e);
-        }
+
     }
 
     public List<DupPubRelMessageMateData> get(String clientId) {
-        return dupPubRelMessageMateDataMap.entrySet().stream()
-                .filter(publish -> publish.getValue().getClientId().equals(clientId))
-                .map(publish -> publish.getValue())
-                .collect(Collectors.toList());
+        if (StringUtils.isEmpty(clientId)) return new ArrayList<>();
+        if (dupPubRelMessageMateDataMap.get(clientId) == null) return new ArrayList<>();
+        return new ArrayList<>(dupPubRelMessageMateDataMap.get(clientId).values());
     }
 
-    public void put(String clientId, DupPubRelMessageMateData dupPubRelMessageStore) throws MmqException {
-        consistencyService.put(UtilsAndCommons.PUBREL_STORE + clientId + dupPubRelMessageStore.getMessageId(), dupPubRelMessageStore);
+    public void put(String clientId, DupPubRelMessageMateData dupPubRelMessageStore) {
+        if (StringUtils.isEmpty(clientId)) return;
+        Map<Integer, DupPubRelMessageMateData> messageMateDataMap = dupPubRelMessageMateDataMap.get(clientId);
+        if (messageMateDataMap == null) {
+            messageMateDataMap = new ConcurrentHashMap<>();
+            dupPubRelMessageMateDataMap.put(clientId, messageMateDataMap);
+        }
+        messageMateDataMap.put(dupPubRelMessageStore.getMessageId(), dupPubRelMessageStore);
     }
 
     @Async
-    public void delete(String clientId, int messageId) throws MmqException {
-        consistencyService.remove(UtilsAndCommons.PUBREL_STORE + clientId + messageId);
+    public void delete(String clientId, int messageId) {
+        if (StringUtils.isEmpty(clientId)) return;
+        Map<Integer,DupPubRelMessageMateData> messageMateDataMap = dupPubRelMessageMateDataMap.get(clientId);
+        if (messageMateDataMap == null || messageMateDataMap.size() <= 0) return;
+        messageMateDataMap.remove(messageId);
     }
 
     @Async
     public void deleteForClient(String clientId) {
-        try {
-            Set<Map.Entry<String, DupPubRelMessageMateData>> curDupPublishMessageStore
-                    = dupPubRelMessageMateDataMap.entrySet().stream().filter(message -> message.getValue().getClientId().equals(clientId))
-                    .collect(Collectors.toSet());
-            curDupPublishMessageStore.forEach(publish -> {
-                try {
-                    consistencyService.remove(publish.getKey());
-                } catch (MmqException e) {
-                    Loggers.BROKER_SERVER.error(e.getMessage());
-                }
-            });
-        } catch (Exception e) {
-            Loggers.BROKER_SERVER.error(e.getMessage());
-        }
-    }
-
-    @Override
-    public boolean interests(String key) {
-        return KeyBuilder.matchPubRelKey(key);
-    }
-
-    @Override
-    public boolean matchUnlistenKey(String key) {
-        return KeyBuilder.matchPubRelKey(key);
-    }
-
-    @Override
-    public void onChange(String key, DupPubRelMessageMateData value) throws Exception {
-        dupPubRelMessageMateDataMap.put(key, value);
-    }
-
-    @Override
-    public void onDelete(String key) throws Exception {
-        dupPubRelMessageMateDataMap.remove(key);
+        if (StringUtils.isEmpty(clientId)) return;
+        dupPubRelMessageMateDataMap.remove(clientId);
     }
 }

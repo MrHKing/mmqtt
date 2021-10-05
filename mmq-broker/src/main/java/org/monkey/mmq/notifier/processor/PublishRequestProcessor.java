@@ -29,9 +29,11 @@ import org.monkey.mmq.core.cluster.ServerMemberManager;
 import org.monkey.mmq.core.entity.InternalMessage;
 import org.monkey.mmq.core.entity.ReadRequest;
 import org.monkey.mmq.core.notify.NotifyCenter;
+import org.monkey.mmq.metadata.message.DupPublishMessageMateData;
 import org.monkey.mmq.metadata.message.SessionMateData;
 import org.monkey.mmq.metadata.subscribe.SubscribeMateData;
 import org.monkey.mmq.notifier.RuleEngineEvent;
+import org.monkey.mmq.service.DupPublishMessageStoreService;
 import org.monkey.mmq.service.SessionStoreService;
 import org.monkey.mmq.service.SubscribeStoreService;
 
@@ -52,13 +54,16 @@ public class PublishRequestProcessor extends AsyncUserProcessor<InternalMessage>
     private final SubscribeStoreService subscribeStoreService;
 
     private final SessionStoreService sessionStoreService;
+    private final DupPublishMessageStoreService dupPublishMessageStoreService;
 
     public PublishRequestProcessor(Member local,
                                    SubscribeStoreService subscribeStoreService,
-                                   SessionStoreService sessionStoreService) {
+                                   SessionStoreService sessionStoreService,
+                                   DupPublishMessageStoreService dupPublishMessageStoreService) {
         this.local = local;
         this.subscribeStoreService = subscribeStoreService;
         this.sessionStoreService = sessionStoreService;
+        this.dupPublishMessageStoreService = dupPublishMessageStoreService;
     }
 
     @Override
@@ -105,6 +110,9 @@ public class PublishRequestProcessor extends AsyncUserProcessor<InternalMessage>
                             new MqttFixedHeader(MqttMessageType.PUBLISH, dup, respQoS, retain, 0),
                             new MqttPublishVariableHeader(topic, messageId), Unpooled.buffer().writeBytes(messageBytes));
                     Loggers.BROKER_NOTIFIER.debug("PUBLISH - clientId: {}, topic: {}, Qos: {}, messageId: {}", subscribeStore.getClientId(), topic, respQoS.value(), messageId);
+                    DupPublishMessageMateData dupPublishMessageStore = new DupPublishMessageMateData().setClientId(subscribeStore.getClientId())
+                            .setTopic(topic).setMessageId(messageId).setMqttQoS(respQoS.value()).setMessageBytes(messageBytes);
+                    dupPublishMessageStoreService.put(subscribeStore.getClientId(), dupPublishMessageStore);
                     SessionMateData sessionStore = sessionStoreService.get(subscribeStore.getClientId());
                     if (sessionStore != null) {
                         sessionStore.getChannel().writeAndFlush(publishMessage);
@@ -115,6 +123,9 @@ public class PublishRequestProcessor extends AsyncUserProcessor<InternalMessage>
                             new MqttFixedHeader(MqttMessageType.PUBLISH, dup, respQoS, retain, 0),
                             new MqttPublishVariableHeader(topic, messageId), Unpooled.buffer().writeBytes(messageBytes));
                     Loggers.BROKER_NOTIFIER.debug("PUBLISH - clientId: {}, topic: {}, Qos: {}, messageId: {}", subscribeStore.getClientId(), topic, respQoS.value(), messageId);
+                    DupPublishMessageMateData dupPublishMessageStore = new DupPublishMessageMateData().setClientId(subscribeStore.getClientId())
+                            .setTopic(topic).setMessageId(messageId).setMqttQoS(respQoS.value()).setMessageBytes(messageBytes);
+                    dupPublishMessageStoreService.put(subscribeStore.getClientId(), dupPublishMessageStore);
                     SessionMateData sessionStore = sessionStoreService.get(subscribeStore.getClientId());
                     if (sessionStore != null) {
                         sessionStore.getChannel().writeAndFlush(publishMessage);

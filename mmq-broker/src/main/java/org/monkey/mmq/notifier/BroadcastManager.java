@@ -38,6 +38,7 @@ import org.monkey.mmq.core.utils.InetUtils;
 import org.monkey.mmq.core.utils.StringUtils;
 import org.monkey.mmq.notifier.processor.PublishRequestProcessor;
 import org.monkey.mmq.notifier.processor.RejectClientProcessor;
+import org.monkey.mmq.service.DupPublishMessageStoreService;
 import org.monkey.mmq.service.SessionStoreService;
 import org.monkey.mmq.service.SubscribeStoreService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +67,8 @@ public final class BroadcastManager extends Subscriber<PublishEvent> {
 
     public BroadcastManager(ServerMemberManager memberManager,
                             SubscribeStoreService subscribeStoreService,
-                            SessionStoreService sessionStoreService) {
+                            SessionStoreService sessionStoreService,
+                            DupPublishMessageStoreService dupPublishMessageStoreService) {
         this.memberManager = memberManager;
 
         // init rpc
@@ -84,7 +86,8 @@ public final class BroadcastManager extends Subscriber<PublishEvent> {
         rpcServer.registerUserProcessor(new PublishRequestProcessor(
                 this.memberManager.getSelf(),
                 subscribeStoreService,
-                sessionStoreService));
+                sessionStoreService,
+                dupPublishMessageStoreService));
         rpcServer.registerUserProcessor(new RejectClientProcessor(sessionStoreService));
         rpcServer.startup();
 
