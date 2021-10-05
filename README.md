@@ -73,6 +73,10 @@ sh shutdown.sh
 
 默认密码：aaaaaa
 
+## 测试
+
+[wiki] (https://github.com/MrHKing/mmq/wiki)
+
 ## MQTT 规范
 
 你可以通过以下链接了解与查阅 MQTT 协议:
