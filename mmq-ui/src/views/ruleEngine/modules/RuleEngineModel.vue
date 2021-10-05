@@ -170,6 +170,7 @@ export default {
       form: this.$form.createForm(this),
       resourcesform: this.$form.createForm(this),
       curResources: [],
+      resourcesAddFlag: true,
       selectResources: [],
       ruleEngine: {
         ruleId: '',
@@ -177,7 +178,7 @@ export default {
         sql: 'SELECT \n   this.payload.msg as msg \nFROM \n   "t/#" \nWHERE \n   this.payload.msg = ' + '\'hello\'',
         description: '',
         enable: true,
-        resourcesMateDatas: [{}]
+        resourcesMateDatas: []
       },
       curType: '',
       options: {
@@ -266,6 +267,7 @@ export default {
       // that.ruleEngine.resources.
     },
     handleResourceSave (record) {
+      this.resourcesAddFlag = !record
       console.log(record)
       this.curType = ''
       this.visible = true
@@ -341,7 +343,9 @@ export default {
             if (resources) {
               const resource = resources[0]
               resource.resource.sql = formData.resource.sql
-              that.ruleEngine.resourcesMateDatas.push(resource)
+              if (this.resourcesAddFlag) {
+                that.ruleEngine.resourcesMateDatas.push(resource)
+              }
             }
           }
           that.confirmResourceLoading = false

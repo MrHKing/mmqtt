@@ -5,8 +5,8 @@
         <a-col :span="6">
           <a-card>
             <a-statistic
-              title="版本"
-              :value="SystemInfoMateData.version"
+              title="总CPU使用情况"
+              :value="Number(useCPU / totalCPU).toFixed(2) + '%'"
               class="demo-class"
               :value-style="{ color: '#3f8600', fontSize: '32px' }"
             >
@@ -19,8 +19,8 @@
         <a-col :span="6">
           <a-card>
             <a-statistic
-              title="系统时间"
-              :value="dateTime"
+              title="总内存使用情况"
+              :value="Number(useMem).toFixed(2) + 'M'"
               class="demo-class"
               :value-style="{ color: '#3f8600', fontSize: '28px' }"
             >
@@ -91,6 +91,7 @@
 <script>
 import moment from 'moment'
 import { getSystemInfo, getNodes } from '@/api/system'
+import { getAction } from '@/api/manage'
 import HttpTrace from './module/HttpTrace'
 import JvmInfo from './module/JvmInfo'
 import SystemInfo from './module/SystemInfo'
@@ -109,6 +110,10 @@ export default {
       dateTime: moment(new Date()).format('YYYY-MM-DD'),
       node: '',
       nodeList: [],
+      totalCPU: 1,
+      useCPU: 1,
+      totalJVMMem: 1,
+      useMem: 1,
       activeKey: '1',
       SystemInfoMateData: {
         clientCount: 0,
@@ -124,18 +129,20 @@ export default {
   },
   mounted () {
     const _this = this // 声明一个变量指向Vue实例this，保证作用域一致
+    this.getTotalSystemInfo()
     this.timer = setInterval(() => {
-      _this.dateTime = moment(new Date()).format('YYYY-MM-DD HH:mm:ss') // 修改数据date
-    }, 1000)
-
-    getNodes().then(res => {
-      this.nodeList = res.data
-      this.node = res.data[0].address
-    })
+      getSystemInfo().then(res => {
+        _this.SystemInfoMateData = res.data
+      })
+      _this.getTotalSystemInfo()
+    }, 5000)
 
     getSystemInfo().then(res => {
-      console.log(res)
-      this.SystemInfoMateData = res.data
+      _this.SystemInfoMateData = res.data
+    })
+    getNodes().then(res => {
+      _this.nodeList = res.data
+      _this.node = res.data[0].address
     })
   },
   methods: {
@@ -149,6 +156,49 @@ export default {
       } else {
         this.$refs.httpTrace.fetch()
       }
+    },
+    getTotalSystemInfo () {
+      this.totalCPU = 1
+      this.useCPU = 0
+      this.totalJVMMem = 1
+      this.useMem = 0
+      this.nodeList.forEach(node => {
+        const url = this.nodeUrl ? 'http://' + this.nodeUrl : ''
+        getAction(url + '/actuator/metrics/system.cpu.count').then(value => {
+          const val = value.measurements[0].value
+          this.totalCPU += val
+          getAction(url + '/actuator/metrics/process.cpu.usage').then(value => {
+            let usage = value.measurements[0].value
+            usage = this.convert(usage, Number)
+            this.useCPU += val * usage
+          })
+        })
+        getAction(url + '/actuator/metrics/jvm.memory.max').then(value => {
+          let val = value.measurements[0].value
+          val = this.convertMem(val, Number)
+          this.totalJVMMem += val
+        })
+        getAction(url + '/actuator/metrics/jvm.memory.used').then(value => {
+          let used = value.measurements[0].value
+          used = this.convertMem(used, Number)
+          this.useMem = Number(this.useMem) + Number(used)
+          console.log(this.useMem + ':' + used)
+        })
+      })
+    },
+    convert (value, type) {
+      if (type === Number) {
+        return Number(value * 100).toFixed(2)
+      } else if (type === Date) {
+        return moment(value * 1000).format('YYYY-MM-DD HH:mm:ss')
+      }
+      return value
+    },
+    convertMem (value, type) {
+      if (type === Number) {
+        return Number(value / 1048576).toFixed(2)
+      }
+      return value
     }
   }
 }

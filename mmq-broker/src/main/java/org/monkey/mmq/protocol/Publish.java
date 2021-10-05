@@ -31,6 +31,7 @@ import org.monkey.mmq.metadata.message.SessionMateData;
 import org.monkey.mmq.metadata.subscribe.SubscribeMateData;
 import org.monkey.mmq.notifier.PublicEventType;
 import org.monkey.mmq.notifier.PublishEvent;
+import org.monkey.mmq.notifier.RuleEngineEvent;
 import org.monkey.mmq.service.*;
 
 import java.util.List;
@@ -68,6 +69,16 @@ public class Publish {
 		} else if (MqttQoS.EXACTLY_ONCE == msg.fixedHeader().qosLevel()) {
 			sendPubRecMessage(channel, msg.variableHeader().packetId());
 		}
+
+		// 规则引擎
+		RuleEngineEvent ruleEngineEvent = new RuleEngineEvent();
+		ruleEngineEvent.setMessage(InternalMessage.newBuilder()
+				.setTopic(msg.variableHeader().topicName())
+				.setMqttQoS(msg.fixedHeader().qosLevel().value())
+				.setMessageBytes(ByteString.copyFrom(messageBytes))
+				.setDup(false).setRetain(false).setMessageId(msg.variableHeader().packetId()).build());
+		NotifyCenter.publishEvent(ruleEngineEvent);
+		
 		// retain=1, 保留消息
 		if (msg.fixedHeader().isRetain()) {
 			if (messageBytes.length == 0) {
@@ -83,10 +94,8 @@ public class Publish {
 	private void sendPublishMessage(String topic, MqttQoS mqttQoS, byte[] messageBytes, boolean retain, boolean dup, int packetId, Channel channel) {
 		List<SubscribeMateData> subscribeStores = subscribeStoreService.search(topic);
 		subscribeStores.forEach(subscribeStore -> {
-
 				// 订阅者收到MQTT消息的QoS级别, 最终取决于发布消息的QoS和主题订阅的QoS
 				MqttQoS respQoS = mqttQoS.value() > subscribeStore.getMqttQoS() ? MqttQoS.valueOf(subscribeStore.getMqttQoS()) : mqttQoS;
-
 				SessionMateData sessionStore = sessionStoreService.get(subscribeStore.getClientId());
 				if (sessionStore != null) {
 					if (respQoS == MqttQoS.AT_MOST_ONCE) {

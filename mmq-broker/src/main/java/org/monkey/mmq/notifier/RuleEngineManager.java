@@ -17,6 +17,7 @@ package org.monkey.mmq.notifier;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.monkey.mmq.config.Loggers;
+import org.monkey.mmq.config.driver.DriverFactory;
 import org.monkey.mmq.config.driver.MysqlDriver;
 import org.monkey.mmq.config.matedata.RuleEngineMateData;
 import org.monkey.mmq.config.service.RuleEngineService;
@@ -28,6 +29,9 @@ import org.monkey.mmq.core.utils.JacksonUtils;
 import org.monkey.mmq.protocol.Connect;
 import org.monkey.mmq.rule.engine.ReactorQL;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.common.TemplateParserContext;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
@@ -81,9 +85,13 @@ public final class RuleEngineManager extends Subscriber<RuleEngineEvent> {
                                     case POSTGRESQL:
                                     case MYSQL:
                                         try {
-                                            Connection connection = mysqlDriver.getDriver(resource.getResourceID());
+                                            Connection connection = (Connection)DriverFactory.getResourceDriverByEnum(resource.getType()).getDriver(resource.getResourceID());
                                             String sql = resource.getResource().get("sql").toString();
-                                            connection.createStatement().execute(sql);
+
+                                            ExpressionParser parser = new SpelExpressionParser();
+                                            TemplateParserContext parserContext = new TemplateParserContext();
+                                            String content = parser.parseExpression(sql, parserContext).getValue(map, String.class);
+                                            connection.createStatement().execute(content);
                                         } catch (Exception e) {
                                             Loggers.BROKER_SERVER.error(e.getMessage());
                                         }

@@ -123,11 +123,6 @@ public final class BroadcastManager extends Subscriber<PublishEvent> {
         } catch (com.alipay.remoting.exception.RemotingException e) {
             e.printStackTrace();
         }
-
-        // 规则引擎
-        RuleEngineEvent ruleEngineEvent = new RuleEngineEvent();
-        ruleEngineEvent.setMessage(event.getInternalMessage());
-        NotifyCenter.publishEvent(ruleEngineEvent);
     }
 
     @Override
