@@ -82,7 +82,7 @@ sh shutdown.sh
 默认密码：aaaaaa
 
 ## 测试及功能说明
-详细参见wiki
+详细参见
 [wiki](https://github.com/MrHKing/mmq/wiki)
 
 ## MQTT 规范
