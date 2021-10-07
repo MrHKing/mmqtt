@@ -170,6 +170,8 @@ export default {
       form: this.$form.createForm(this),
       resourcesform: this.$form.createForm(this),
       curResources: [],
+      resourceIndex: 0,
+      resourceEditIndex: null,
       resourcesAddFlag: true,
       selectResources: [],
       ruleEngine: {
@@ -230,6 +232,10 @@ export default {
 
           console.log(this.ruleEngine)
           this.$nextTick(() => {
+            this.ruleEngine.resourcesMateDatas.forEach(x => {
+              x.resourceIndex = this.resourceIndex
+              this.resourceIndex++
+            })
             this.ruleEngine.resourcesMateDatas.unshift({})
             this.form.setFieldsValue(
               {
@@ -267,7 +273,12 @@ export default {
       // that.ruleEngine.resources.
     },
     handleResourceSave (record) {
-      this.resourcesAddFlag = !record
+      this.resourcesAddFlag = !record.resourceID
+      console.log(this.resourcesAddFlag)
+      if (!this.resourcesAddFlag) {
+        this.resourceEditIndex = record.resourceIndex
+      }
+
       console.log(record)
       this.curType = ''
       this.visible = true
@@ -339,12 +350,24 @@ export default {
           const formData = Object.assign({}, values)
           console.log(formData)
           if (formData) {
-            const resources = this.curResources.filter(x => formData.type === x.type)
+            const resources = that.curResources.filter(x => formData.type === x.type)
             if (resources) {
               const resource = resources[0]
               resource.resource.sql = formData.resource.sql
-              if (this.resourcesAddFlag) {
+              resource.resourceIndex = that.resourceIndex
+              that.resourceIndex++
+              console.log(that.resourcesAddFlag)
+              if (that.resourcesAddFlag) {
                 that.ruleEngine.resourcesMateDatas.push(resource)
+              } else {
+                for (const editResources in that.ruleEngine.resourcesMateDatas) {
+                  if (that.ruleEngine.resourcesMateDatas[editResources].resourceIndex === that.resourceEditIndex) {
+                    that.ruleEngine.resourcesMateDatas[editResources] = resource
+                    that.ruleEngine.resourcesMateDatas[editResources].resourceIndex = that.resourceIndex
+                    that.resourceIndex++
+                  }
+                }
+                console.log(that.ruleEngine)
               }
             }
           }

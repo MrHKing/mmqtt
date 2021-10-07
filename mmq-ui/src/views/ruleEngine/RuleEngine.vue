@@ -153,9 +153,9 @@ export default {
         }
       })
     },
-    hanldeDelete (record) {
+    handleDelete (record) {
       console.log(record)
-      deleteAction('/v1/ruleEngine', { resourceID: record.resourceID }).then(res => {
+      deleteAction('/v1/ruleEngine', { ruleId: record.ruleId }).then(res => {
         if (res.code === 200) {
           this.$message.info(res.message)
           this.$refs.table.refresh(true)

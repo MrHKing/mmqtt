@@ -72,11 +72,6 @@ public class PublishRequestProcessor extends AsyncUserProcessor<InternalMessage>
         this.sendPublishMessage(message.getTopic(), MqttQoS.valueOf(message.getMqttQoS()),
                 message.getMessageBytes().toByteArray(), message.getRetain(),
                 message.getDup(), message.getMessageId());
-
-        // 规则引擎
-        RuleEngineEvent ruleEngineEvent = new RuleEngineEvent();
-        ruleEngineEvent.setMessage(message);
-        NotifyCenter.publishEvent(ruleEngineEvent);
     }
 
     @Override

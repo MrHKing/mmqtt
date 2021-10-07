@@ -88,6 +88,7 @@
     <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
     <jacoco-maven-plugin.version>0.7.8</jacoco-maven-plugin.version>
     <reactor.version>Dysprosium-SR10</reactor.version>
+    <commons-text.version>1.8</commons-text.version>
     <commons-dbcp.version>1.4</commons-dbcp.version>
     <commons-io.version>2.7</commons-io.version>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -241,6 +242,11 @@
         <groupId>commons-beanutils</groupId>
         <artifactId>commons-beanutils</artifactId>
         <version>${commons-beanutils.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-text</artifactId>
+        <version>${commons-text.version}</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
