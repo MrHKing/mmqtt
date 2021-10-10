@@ -27,6 +27,11 @@ public class TDengineDriver implements ResourceDriver {
     }
 
     @Override
+    public void deleteDriver(String resourceId) {
+
+    }
+
+    @Override
     public Object getDriver(String resourceId) throws Exception {
         return null;
     }

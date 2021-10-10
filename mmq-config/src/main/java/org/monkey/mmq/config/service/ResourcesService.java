@@ -100,6 +100,9 @@ public class ResourcesService implements RecordListener<ResourcesMateData> {
 
     @Override
     public void onDelete(String key) throws Exception {
+        ResourcesMateData resourcesMateData = resourcesMateDataMap.get(key);
+        if (resourcesMateData == null) return;
+        DriverFactory.getResourceDriverByEnum(resourcesMateData.getType()).deleteDriver(resourcesMateData.getResourceID());
         resourcesMateDataMap.remove(key);
     }
 }

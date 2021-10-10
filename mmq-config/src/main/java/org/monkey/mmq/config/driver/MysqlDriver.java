@@ -37,7 +37,12 @@ public class MysqlDriver implements ResourceDriver<Connection>{
 
     @Override
     public void addDriver(String resourceId, Map<String, Object> resource) {
-        if (dataSources.get(resourceId) != null) return;
+        DruidDataSource druidDataSource = dataSources.get(resourceId);
+        if (druidDataSource != null) {
+            druidDataSource.close();
+            dataSources.remove(resourceId);
+        }
+
         if (StringUtils.isEmpty(resource.get("ip").toString())) return;
         if (StringUtils.isEmpty(resource.get("databaseName").toString())) return;
         if (StringUtils.isEmpty(resource.get("username").toString())) return;
@@ -54,13 +59,24 @@ public class MysqlDriver implements ResourceDriver<Connection>{
         dataSource.setInitialSize(8); // 设置连接池的初始大小
         dataSource.setMinIdle(1); // 设置连接池大小的下限
         dataSource.setMaxActive(20); // 设置连接池大小的上限
+        try {
+            dataSource.getConnection();
+        } catch (SQLException throwables) {
+            return;
+        }
         dataSources.put(resourceId, dataSource);
+    }
+
+    @Override
+    public void deleteDriver(String resourceId) {
+        dataSources.remove(resourceId);
     }
 
     @Override
     public Connection getDriver(String resourceId) throws Exception {
         if (dataSources == null) return null;
         if (dataSources.get(resourceId) == null) return null;
+        if (!dataSources.get(resourceId).isInited()) return null;
         return dataSources.get(resourceId).getConnection();
     }
 }

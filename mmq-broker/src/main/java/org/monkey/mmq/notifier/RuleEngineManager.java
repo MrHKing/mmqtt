@@ -87,12 +87,14 @@ public final class RuleEngineManager extends Subscriber<RuleEngineEvent> {
                                     case SQLSERVER:
                                         try {
                                             Connection connection = (Connection)DriverFactory.getResourceDriverByEnum(resource.getType()).getDriver(resource.getResourceID());
-                                            String sql = resource.getResource().get("sql").toString();
-
-                                            ExpressionParser parser = new SpelExpressionParser();
-                                            TemplateParserContext parserContext = new TemplateParserContext();
-                                            String content = parser.parseExpression(sql, parserContext).getValue(map, String.class);
-                                            connection.createStatement().execute(content);
+                                            if (connection != null) {
+                                                String sql = resource.getResource().get("sql").toString();
+                                                ExpressionParser parser = new SpelExpressionParser();
+                                                TemplateParserContext parserContext = new TemplateParserContext();
+                                                String content = parser.parseExpression(sql, parserContext).getValue(map, String.class);
+                                                connection.createStatement().execute(content);
+                                                connection.close();
+                                            }
                                         } catch (Exception e) {
                                             Loggers.BROKER_SERVER.error(e.getMessage());
                                         }

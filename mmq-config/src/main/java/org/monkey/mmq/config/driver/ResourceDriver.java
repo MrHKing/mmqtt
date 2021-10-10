@@ -7,5 +7,7 @@ public interface ResourceDriver<T> {
 
     void addDriver(String resourceId, Map<String, Object> resource);
 
+    void deleteDriver(String resourceId);
+
     T getDriver(String resourceId) throws Exception;
 }
