@@ -16,8 +16,6 @@
 package org.monkey.mmq.config.service;
 
 import org.monkey.mmq.config.config.Loggers;
-import org.monkey.mmq.config.driver.DriverFactory;
-import org.monkey.mmq.config.driver.MysqlDriver;
 import org.monkey.mmq.config.matedata.KeyBuilder;
 import org.monkey.mmq.config.matedata.RuleEngineMateData;
 import org.monkey.mmq.config.matedata.UtilsAndCommons;
@@ -39,9 +37,6 @@ import java.util.Map;
  */
 @Service
 public class RuleEngineService implements RecordListener<RuleEngineMateData> {
-
-    @Autowired
-    MysqlDriver mysqlDriver;
 
     Map<String, RuleEngineMateData> ruleEngineMateDataMap = new HashMap<>();
 

@@ -22,13 +22,14 @@
           >
             <a-select-option value="MYSQL"> Mysql </a-select-option>
             <a-select-option value="POSTGRESQL"> Postgresql </a-select-option>
+            <a-select-option value="SQLSERVER"> SqlServer </a-select-option>
             <a-select-option value="TDENGINE"> Tdengine </a-select-option>
             <a-select-option value="INFLUXDB"> InfluxDB </a-select-option>
             <a-select-option value="KAFKA"> Kafka </a-select-option>
           </a-select>
         </a-form-item>
       </a-row>
-      <div v-show="type === 'MYSQL'">
+      <div v-show="type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER'">
         <a-row :gutter="16">
           <a-col :span="12">
             <a-form-item label="IP">
@@ -36,7 +37,7 @@
                 v-decorator="[
                   'resource.ip',
                   {
-                    rules: [{ required: type === 'MYSQL' ? true : false, message: '请输入IP' }],
+                    rules: [{ required: true, message: '请输入IP' }],
                   },
                 ]"
                 placeholder="请输入IP"
@@ -49,7 +50,7 @@
                 v-decorator="[
                   'resource.port',
                   {
-                    rules: [{ required: type === 'MYSQL' ? true : false, message: '请输入端口' }],
+                    rules: [{ required: true, message: '请输入端口' }],
                   },
                 ]"
                 placeholder="请输入端口"
@@ -59,28 +60,28 @@
         </a-row>
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-item label="Mysql账户">
+            <a-form-item label="账户">
               <a-input
                 v-decorator="[
                   'resource.username',
                   {
-                    rules: [{ required: type === 'MYSQL' ? true : false, message: '请输入Mysql账户' }],
+                    rules: [{ required: true, message: '请输入账户' }],
                   },
                 ]"
-                placeholder="请输入Mysql账户"
+                placeholder="请输入账户"
               />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="Mysql密码">
+            <a-form-item label="密码">
               <a-input-password
                 v-decorator="[
                   'resource.password',
                   {
-                    rules: [{ required: type === 'MYSQL' ? true : false, message: '请输入Mysql密码' }],
+                    rules: [{ required: true, message: '请输入密码' }],
                   },
                 ]"
-                placeholder="请输入Mysql密码"
+                placeholder="请输入密码"
               />
             </a-form-item>
           </a-col>
@@ -92,81 +93,7 @@
                 v-decorator="[
                   'resource.databaseName',
                   {
-                    rules: [{ required: type === 'MYSQL' ? true : false, message: '请输入要连接的数据库' }],
-                  },
-                ]"
-                placeholder="请输入要连接的数据库"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="12"> </a-col>
-        </a-row>
-      </div>
-      <div v-show="type === 'POSTGRESQL'">
-        <a-row :gutter="16">
-          <a-col :span="12">
-            <a-form-item label="IP">
-              <a-input
-                v-decorator="[
-                  'resource.ip',
-                  {
-                    rules: [{ required: type === 'POSTGRESQL' ? true : false, message: '请输入IP' }],
-                  },
-                ]"
-                placeholder="请输入IP"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="12">
-            <a-form-item label="PORT">
-              <a-input
-                v-decorator="[
-                  'resource.port',
-                  {
-                    rules: [{ required: type === 'POSTGRESQL' ? true : false, message: '请输入端口' }],
-                  },
-                ]"
-                placeholder="请输入端口"
-              />
-            </a-form-item>
-          </a-col>
-        </a-row>
-        <a-row :gutter="16">
-          <a-col :span="12">
-            <a-form-item label="Postgresql账户">
-              <a-input
-                v-decorator="[
-                  'resource.username',
-                  {
-                    rules: [{ required: type === 'POSTGRESQL' ? true : false, message: '请输入Postgresql账户' }],
-                  },
-                ]"
-                placeholder="请输入Postgresql账户"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="12">
-            <a-form-item label="Postgresql密码">
-              <a-input-password
-                v-decorator="[
-                  'resource.password',
-                  {
-                    rules: [{ required: type === 'POSTGRESQL' ? true : false, message: '请输入Postgresql密码' }],
-                  },
-                ]"
-                placeholder="请输入Postgresql密码"
-              />
-            </a-form-item>
-          </a-col>
-        </a-row>
-        <a-row :gutter="16">
-          <a-col :span="12">
-            <a-form-item label="数据库">
-              <a-input
-                v-decorator="[
-                  'resource.databaseName',
-                  {
-                    rules: [{ required: type === 'POSTGRESQL' ? true : false, message: '请输入要连接的数据库' }],
+                    rules: [{ required: true, message: '请输入要连接的数据库' }],
                   },
                 ]"
                 placeholder="请输入要连接的数据库"
@@ -229,7 +156,7 @@
               v-decorator="[
                 'description',
                 {
-                  rules: [{ required: true, message: '请输入备注' }],
+                  rules: [{ required: false, message: '请输入备注' }],
                 },
               ]"
               :rows="4"
@@ -265,6 +192,7 @@ export default {
     return {
       title: '操作',
       visible: false,
+      curResourceID: null,
       confirmLoading: false,
       type: '',
       form: this.$form.createForm(this),
@@ -279,6 +207,7 @@ export default {
       this.form.resetFields()
       this.visible = true
       if (record) {
+        this.curResourceID = record.resourceID
         this.setFieldsValueByType(record.type, record)
       }
     },
@@ -304,6 +233,23 @@ export default {
           })
           break
         case 'POSTGRESQL':
+          this.$nextTick(() => {
+            this.form.setFieldsValue(
+              {
+                resourceID: record.resourceID,
+                type: type,
+                description: record.description,
+                resource: {
+                  ip: record.resource.ip,
+                  port: record.resource.port,
+                  databaseName: record.resource.databaseName,
+                  password: record.resource.password,
+                  username: record.resource.username
+                }
+              })
+          })
+          break
+        case 'SQLSERVER':
           this.$nextTick(() => {
             this.form.setFieldsValue(
               {
@@ -354,6 +300,7 @@ export default {
           console.log(values)
           const formData = Object.assign({}, values)
           console.log(formData)
+          formData.resourceID = this.curResourceID
           const obj = postAction(this.url.save, formData)
           obj
             .then((res) => {

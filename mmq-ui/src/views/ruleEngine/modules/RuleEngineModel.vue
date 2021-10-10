@@ -103,6 +103,7 @@
             >
               <a-select-option value="MYSQL"> Mysql </a-select-option>
               <a-select-option value="POSTGRESQL"> Postgresql </a-select-option>
+              <a-select-option value="SQLSERVER"> SqlServer </a-select-option>
               <a-select-option value="TDENGINE"> Tdengine </a-select-option>
               <a-select-option value="INFLUXDB"> InfluxDB </a-select-option>
               <a-select-option value="KAFKA"> Kafka </a-select-option>
@@ -259,6 +260,8 @@ export default {
           return ' ip:' + resource.ip + ' port:' + resource.port + ' 数据库名称:' + resource.databaseName
         case 'POSTGRESQL':
           return ' ip:' + resource.ip + ' port:' + resource.port + ' 数据库名称:' + resource.databaseName
+        case 'SQLSERVER':
+          return ' ip:' + resource.ip + ' port:' + resource.port + ' 数据库名称:' + resource.databaseName
         case 'KAFKA':
           return ' Kafka服务:' + resource.server
         default:
@@ -319,6 +322,25 @@ export default {
                   username: record.resource.username,
                   sql: record.resource.sql
                 }
+              })
+          })
+          break
+        case 'SQLSERVER':
+          this.$nextTick(() => {
+            this.resourcesform.setFieldsValue(
+              {
+                resourceID: record.resourceID,
+                type: type,
+                description: record.description,
+                resource: {
+                  ip: record.resource.ip,
+                  port: record.resource.port,
+                  databaseName: record.resource.databaseName,
+                  password: record.resource.password,
+                  username: record.resource.username,
+                  sql: record.resource.sql
+                }
+
               })
           })
           break

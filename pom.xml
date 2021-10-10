@@ -74,7 +74,7 @@
         <maven-failsafe-plugin.version>2.19.1</maven-failsafe-plugin.version>
         <maven-assembly-plugin.version>3.0.0</maven-assembly-plugin.version>
         <maven-flatten-version>1.1.0</maven-flatten-version>
-
+        <mssql-jdbc.version>6.1.0.jre8</mssql-jdbc.version>
         <!-- dependency version -->
         <spring-boot-dependencies.version>2.1.6.RELEASE</spring-boot-dependencies.version>
 <!--        <spring-boot-dependencies.version>2.0.4.RELEASE</spring-boot-dependencies.version>-->
@@ -92,6 +92,7 @@
         <commons-beanutils.version>1.9.4</commons-beanutils.version>
         <commons-text.version>1.8</commons-text.version>
         <slf4j-api.version>1.7.7</slf4j-api.version>
+        <sqljdbc4.version>4.0</sqljdbc4.version>
         <logback.version>1.2.3</logback.version>
         <log4j.version>2.13.3</log4j.version>
 
@@ -335,7 +336,12 @@
         </dependency>
 
     </dependencies>
-
+    <repositories>
+        <repository>
+            <id>clojars</id>
+            <url>http://clojars.org/repo/</url>
+        </repository>
+    </repositories>
     <!-- 管理依赖版本号,子项目不会默认依赖 -->
     <dependencyManagement>
         <dependencies>
@@ -596,6 +602,12 @@
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql-connector-java.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.microsoft.sqlserver</groupId>
+                <artifactId>sqljdbc4</artifactId>
+                <version>${sqljdbc4.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.apache.derby</groupId>
                 <artifactId>derby</artifactId>

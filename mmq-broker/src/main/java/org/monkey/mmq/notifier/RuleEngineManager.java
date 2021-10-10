@@ -84,6 +84,7 @@ public final class RuleEngineManager extends Subscriber<RuleEngineEvent> {
                                 switch (resource.getType()) {
                                     case POSTGRESQL:
                                     case MYSQL:
+                                    case SQLSERVER:
                                         try {
                                             Connection connection = (Connection)DriverFactory.getResourceDriverByEnum(resource.getType()).getDriver(resource.getResourceID());
                                             String sql = resource.getResource().get("sql").toString();
