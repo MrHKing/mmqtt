@@ -29,7 +29,7 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
 @ServletComponentScan
 public class Mmq {
     public static void main(String[] args) {
-         EnvUtil.setIsStandalone(true);
+//         EnvUtil.setIsStandalone(true);
         SpringApplication.run(Mmq.class, args);
     }
 }

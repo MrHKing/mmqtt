@@ -96,4 +96,4 @@ sh shutdown.sh
 Apache License 2.0, 详见 [LICENSE](./LICENSE)。
 
 ## 群号
-QQ: 1016132679
+QQ群: 1016132679
