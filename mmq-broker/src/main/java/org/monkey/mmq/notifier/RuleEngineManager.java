@@ -16,6 +16,8 @@
 package org.monkey.mmq.notifier;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.config.driver.DriverFactory;
 import org.monkey.mmq.config.driver.MysqlDriver;
@@ -37,10 +39,7 @@ import reactor.core.publisher.Flux;
 
 import javax.annotation.PostConstruct;
 import java.sql.Connection;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -81,12 +80,18 @@ public final class RuleEngineManager extends Subscriber<RuleEngineEvent> {
                         if (map != null && rule.getResourcesMateDatas().size() != 0) {
                             // 根据规则获得规则的响应
                             rule.getResourcesMateDatas().forEach(resource -> {
+                                Object driver = null;
+                                try {
+                                    driver = DriverFactory.getResourceDriverByEnum(resource.getType()).getDriver(resource.getResourceID());
+                                } catch (Exception e) {
+                                    Loggers.BROKER_SERVER.error(e.getMessage());
+                                }
                                 switch (resource.getType()) {
                                     case POSTGRESQL:
                                     case MYSQL:
                                     case SQLSERVER:
                                         try {
-                                            Connection connection = (Connection)DriverFactory.getResourceDriverByEnum(resource.getType()).getDriver(resource.getResourceID());
+                                            Connection connection = (Connection)driver;
                                             if (connection != null) {
                                                 String sql = resource.getResource().get("sql").toString();
                                                 ExpressionParser parser = new SpelExpressionParser();
@@ -104,6 +109,18 @@ public final class RuleEngineManager extends Subscriber<RuleEngineEvent> {
                                         break;
                                     case INFLUXDB:
                                     case KAFKA:
+                                        try {
+                                            Producer<String, String> producer = (Producer<String, String>)driver;
+                                            Map<String, Object> payload = new HashMap<>();
+                                            payload.put("topic", event.getMessage().getTopic());
+                                            payload.put("payload", map);
+                                            payload.put("address", event.getMessage().getAddress());
+                                            payload.put("qos", event.getMessage().getMqttQoS());
+                                            producer.send(new ProducerRecord<>(resource.getResource().get("topic").toString(), JacksonUtils.toJson(payload)));
+                                        } catch (Exception e) {
+                                            Loggers.BROKER_SERVER.error(e.getMessage());
+                                        }
+                                        break;
                                     default:
                                         break;
                                 }

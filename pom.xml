@@ -83,6 +83,7 @@
         <hessian.version>4.0.63</hessian.version>
         <hutool.version>4.1.6</hutool.version>
         <hsweb-utils.version>3.0.2</hsweb-utils.version>
+        <kafka-clients.version>2.3.1</kafka-clients.version>
         <commons-lang3.version>3.4</commons-lang3.version>
         <commons-io.version>2.7</commons-io.version>
         <commons-collections.version>3.2.2</commons-collections.version>
@@ -450,6 +451,12 @@
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-crypto</artifactId>
                 <version>${hutool.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka-clients</artifactId>
+                <version>${kafka-clients.version}</version>
             </dependency>
 
             <!-- Apache commons -->

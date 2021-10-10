@@ -15,24 +15,50 @@
  */
 package org.monkey.mmq.config.driver;
 
+import com.alibaba.druid.pool.DruidDataSource;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.serialization.StringSerializer;
+import org.monkey.mmq.core.utils.StringUtils;
+import org.springframework.stereotype.Component;
+
+import java.sql.Connection;
 import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author solley
  */
-public class KafkaDriver implements ResourceDriver {
+@Component
+public class KafkaDriver implements ResourceDriver<Producer<String, String>> {
+    private ConcurrentHashMap<String, Producer<String, String>> producers = new ConcurrentHashMap<>();
+
     @Override
     public void addDriver(String resourceId, Map resource) {
+        Producer<String, String> producer = producers.get(resourceId);
+        if (producer != null) {
+            producer.close();
+            producers.remove(resourceId);
+        }
 
+        if (StringUtils.isEmpty(resource.get("servers").toString())) return;
+
+        Properties prop = new Properties();
+        prop.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, resource.get("servers"));
+        prop.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        prop.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        producers.put(resourceId, new KafkaProducer<>(prop));
     }
 
     @Override
     public void deleteDriver(String resourceId) {
-
+        producers.remove(resourceId);
     }
 
     @Override
-    public Object getDriver(String resourceId) throws Exception {
-        return null;
+    public Producer<String, String> getDriver(String resourceId) throws Exception {
+        return producers.get(resourceId);
     }
 }
