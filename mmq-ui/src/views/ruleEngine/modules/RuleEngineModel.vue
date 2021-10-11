@@ -8,7 +8,7 @@
           <a-form-item label="规则名称">
             <a-input
               v-decorator="['name', { rules: [{ required: true, message: '请输入规则名称' }] }]"
-              :placeholder="$t('form.basic-form.title.placeholder')"
+              placeholder="请输入规则名称"
             />
           </a-form-item>
 
@@ -128,12 +128,20 @@
           </a-form-item>
         </a-row>
         <a-row :gutter="16">
-          <div>
+          <div v-if="curType != 'KAFKA'">
             <a-form-item label="SQL">
               <codemirror
                 v-decorator="['resource.sql', { rules: [{ required: true, message: '请输入SQL' }] }]"
                 :options="options"
               ></codemirror>
+            </a-form-item>
+          </div>
+          <div v-if="curType === 'KAFKA'">
+            <a-form-item label="Topic">
+              <a-input
+                v-decorator="['resource.topic', { rules: [{ required: true, message: '请输入Topic' }] }]"
+                placeholder="请输入Topic"
+              />
             </a-form-item>
           </div>
         </a-row>
@@ -263,7 +271,7 @@ export default {
         case 'SQLSERVER':
           return ' ip:' + resource.ip + ' port:' + resource.port + ' 数据库名称:' + resource.databaseName
         case 'KAFKA':
-          return ' Kafka服务:' + resource.server
+          return ' Kafka服务:' + resource.server + ' topic:' + resource.topic
         default:
           return ''
       }
@@ -283,7 +291,7 @@ export default {
       }
 
       console.log(record)
-      this.curType = ''
+      this.curType = record.type
       this.visible = true
       this.resourcesform.resetFields()
       const type = record.type
@@ -356,7 +364,8 @@ export default {
                 resource: {
                   server: record.resource.server,
                   password: record.resource.password,
-                  username: record.resource.username
+                  username: record.resource.username,
+                  topic: record.resource.topic
                 }
               })
           })
@@ -376,6 +385,7 @@ export default {
             if (resources) {
               const resource = resources[0]
               resource.resource.sql = formData.resource.sql
+              resource.resource.topic = formData.resource.topic
               resource.resourceIndex = that.resourceIndex
               that.resourceIndex++
               console.log(that.resourcesAddFlag)

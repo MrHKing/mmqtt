@@ -37,7 +37,12 @@
                 v-decorator="[
                   'resource.ip',
                   {
-                    rules: [{ required: true, message: '请输入IP' }],
+                    rules: [
+                      {
+                        required: type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' ? true : false,
+                        message: '请输入IP',
+                      },
+                    ],
                   },
                 ]"
                 placeholder="请输入IP"
@@ -50,7 +55,12 @@
                 v-decorator="[
                   'resource.port',
                   {
-                    rules: [{ required: true, message: '请输入端口' }],
+                    rules: [
+                      {
+                        required: type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' ? true : false,
+                        message: '请输入端口',
+                      },
+                    ],
                   },
                 ]"
                 placeholder="请输入端口"
@@ -65,7 +75,12 @@
                 v-decorator="[
                   'resource.username',
                   {
-                    rules: [{ required: true, message: '请输入账户' }],
+                    rules: [
+                      {
+                        required: type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' ? true : false,
+                        message: '请输入账户',
+                      },
+                    ],
                   },
                 ]"
                 placeholder="请输入账户"
@@ -78,7 +93,12 @@
                 v-decorator="[
                   'resource.password',
                   {
-                    rules: [{ required: true, message: '请输入密码' }],
+                    rules: [
+                      {
+                        required: type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' ? true : false,
+                        message: '请输入密码',
+                      },
+                    ],
                   },
                 ]"
                 placeholder="请输入密码"
@@ -93,7 +113,12 @@
                 v-decorator="[
                   'resource.databaseName',
                   {
-                    rules: [{ required: true, message: '请输入要连接的数据库' }],
+                    rules: [
+                      {
+                        required: type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' ? true : false,
+                        message: '请输入要连接的数据库',
+                      },
+                    ],
                   },
                 ]"
                 placeholder="请输入要连接的数据库"
@@ -180,6 +205,7 @@
       }"
     >
       <a-button :style="{ marginRight: '8px' }" @click="onClose"> Cancel </a-button>
+      <a-button type="primary" @click="handleConnect"> Test Connect </a-button>
       <a-button type="primary" @click="handleOk"> Submit </a-button>
     </div>
   </a-drawer>
@@ -295,6 +321,7 @@ export default {
       const that = this
       // 触发表单验证
       this.form.validateFields((err, values) => {
+        console.log(err)
         if (!err) {
           that.confirmLoading = true
           console.log(values)
@@ -316,6 +343,13 @@ export default {
               that.onClose()
             })
         }
+      })
+    },
+    handleConnect () {
+      // 触发表单验证
+      this.form.validateFields((err, values) => {
+        console.log(err)
+        // const formData = Object.assign({}, values)
       })
     },
     filterOption (input, option) {
