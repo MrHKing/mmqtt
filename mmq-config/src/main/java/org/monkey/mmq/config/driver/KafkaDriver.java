@@ -43,10 +43,10 @@ public class KafkaDriver implements ResourceDriver<Producer<String, String>> {
             producers.remove(resourceId);
         }
 
-        if (StringUtils.isEmpty(resource.get("servers").toString())) return;
+        if (StringUtils.isEmpty(resource.get("server").toString())) return;
 
         Properties prop = new Properties();
-        prop.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, resource.get("servers"));
+        prop.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, resource.get("server"));
         prop.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         prop.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         producers.put(resourceId, new KafkaProducer<>(prop));
