@@ -39,6 +39,7 @@ import reactor.core.publisher.Flux;
 
 import javax.annotation.PostConstruct;
 import java.sql.Connection;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -78,6 +79,8 @@ public final class RuleEngineManager extends Subscriber<RuleEngineEvent> {
                     .doOnNext(map -> {
                         // 如果不为空则触发响应
                         if (map != null && rule.getResourcesMateDatas().size() != 0) {
+                            this.setProperty(map);
+
                             // 根据规则获得规则的响应
                             rule.getResourcesMateDatas().forEach(resource -> {
                                 Object driver = null;
@@ -134,5 +137,18 @@ public final class RuleEngineManager extends Subscriber<RuleEngineEvent> {
     @Override
     public Class<? extends Event> subscribeType() {
         return RuleEngineEvent.class;
+    }
+
+    private void setProperty(Map property) {
+        property.put("uuid", UUID.randomUUID().toString());
+
+        Date date = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        property.put("date", sdf.format(date));
+        sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        property.put("datetime", sdf.format(date));
+        sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        property.put("utc", sdf.format(date));
+
     }
 }
