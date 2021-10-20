@@ -101,7 +101,7 @@ mmq.broker.default.anonymous=true
 
 默认密码：aaaaaa
 
-## 测试及功能说明
+## 测试及规则引擎
 详细参见
 [wiki](https://github.com/MrHKing/mmq/wiki)
 
