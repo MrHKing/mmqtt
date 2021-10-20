@@ -47,6 +47,21 @@ public class ResourcesController {
     }
 
     /**
+     * test connect resources.
+     *
+     * @return Current resources
+     */
+    @PostMapping("/testConnect")
+    public Object testConnect(@RequestBody ResourcesMateData resourcesMateData) {
+        boolean connected = resourcesService.testConnect(resourcesMateData);
+        if (!connected) {
+            return RestResultUtils.failed();
+        } else {
+            return RestResultUtils.success("connect resource ok!", null);
+        }
+    }
+
+    /**
      * Delete an existed resources.
      *
      * @param resourceID

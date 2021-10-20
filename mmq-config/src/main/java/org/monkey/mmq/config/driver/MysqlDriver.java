@@ -16,10 +16,12 @@
 package org.monkey.mmq.config.driver;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import org.monkey.mmq.config.matedata.ResourcesMateData;
 import org.monkey.mmq.core.utils.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Map;
@@ -78,5 +80,22 @@ public class MysqlDriver implements ResourceDriver<Connection>{
         if (dataSources.get(resourceId) == null) return null;
         if (!dataSources.get(resourceId).isInited()) return null;
         return dataSources.get(resourceId).getConnection();
+    }
+
+    @Override
+    public boolean testConnect(ResourcesMateData resourcesMateData) {
+        try {
+            Class.forName(JDBC_DRIVER);
+            DriverManager.getConnection(String.format("jdbc:mysql://%s:%s/%s?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT",
+                    resourcesMateData.getResource().get("ip").toString(),
+                    resourcesMateData.getResource().get("port").toString(),
+                    resourcesMateData.getResource().get("databaseName").toString()),
+                    resourcesMateData.getResource().get("username").toString(),
+                    resourcesMateData.getResource().get("password").toString());
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

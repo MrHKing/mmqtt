@@ -78,6 +78,11 @@ public class ResourcesService implements RecordListener<ResourcesMateData> {
         return resourcesMateDataMap;
     }
 
+    public boolean testConnect(ResourcesMateData resourcesMateData) {
+        if (resourcesMateData == null) return false;
+        return DriverFactory.getResourceDriverByEnum(resourcesMateData.getType()).testConnect(resourcesMateData);
+    }
+
     public ResourcesMateData getResourcesByResourceID(String resourceID) {
         return resourcesMateDataMap.get(UtilsAndCommons.RESOURCES_STORE +resourceID);
     }

@@ -15,6 +15,8 @@
  */
 package org.monkey.mmq.config.driver;
 
+import org.monkey.mmq.config.matedata.ResourcesMateData;
+
 import java.util.Map;
 
 /**
@@ -34,5 +36,10 @@ public class InfluxDBDriver implements ResourceDriver{
     @Override
     public Object getDriver(String resourceId) throws Exception {
         return null;
+    }
+
+    @Override
+    public boolean testConnect(ResourcesMateData resourcesMateData) {
+        return false;
     }
 }

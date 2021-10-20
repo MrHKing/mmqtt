@@ -16,14 +16,17 @@
 package org.monkey.mmq.config.driver;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.monkey.mmq.config.matedata.ResourcesMateData;
 import org.monkey.mmq.core.utils.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -49,6 +52,11 @@ public class KafkaDriver implements ResourceDriver<Producer<String, String>> {
         prop.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, resource.get("server"));
         prop.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         prop.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        try {
+            KafkaConsumer<String, String> consumer = new KafkaConsumer<>(prop);
+        } catch (Exception e) {
+            return;
+        }
         producers.put(resourceId, new KafkaProducer<>(prop));
     }
 
@@ -60,5 +68,19 @@ public class KafkaDriver implements ResourceDriver<Producer<String, String>> {
     @Override
     public Producer<String, String> getDriver(String resourceId) throws Exception {
         return producers.get(resourceId);
+    }
+
+    @Override
+    public boolean testConnect(ResourcesMateData resourcesMateData) {
+        try {
+            Properties prop = new Properties();
+            prop.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, resourcesMateData.getResource().get("server"));
+            prop.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+            prop.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+            KafkaConsumer<String, String> consumer = new KafkaConsumer<>(prop);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

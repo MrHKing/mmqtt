@@ -57,6 +57,7 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <jsqlparser.version>4.0</jsqlparser.version>
     <maven.javadoc.skip>true</maven.javadoc.skip>
+    <mssql-jdbc.version>6.1.0.jre8</mssql-jdbc.version>
     <jackson-databind.version>2.12.2</jackson-databind.version>
     <slf4j-api.version>1.7.7</slf4j-api.version>
     <apache-rat-plugin.version>0.12</apache-rat-plugin.version>
@@ -85,6 +86,7 @@
     <clirr-maven-plugin.version>2.7</clirr-maven-plugin.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <jackson-core-asl.version>1.9.13</jackson-core-asl.version>
+    <kafka-clients.version>2.3.1</kafka-clients.version>
     <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
     <jacoco-maven-plugin.version>0.7.8</jacoco-maven-plugin.version>
     <reactor.version>Dysprosium-SR10</reactor.version>
@@ -93,6 +95,7 @@
     <commons-io.version>2.7</commons-io.version>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+    <sqljdbc4.version>4.0</sqljdbc4.version>
     <maven-assembly-plugin.version>3.0.0</maven-assembly-plugin.version>
     <commons-logging.version>1.2</commons-logging.version>
     <maven-javadoc-plugin.version>2.10.4</maven-javadoc-plugin.version>
@@ -207,6 +210,11 @@
         <groupId>cn.hutool</groupId>
         <artifactId>hutool-crypto</artifactId>
         <version>${hutool.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.kafka</groupId>
+        <artifactId>kafka-clients</artifactId>
+        <version>${kafka-clients.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
@@ -345,6 +353,11 @@
         <version>${mysql-connector-java.version}</version>
       </dependency>
       <dependency>
+        <groupId>com.microsoft.sqlserver</groupId>
+        <artifactId>sqljdbc4</artifactId>
+        <version>${sqljdbc4.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.apache.derby</groupId>
         <artifactId>derby</artifactId>
         <version>${derby.version}</version>
@@ -415,6 +428,12 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <repositories>
+    <repository>
+      <id>clojars</id>
+      <url>http://clojars.org/repo/</url>
+    </repository>
+  </repositories>
   <build>
     <plugins>
       <plugin>

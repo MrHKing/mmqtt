@@ -16,10 +16,12 @@
 package org.monkey.mmq.config.driver;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import org.monkey.mmq.config.matedata.ResourcesMateData;
 import org.monkey.mmq.core.utils.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -78,5 +80,28 @@ public class SqlServerDriver implements ResourceDriver<Connection>{
         if (dataSources.get(resourceId) == null) return null;
         if (!dataSources.get(resourceId).isInited()) return null;
         return dataSources.get(resourceId).getConnection();
+    }
+
+    @Override
+    public boolean testConnect(ResourcesMateData resourcesMateData) {
+        DruidDataSource dataSource = new DruidDataSource(); // 创建Druid连接池
+        dataSource.setDriverClassName(JDBC_DRIVER); // 设置连接池的数据库驱动
+        dataSource.setUrl(String.format("jdbc:sqlserver://%s:%s;DatabaseName=%s",
+                resourcesMateData.getResource().get("ip").toString(),
+                resourcesMateData.getResource().get("port").toString(),
+                resourcesMateData.getResource().get("databaseName").toString())); // 设置数据库的连接地址
+        dataSource.setUsername(resourcesMateData.getResource().get("username").toString()); // 数据库的用户名
+        dataSource.setPassword(resourcesMateData.getResource().get("password").toString()); // 数据库的密码
+        dataSource.setValidationQuery("select 'x'");
+        dataSource.setInitialSize(8); // 设置连接池的初始大小
+        dataSource.setMinIdle(1); // 设置连接池大小的下限
+        dataSource.setMaxActive(20); // 设置连接池大小的上限
+
+        try {
+            dataSource.getConnection();
+            return true;
+        } catch (SQLException throwables) {
+            return false;
+        }
     }
 }

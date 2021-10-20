@@ -9,25 +9,32 @@
   >
     <a-form :form="form" layout="vertical" hide-required-mark>
       <a-row :gutter="16">
-        <a-form-item label="资源类型">
-          <a-select
-            @change="typeChange"
-            v-decorator="[
-              'type',
-              {
-                rules: [{ required: true, message: '请选择资源类型' }],
-              },
-            ]"
-            placeholder="请选择资源类型"
-          >
-            <a-select-option value="MYSQL"> Mysql </a-select-option>
-            <a-select-option value="POSTGRESQL"> Postgresql </a-select-option>
-            <a-select-option value="SQLSERVER"> SqlServer </a-select-option>
-            <a-select-option value="TDENGINE"> Tdengine </a-select-option>
-            <a-select-option value="INFLUXDB"> InfluxDB </a-select-option>
-            <a-select-option value="KAFKA"> Kafka </a-select-option>
-          </a-select>
-        </a-form-item>
+        <a-col :span="12">
+          <a-form-item label="资源类型">
+            <a-select
+              @change="typeChange"
+              v-decorator="[
+                'type',
+                {
+                  rules: [{ required: true, message: '请选择资源类型' }],
+                },
+              ]"
+              placeholder="请选择资源类型"
+            >
+              <a-select-option value="MYSQL"> Mysql </a-select-option>
+              <a-select-option value="POSTGRESQL"> Postgresql </a-select-option>
+              <a-select-option value="SQLSERVER"> SqlServer </a-select-option>
+              <a-select-option value="TDENGINE"> Tdengine </a-select-option>
+              <a-select-option value="INFLUXDB"> InfluxDB </a-select-option>
+              <a-select-option value="KAFKA"> Kafka </a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+        <a-col :span="12">
+          <a-form-item label="测试连接">
+            <a-button :style="{ marginRight: '8px' }" type="primary" @click="handleConnect"> Test Connect </a-button>
+          </a-form-item>
+        </a-col>
       </a-row>
       <div v-show="type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER'">
         <a-row :gutter="16">
@@ -205,7 +212,6 @@
       }"
     >
       <a-button :style="{ marginRight: '8px' }" @click="onClose"> Cancel </a-button>
-      <a-button type="primary" @click="handleConnect"> Test Connect </a-button>
       <a-button type="primary" @click="handleOk"> Submit </a-button>
     </div>
   </a-drawer>
@@ -223,7 +229,8 @@ export default {
       type: '',
       form: this.$form.createForm(this),
       url: {
-        save: '/v1/resources'
+        save: '/v1/resources',
+        testConnect: '/v1/resources/testConnect'
       }
     }
   },
@@ -346,9 +353,21 @@ export default {
       })
     },
     handleConnect () {
+      const that = this
       // 触发表单验证
       this.form.validateFields((err, values) => {
-        console.log(err)
+        if (!err) {
+          const formData = Object.assign({}, values)
+          formData.resourceID = this.curResourceID
+          console.log(formData)
+          postAction(this.url.testConnect, formData).then((res) => {
+            if (res.code === 200) {
+              that.$message.success('连接成功！')
+            } else {
+              that.$message.warning('连接失败！')
+            }
+          })
+        }
         // const formData = Object.assign({}, values)
       })
     },

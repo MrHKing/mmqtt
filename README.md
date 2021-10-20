@@ -74,6 +74,26 @@ sh startup.sh
 sh shutdown.sh
 ```
 
+### 配置文件
+mqtt tcp端口默认：3883
+
+mqtt websocket端口：2883
+```bash
+#*************** Spring Boot Related Configurations ***************#
+### Default web context path:
+server.servlet.contextPath=/
+### Default web server port:
+server.port=8888
+
+#*************** mqtt broker Configurations ***************#
+mmq.broker.websocketPort=2883
+mmq.broker.port=3883
+mmq.broker.ssl.enabled=false
+mmq.broker.ssl.password=true
+mmq.broker.default.user=admin
+mmq.broker.default.password=admin@mmq
+mmq.broker.default.anonymous=true
+```
 ### Dashboard
 启动后访问 http://ip:8888/dashboard/monitor
 
