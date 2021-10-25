@@ -93,6 +93,7 @@ public final class RuleEngineManager extends Subscriber<RuleEngineEvent> {
                                     case POSTGRESQL:
                                     case MYSQL:
                                     case SQLSERVER:
+                                    case TDENGINE:
                                         try {
                                             Connection connection = (Connection)driver;
                                             if (connection != null) {
@@ -106,9 +107,6 @@ public final class RuleEngineManager extends Subscriber<RuleEngineEvent> {
                                         } catch (Exception e) {
                                             Loggers.BROKER_SERVER.error(e.getMessage());
                                         }
-                                        break;
-                                    case TDENGINE:
-
                                         break;
                                     case INFLUXDB:
                                     case KAFKA:
@@ -130,7 +128,6 @@ public final class RuleEngineManager extends Subscriber<RuleEngineEvent> {
                             });
                         }
                     }).subscribe();
-
         });
     }
 

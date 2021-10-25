@@ -36,7 +36,7 @@
           </a-form-item>
         </a-col>
       </a-row>
-      <div v-show="type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER'">
+      <div v-show="type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' || type === 'TDENGINE'">
         <a-row :gutter="16">
           <a-col :span="12">
             <a-form-item label="IP">
@@ -46,7 +46,10 @@
                   {
                     rules: [
                       {
-                        required: type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' ? true : false,
+                        required:
+                          type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' || type === 'TDENGINE'
+                            ? true
+                            : false,
                         message: '请输入IP',
                       },
                     ],
@@ -64,7 +67,10 @@
                   {
                     rules: [
                       {
-                        required: type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' ? true : false,
+                        required:
+                          type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' || type === 'TDENGINE'
+                            ? true
+                            : false,
                         message: '请输入端口',
                       },
                     ],
@@ -84,7 +90,10 @@
                   {
                     rules: [
                       {
-                        required: type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' ? true : false,
+                        required:
+                          type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' || type === 'TDENGINE'
+                            ? true
+                            : false,
                         message: '请输入账户',
                       },
                     ],
@@ -102,7 +111,10 @@
                   {
                     rules: [
                       {
-                        required: type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' ? true : false,
+                        required:
+                          type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' || type === 'TDENGINE'
+                            ? true
+                            : false,
                         message: '请输入密码',
                       },
                     ],
@@ -122,7 +134,10 @@
                   {
                     rules: [
                       {
-                        required: type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' ? true : false,
+                        required:
+                          type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' || type === 'TDENGINE'
+                            ? true
+                            : false,
                         message: '请输入要连接的数据库',
                       },
                     ],

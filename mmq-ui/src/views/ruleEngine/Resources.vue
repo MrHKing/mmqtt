@@ -68,6 +68,8 @@ export default {
           return ' ip:' + resource.ip + ' port:' + resource.port + ' 数据库名称:' + resource.databaseName
         case 'SQLSERVER':
           return ' ip:' + resource.ip + ' port:' + resource.port + ' 数据库名称:' + resource.databaseName
+        case 'TDENGINE':
+          return ' ip:' + resource.ip + ' port:' + resource.port + ' 数据库名称:' + resource.databaseName
         case 'KAFKA':
           return ' Kafka服务:' + resource.server
         default:

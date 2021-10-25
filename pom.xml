@@ -114,6 +114,7 @@
         <proto-google-common-protos.version>1.17.0</proto-google-common-protos.version>
         <protobuf-java.version>3.8.0</protobuf-java.version>
         <tomcat-embed-jasper.version>9.0.40</tomcat-embed-jasper.version>
+        <taos.version>2.0.18</taos.version>
         <javatuples.version>1.2</javatuples.version>
     </properties>
     <!-- == -->
@@ -613,6 +614,11 @@
                 <groupId>com.microsoft.sqlserver</groupId>
                 <artifactId>sqljdbc4</artifactId>
                 <version>${sqljdbc4.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.taosdata.jdbc</groupId>
+                <artifactId>taos-jdbcdriver</artifactId>
+                <version>${taos.version}</version>
             </dependency>
 
             <dependency>

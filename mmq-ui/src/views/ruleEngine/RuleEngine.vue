@@ -42,8 +42,8 @@
           {{ index + 1 }}
         </span>
         <span slot="enable" slot-scope="record">
-          <a-tag v-show="record.enable" color="red"> 启用 </a-tag>
-          <a-tag v-show="!record.enable" color="green"> 停止 </a-tag>
+          <a-tag v-show="record.enable" color="red"> 停止 </a-tag>
+          <a-tag v-show="!record.enable" color="green"> 启用 </a-tag>
         </span>
         <span slot="action" slot-scope="text, record">
           <template>
@@ -146,7 +146,7 @@ export default {
       record.enable = !record.enable
       postAction('/v1/ruleEngine', record).then(res => {
         if (res.code === 200) {
-          this.$message.info('踢出成功！')
+          this.$message.info('启动成功！')
           this.$refs.table.refresh(true)
         } else {
           this.$message.info(res.message)
