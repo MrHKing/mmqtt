@@ -105,7 +105,6 @@
               <a-select-option value="POSTGRESQL"> Postgresql </a-select-option>
               <a-select-option value="SQLSERVER"> SqlServer </a-select-option>
               <a-select-option value="TDENGINE"> Tdengine </a-select-option>
-              <a-select-option value="INFLUXDB"> InfluxDB </a-select-option>
               <a-select-option value="KAFKA"> Kafka </a-select-option>
             </a-select>
           </a-form-item>
@@ -270,6 +269,8 @@ export default {
           return ' ip:' + resource.ip + ' port:' + resource.port + ' 数据库名称:' + resource.databaseName
         case 'SQLSERVER':
           return ' ip:' + resource.ip + ' port:' + resource.port + ' 数据库名称:' + resource.databaseName
+        case 'TDENGINE':
+          return ' ip:' + resource.ip + ' port:' + resource.port + ' 数据库名称:' + resource.databaseName
         case 'KAFKA':
           return ' Kafka服务:' + resource.server + ' topic:' + resource.topic
         default:
@@ -297,43 +298,9 @@ export default {
       const type = record.type
       switch (type) {
         case 'MYSQL':
-          this.$nextTick(() => {
-            this.resourcesform.setFieldsValue(
-              {
-                resourceID: record.resourceID,
-                type: type,
-                description: record.description,
-                resource: {
-                  ip: record.resource.ip,
-                  port: record.resource.port,
-                  databaseName: record.resource.databaseName,
-                  password: record.resource.password,
-                  username: record.resource.username,
-                  sql: record.resource.sql
-                }
-
-              })
-          })
-          break
         case 'POSTGRESQL':
-          this.$nextTick(() => {
-            this.resourcesform.setFieldsValue(
-              {
-                resourceID: record.resourceID,
-                type: type,
-                description: record.description,
-                resource: {
-                  ip: record.resource.ip,
-                  port: record.resource.port,
-                  databaseName: record.resource.databaseName,
-                  password: record.resource.password,
-                  username: record.resource.username,
-                  sql: record.resource.sql
-                }
-              })
-          })
-          break
         case 'SQLSERVER':
+        case 'TDENGINE':
           this.$nextTick(() => {
             this.resourcesform.setFieldsValue(
               {
@@ -351,8 +318,6 @@ export default {
 
               })
           })
-          break
-        case 'TDENGINE':
           break
         case 'KAFKA':
           this.$nextTick(() => {

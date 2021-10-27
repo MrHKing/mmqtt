@@ -77,6 +77,7 @@
     <sonar.exclusions>file:**/generated-sources/**,**/test/**</sonar.exclusions>
     <maven-failsafe-plugin.version>2.19.1</maven-failsafe-plugin.version>
     <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
+    <taos.version>2.0.18</taos.version>
     <maven.test.skip>false</maven.test.skip>
     <hutool.version>4.1.6</hutool.version>
     <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
@@ -356,6 +357,11 @@
         <groupId>com.microsoft.sqlserver</groupId>
         <artifactId>sqljdbc4</artifactId>
         <version>${sqljdbc4.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.taosdata.jdbc</groupId>
+        <artifactId>taos-jdbcdriver</artifactId>
+        <version>${taos.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.derby</groupId>

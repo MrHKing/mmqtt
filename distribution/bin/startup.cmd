@@ -69,7 +69,7 @@ if %MODE% == "cluster" (
 )
 
 rem set mmq options
-set "MMQ_OPTS=%MMQ_OPTS% -Dmmq.home=%BASE_DIR%"
+set "MMQ_OPTS=%MMQ_OPTS% -Dmmq.home=%BASE_DIR% -Duser.timezone=GMT+08"
 set "MMQ_OPTS=%MMQ_OPTS% -jar %BASE_DIR%\target\%SERVER%.jar"
 
 rem set mmq spring config location

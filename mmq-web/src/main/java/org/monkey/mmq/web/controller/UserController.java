@@ -198,7 +198,7 @@ public class UserController {
     }
 
     /**
-     * Login to Nacos
+     * Login to solley
      *
      * <p>This methods uses username and password to require a new token.
      *

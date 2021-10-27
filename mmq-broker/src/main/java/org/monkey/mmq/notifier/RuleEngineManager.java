@@ -16,6 +16,8 @@
 package org.monkey.mmq.notifier;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.protobuf.ByteString;
+import io.netty.handler.codec.mqtt.MqttQoS;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.monkey.mmq.config.Loggers;
@@ -24,6 +26,7 @@ import org.monkey.mmq.config.driver.MysqlDriver;
 import org.monkey.mmq.config.matedata.RuleEngineMateData;
 import org.monkey.mmq.config.service.RuleEngineService;
 import org.monkey.mmq.core.consistency.notifier.ValueChangeEvent;
+import org.monkey.mmq.core.entity.InternalMessage;
 import org.monkey.mmq.core.notify.Event;
 import org.monkey.mmq.core.notify.NotifyCenter;
 import org.monkey.mmq.core.notify.listener.Subscriber;
@@ -42,6 +45,8 @@ import java.sql.Connection;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.monkey.mmq.core.common.Constants.RULE_ENGINE;
 
 /**
  * @author solley
@@ -106,6 +111,11 @@ public final class RuleEngineManager extends Subscriber<RuleEngineEvent> {
                                             }
                                         } catch (Exception e) {
                                             Loggers.BROKER_SERVER.error(e.getMessage());
+                                            SysMessageEvent sysMessageEvent = new SysMessageEvent();
+                                            sysMessageEvent.setTopic(RULE_ENGINE);
+                                            sysMessageEvent.setPayload(e.getMessage());
+                                            sysMessageEvent.setMqttQoS(MqttQoS.AT_LEAST_ONCE);
+                                            NotifyCenter.publishEvent(sysMessageEvent);
                                         }
                                         break;
                                     case INFLUXDB:
@@ -120,6 +130,11 @@ public final class RuleEngineManager extends Subscriber<RuleEngineEvent> {
                                             producer.send(new ProducerRecord<>(resource.getResource().get("topic").toString(), JacksonUtils.toJson(payload)));
                                         } catch (Exception e) {
                                             Loggers.BROKER_SERVER.error(e.getMessage());
+                                            SysMessageEvent sysMessageEvent = new SysMessageEvent();
+                                            sysMessageEvent.setTopic(RULE_ENGINE);
+                                            sysMessageEvent.setPayload(e.getMessage());
+                                            sysMessageEvent.setMqttQoS(MqttQoS.AT_LEAST_ONCE);
+                                            NotifyCenter.publishEvent(sysMessageEvent);
                                         }
                                         break;
                                     default:

@@ -25,7 +25,6 @@
               <a-select-option value="POSTGRESQL"> Postgresql </a-select-option>
               <a-select-option value="SQLSERVER"> SqlServer </a-select-option>
               <a-select-option value="TDENGINE"> Tdengine </a-select-option>
-              <a-select-option value="INFLUXDB"> InfluxDB </a-select-option>
               <a-select-option value="KAFKA"> Kafka </a-select-option>
             </a-select>
           </a-form-item>
@@ -263,41 +262,9 @@ export default {
       this.type = type
       switch (type) {
         case 'MYSQL':
-          this.$nextTick(() => {
-            this.form.setFieldsValue(
-              {
-                resourceID: record.resourceID,
-                type: type,
-                description: record.description,
-                resource: {
-                  ip: record.resource.ip,
-                  port: record.resource.port,
-                  databaseName: record.resource.databaseName,
-                  password: record.resource.password,
-                  username: record.resource.username
-                }
-
-              })
-          })
-          break
         case 'POSTGRESQL':
-          this.$nextTick(() => {
-            this.form.setFieldsValue(
-              {
-                resourceID: record.resourceID,
-                type: type,
-                description: record.description,
-                resource: {
-                  ip: record.resource.ip,
-                  port: record.resource.port,
-                  databaseName: record.resource.databaseName,
-                  password: record.resource.password,
-                  username: record.resource.username
-                }
-              })
-          })
-          break
         case 'SQLSERVER':
+        case 'TDENGINE':
           this.$nextTick(() => {
             this.form.setFieldsValue(
               {
@@ -313,8 +280,6 @@ export default {
                 }
               })
           })
-          break
-        case 'TDENGINE':
           break
         case 'KAFKA':
           this.$nextTick(() => {

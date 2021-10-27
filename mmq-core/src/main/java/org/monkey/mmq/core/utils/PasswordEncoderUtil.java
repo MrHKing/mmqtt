@@ -21,7 +21,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 /**
  * Password encoder tool.
  *
- * @author nacos
+ * @author solley
  */
 public class PasswordEncoderUtil {
     
