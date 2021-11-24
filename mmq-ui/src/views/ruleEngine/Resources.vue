@@ -34,33 +34,33 @@ export default {
   components: {
     ResourceModel
   },
-  data () {
+  data() {
     return {
       loading: true,
       data: []
     }
   },
-  filters: {
-  },
-  created () {
+  filters: {},
+  created() {
     this.loadData()
   },
   methods: {
-    loadData () {
-      return getAction('/v1/resources/resources', {})
-        .then(res => {
-          this.data = res.data
-          this.data.unshift({})
-          //   res.data.forEach(resource => {
-          //     this.data.push(resource)
-          //   })
-          console.log(this.data)
-        })
+    loadData() {
+      return getAction('/v1/resources/resources', {}).then(res => {
+        this.data = res.data
+        this.data.unshift({})
+        //   res.data.forEach(resource => {
+        //     this.data.push(resource)
+        //   })
+        console.log(this.data)
+      })
     },
-    getDescription (item) {
-      return '资源ID:' + item.resourceID + ' 资源类型:' + item.type + this.getResourceContentByType(item.resource, item.type)
+    getDescription(item) {
+      return (
+        '资源ID:' + item.resourceID + ' 资源类型:' + item.type + this.getResourceContentByType(item.resource, item.type)
+      )
     },
-    getResourceContentByType (resource, type) {
+    getResourceContentByType(resource, type) {
       switch (type) {
         case 'MYSQL':
           return ' ip:' + resource.ip + ' port:' + resource.port + ' 数据库名称:' + resource.databaseName
@@ -72,14 +72,16 @@ export default {
           return ' ip:' + resource.ip + ' port:' + resource.port + ' 数据库名称:' + resource.databaseName
         case 'KAFKA':
           return ' Kafka服务:' + resource.server
+        case 'MQTT_BROKER':
+          return ' MQTT BROKER服务:' + resource.server
         default:
           return ''
       }
     },
-    handleSave (record) {
+    handleSave(record) {
       this.$refs.ResourceModel.save(record)
     },
-    handleDelete (record) {
+    handleDelete(record) {
       console.log(record)
       deleteAction('/v1/resources', { resourceID: record.resourceID }).then(res => {
         if (res.code === 200) {

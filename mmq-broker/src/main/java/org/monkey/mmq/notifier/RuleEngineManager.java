@@ -15,11 +15,14 @@
  */
 package org.monkey.mmq.notifier;
 
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.protobuf.ByteString;
 import io.netty.handler.codec.mqtt.MqttQoS;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.config.driver.DriverFactory;
 import org.monkey.mmq.config.driver.MysqlDriver;
@@ -84,8 +87,6 @@ public final class RuleEngineManager extends Subscriber<RuleEngineEvent> {
                     .doOnNext(map -> {
                         // 如果不为空则触发响应
                         if (map != null && rule.getResourcesMateDatas().size() != 0) {
-                            this.setProperty(map);
-
                             // 根据规则获得规则的响应
                             rule.getResourcesMateDatas().forEach(resource -> {
                                 Object driver = null;
@@ -100,6 +101,7 @@ public final class RuleEngineManager extends Subscriber<RuleEngineEvent> {
                                     case SQLSERVER:
                                     case TDENGINE:
                                         try {
+                                            this.setProperty(map);
                                             Connection connection = (Connection)driver;
                                             if (connection != null) {
                                                 String sql = resource.getResource().get("sql").toString();
@@ -129,6 +131,21 @@ public final class RuleEngineManager extends Subscriber<RuleEngineEvent> {
                                             payload.put("qos", event.getMessage().getMqttQoS());
                                             producer.send(new ProducerRecord<>(resource.getResource().get("topic").toString(), JacksonUtils.toJson(payload)));
                                         } catch (Exception e) {
+                                            Loggers.BROKER_SERVER.error(e.getMessage());
+                                            SysMessageEvent sysMessageEvent = new SysMessageEvent();
+                                            sysMessageEvent.setTopic(RULE_ENGINE);
+                                            sysMessageEvent.setPayload(e.getMessage());
+                                            sysMessageEvent.setMqttQoS(MqttQoS.AT_LEAST_ONCE);
+                                            NotifyCenter.publishEvent(sysMessageEvent);
+                                        }
+                                        break;
+                                    case MQTT_BROKER:
+                                        MqttClient mqttClient = (MqttClient)driver;
+                                        try {
+                                            mqttClient.publish(event.getMessage().getTopic(),
+                                                    JSON.toJSONString(map).getBytes(),
+                                                    event.getMessage().getMqttQoS(), false);
+                                        } catch (MqttException e) {
                                             Loggers.BROKER_SERVER.error(e.getMessage());
                                             SysMessageEvent sysMessageEvent = new SysMessageEvent();
                                             sysMessageEvent.setTopic(RULE_ENGINE);

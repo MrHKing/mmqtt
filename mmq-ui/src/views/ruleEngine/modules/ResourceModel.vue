@@ -16,8 +16,8 @@
               v-decorator="[
                 'type',
                 {
-                  rules: [{ required: true, message: '请选择资源类型' }],
-                },
+                  rules: [{ required: true, message: '请选择资源类型' }]
+                }
               ]"
               placeholder="请选择资源类型"
             >
@@ -26,6 +26,7 @@
               <a-select-option value="SQLSERVER"> SqlServer </a-select-option>
               <a-select-option value="TDENGINE"> Tdengine </a-select-option>
               <a-select-option value="KAFKA"> Kafka </a-select-option>
+              <a-select-option value="MQTT_BROKER"> MQTT Broker </a-select-option>
             </a-select>
           </a-form-item>
         </a-col>
@@ -49,10 +50,10 @@
                           type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' || type === 'TDENGINE'
                             ? true
                             : false,
-                        message: '请输入IP',
-                      },
-                    ],
-                  },
+                        message: '请输入IP'
+                      }
+                    ]
+                  }
                 ]"
                 placeholder="请输入IP"
               />
@@ -70,10 +71,10 @@
                           type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' || type === 'TDENGINE'
                             ? true
                             : false,
-                        message: '请输入端口',
-                      },
-                    ],
-                  },
+                        message: '请输入端口'
+                      }
+                    ]
+                  }
                 ]"
                 placeholder="请输入端口"
               />
@@ -93,10 +94,10 @@
                           type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' || type === 'TDENGINE'
                             ? true
                             : false,
-                        message: '请输入账户',
-                      },
-                    ],
-                  },
+                        message: '请输入账户'
+                      }
+                    ]
+                  }
                 ]"
                 placeholder="请输入账户"
               />
@@ -114,10 +115,10 @@
                           type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' || type === 'TDENGINE'
                             ? true
                             : false,
-                        message: '请输入密码',
-                      },
-                    ],
-                  },
+                        message: '请输入密码'
+                      }
+                    ]
+                  }
                 ]"
                 placeholder="请输入密码"
               />
@@ -137,10 +138,10 @@
                           type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' || type === 'TDENGINE'
                             ? true
                             : false,
-                        message: '请输入要连接的数据库',
-                      },
-                    ],
-                  },
+                        message: '请输入要连接的数据库'
+                      }
+                    ]
+                  }
                 ]"
                 placeholder="请输入要连接的数据库"
               />
@@ -157,8 +158,8 @@
                 v-decorator="[
                   'resource.server',
                   {
-                    rules: [{ required: type === 'KAFKA' ? true : false, message: '请输入Kafka服务' }],
-                  },
+                    rules: [{ required: type === 'KAFKA' ? true : false, message: '请输入Kafka服务' }]
+                  }
                 ]"
                 placeholder="请输入Kafka服务"
               />
@@ -173,8 +174,8 @@
                 v-decorator="[
                   'resource.username',
                   {
-                    rules: [{ required: false, message: '请输入Kafka账户' }],
-                  },
+                    rules: [{ required: false, message: '请输入Kafka账户' }]
+                  }
                 ]"
                 placeholder="请输入Kafka账户"
               />
@@ -186,10 +187,56 @@
                 v-decorator="[
                   'resource.password',
                   {
-                    rules: [{ required: false, message: '请输入Kafka密码' }],
-                  },
+                    rules: [{ required: false, message: '请输入Kafka密码' }]
+                  }
                 ]"
                 placeholder="请输入Kafka密码"
+              />
+            </a-form-item>
+          </a-col>
+        </a-row>
+      </div>
+      <div v-show="type === 'MQTT_BROKER'">
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item label="MQTT服务">
+              <a-input
+                v-decorator="[
+                  'resource.server',
+                  {
+                    rules: [{ required: type === 'MQTT_BROKER' ? true : false, message: '请输入MQTT服务' }]
+                  }
+                ]"
+                placeholder="请输入MQTT服务"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12"> </a-col>
+        </a-row>
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item label="MQTT账户">
+              <a-input
+                v-decorator="[
+                  'resource.username',
+                  {
+                    rules: [{ required: false, message: '请输入Kafka账户' }]
+                  }
+                ]"
+                placeholder="请输入MQTT账户"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="MQTT密码">
+              <a-input-password
+                v-decorator="[
+                  'resource.password',
+                  {
+                    rules: [{ required: false, message: '请输入MQTT密码' }]
+                  }
+                ]"
+                placeholder="请输入MQTT密码"
               />
             </a-form-item>
           </a-col>
@@ -202,8 +249,8 @@
               v-decorator="[
                 'description',
                 {
-                  rules: [{ required: false, message: '请输入备注' }],
-                },
+                  rules: [{ required: false, message: '请输入备注' }]
+                }
               ]"
               :rows="4"
               placeholder="请输入备注"
@@ -222,7 +269,7 @@
         padding: '10px 16px',
         background: '#fff',
         textAlign: 'right',
-        zIndex: 1,
+        zIndex: 1
       }"
     >
       <a-button :style="{ marginRight: '8px' }" @click="onClose"> Cancel </a-button>
@@ -234,7 +281,7 @@
 <script>
 import { postAction } from '@/api/manage'
 export default {
-  data () {
+  data() {
     return {
       title: '操作',
       visible: false,
@@ -248,9 +295,9 @@ export default {
       }
     }
   },
-  created () { },
+  created() {},
   methods: {
-    save (record) {
+    save(record) {
       this.form.resetFields()
       this.visible = true
       if (record) {
@@ -258,7 +305,7 @@ export default {
         this.setFieldsValueByType(record.type, record)
       }
     },
-    setFieldsValueByType (type, record) {
+    setFieldsValueByType(type, record) {
       this.type = type
       switch (type) {
         case 'MYSQL':
@@ -266,45 +313,43 @@ export default {
         case 'SQLSERVER':
         case 'TDENGINE':
           this.$nextTick(() => {
-            this.form.setFieldsValue(
-              {
-                resourceID: record.resourceID,
-                type: type,
-                description: record.description,
-                resource: {
-                  ip: record.resource.ip,
-                  port: record.resource.port,
-                  databaseName: record.resource.databaseName,
-                  password: record.resource.password,
-                  username: record.resource.username
-                }
-              })
+            this.form.setFieldsValue({
+              resourceID: record.resourceID,
+              type: type,
+              description: record.description,
+              resource: {
+                ip: record.resource.ip,
+                port: record.resource.port,
+                databaseName: record.resource.databaseName,
+                password: record.resource.password,
+                username: record.resource.username
+              }
+            })
           })
           break
         case 'KAFKA':
           this.$nextTick(() => {
-            this.form.setFieldsValue(
-              {
-                resourceID: record.resourceID,
-                type: type,
-                description: record.description,
-                resource: {
-                  server: record.resource.server,
-                  password: record.resource.password,
-                  username: record.resource.username
-                }
-              })
+            this.form.setFieldsValue({
+              resourceID: record.resourceID,
+              type: type,
+              description: record.description,
+              resource: {
+                server: record.resource.server,
+                password: record.resource.password,
+                username: record.resource.username
+              }
+            })
           })
           break
       }
     },
-    typeChange (value) {
+    typeChange(value) {
       this.type = value
     },
-    onClose () {
+    onClose() {
       this.visible = false
     },
-    handleOk () {
+    handleOk() {
       const that = this
       // 触发表单验证
       this.form.validateFields((err, values) => {
@@ -317,7 +362,7 @@ export default {
           formData.resourceID = this.curResourceID
           const obj = postAction(this.url.save, formData)
           obj
-            .then((res) => {
+            .then(res => {
               if (res.code === 200) {
                 that.$message.success(res.message)
                 that.$emit('ok')
@@ -332,7 +377,7 @@ export default {
         }
       })
     },
-    handleConnect () {
+    handleConnect() {
       const that = this
       // 触发表单验证
       this.form.validateFields((err, values) => {
@@ -340,7 +385,7 @@ export default {
           const formData = Object.assign({}, values)
           formData.resourceID = this.curResourceID
           console.log(formData)
-          postAction(this.url.testConnect, formData).then((res) => {
+          postAction(this.url.testConnect, formData).then(res => {
             if (res.code === 200) {
               that.$message.success('连接成功！')
             } else {
@@ -351,13 +396,13 @@ export default {
         // const formData = Object.assign({}, values)
       })
     },
-    filterOption (input, option) {
+    filterOption(input, option) {
       if (!option.componentOptions.children[0].text) {
         return false
       }
       return option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
     },
-    handleCancel () {
+    handleCancel() {
       this.onClose()
     }
   }

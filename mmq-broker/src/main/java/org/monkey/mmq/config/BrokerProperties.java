@@ -35,15 +35,11 @@ public class BrokerProperties {
 	private static final String MMQ_BROKER_WEBSOCKET_PROPERTY = "mmq.broker.websocketPort";
 	private static final String DEFAULT_MMQ_BROKER_WEBSOCKET = "2883";
 
-	/**
-	 * SSL端口号, 默认8883端口
-	 */
-	private int port;
+	private static final String MMQ_BROKER_SSL_PORT_PROPERTY = "mmq.broker.ssl.port";
+	private static final String DEFAULT_MMQ_BROKER_SSL_PORT = "1663";
 
-	/**
-	 * WebSocket SSL端口号, 默认9993端口
-	 */
-	private int websocketPort;
+	private static final String MMQ_BROKER_WEBSOCKET_SSL_PROPERTY = "mmq.broker.ssl.websocketPort";
+	private static final String DEFAULT_MMQ_BROKER_SSL_WEBSOCKET = "2663";
 
 	/**
 	 * WebSocket Path值, 默认值 /mqtt
@@ -53,7 +49,7 @@ public class BrokerProperties {
 	/**
 	 * SSL密钥文件密码
 	 */
-	private String sslPassword = "123456";
+	private String sslPassword = "mmq@123";
 
 	/**
 	 * SSL是否启用
@@ -81,11 +77,19 @@ public class BrokerProperties {
 	private boolean soKeepAlive = false;
 
 	public int getPort() {
-		return Integer.valueOf(EnvUtil.getProperty(MMQ_BROKER_PORT_PROPERTY, DEFAULT_MMQ_BROKER_PORT));
+		return Integer.parseInt(EnvUtil.getProperty(MMQ_BROKER_PORT_PROPERTY, DEFAULT_MMQ_BROKER_PORT));
 	}
 
 	public int getWebsocketPort() {
-		return Integer.valueOf(EnvUtil.getProperty(MMQ_BROKER_WEBSOCKET_PROPERTY, DEFAULT_MMQ_BROKER_WEBSOCKET));
+		return Integer.parseInt(EnvUtil.getProperty(MMQ_BROKER_WEBSOCKET_PROPERTY, DEFAULT_MMQ_BROKER_WEBSOCKET));
+	}
+
+	public int getSSLPort() {
+		return Integer.parseInt(EnvUtil.getProperty(MMQ_BROKER_SSL_PORT_PROPERTY, DEFAULT_MMQ_BROKER_SSL_PORT));
+	}
+
+	public int getSSLWebsocketPort() {
+		return Integer.parseInt(EnvUtil.getProperty(MMQ_BROKER_WEBSOCKET_SSL_PROPERTY, DEFAULT_MMQ_BROKER_SSL_WEBSOCKET));
 	}
 
 	public String getWebsocketPath() {

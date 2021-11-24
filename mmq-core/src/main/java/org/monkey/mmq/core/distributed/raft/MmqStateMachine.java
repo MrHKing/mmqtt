@@ -96,7 +96,8 @@ class MmqStateMachine extends StateMachineAdapter {
                         final ByteBuffer data = iter.getData();
                         message = ProtoMessageUtil.parse(data.array());
                     }
-                    
+
+                    Loggers.RAFT.info("receive log : {}", message);
                     LoggerUtils.printIfDebugEnabled(Loggers.RAFT, "receive log : {}", message);
                     
                     if (message instanceof WriteRequest) {

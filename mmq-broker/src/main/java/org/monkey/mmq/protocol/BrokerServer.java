@@ -73,8 +73,6 @@ public class BrokerServer {
 
 	private EventLoopGroup workerGroup;
 
-	private SslContext sslContext;
-
 	private Channel channel;
 
 	private Channel websocketChannel;
@@ -84,14 +82,6 @@ public class BrokerServer {
 		LoggerUtils.printIfInfoEnabled(Loggers.BROKER_PROTOCOL,"Initializing {} MQTT Broker ...", "[" + id + "]");
 		bossGroup = brokerProperties.isUseEpoll() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
 		workerGroup = brokerProperties.isUseEpoll() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
-		if (brokerProperties.getSslEnabled()) {
-			KeyStore keyStore = KeyStore.getInstance("PKCS12");
-			InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("keystore/server.pfx");
-			keyStore.load(inputStream, brokerProperties.getSslPassword().toCharArray());
-			KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
-			kmf.init(keyStore, brokerProperties.getSslPassword().toCharArray());
-			sslContext = SslContextBuilder.forServer(kmf).build();
-		}
 		mqttServer();
 		websocketServer();
 		LoggerUtils.printIfInfoEnabled(Loggers.BROKER_PROTOCOL,"MQTT Broker {} is up and running. Open SSLPort: {} WebSocketSSLPort: {}", "[" + id + "]", brokerProperties.getPort(), brokerProperties.getWebsocketPort());
@@ -124,18 +114,6 @@ public class BrokerServer {
 					ChannelPipeline channelPipeline = socketChannel.pipeline();
 					// Netty提供的心跳检测
 					channelPipeline.addFirst("idle", new IdleStateHandler(0, 0, brokerProperties.getKeepAlive()));
-					if (brokerProperties.getSslEnabled()) {
-						// Netty提供的SSL处理
-						SSLEngine sslEngine = sslContext.newEngine(socketChannel.alloc());
-						sslEngine.setUseClientMode(false);        // 服务端模式
-						sslEngine.setNeedClientAuth(false);        // 不需要验证客户端
-						sslEngine.setEnabledCipherSuites(new String[]{
-								"TLS_RSA_WITH_AES_256_CBC_SHA256",
-								"TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
-								"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
-						});
-						channelPipeline.addLast("ssl", new SslHandler(sslEngine));
-					}
 					channelPipeline.addLast("decoder", new MqttDecoder());
 					channelPipeline.addLast("encoder", MqttEncoder.INSTANCE);
 					channelPipeline.addLast("broker", new BrokerHandler(protocolProcess));
@@ -162,16 +140,6 @@ public class BrokerServer {
 					ChannelPipeline channelPipeline = socketChannel.pipeline();
 					// Netty提供的心跳检测
 					channelPipeline.addFirst("idle", new IdleStateHandler(0, 0, brokerProperties.getKeepAlive()));
-					if (brokerProperties.getSslEnabled()) {
-						// Netty提供的SSL处理
-						SSLEngine sslEngine = sslContext.newEngine(socketChannel.alloc());
-						sslEngine.setUseClientMode(false);        // 服务端模式
-						sslEngine.setNeedClientAuth(false);        // 不需要验证客户端
-//						sslEngine.setEnabledCipherSuites(new String[]{
-//								"TLS_RSA_WITH_AES_256_CBC_SHA256"
-//						});
-						channelPipeline.addLast("ssl", new SslHandler(sslEngine));
-					}
 					// 将请求和应答消息编码或解码为HTTP消息
 					channelPipeline.addLast("http-codec", new HttpServerCodec());
 					// 将HTTP消息的多个部分合成一条完整的HTTP消息

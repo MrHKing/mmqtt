@@ -5,6 +5,7 @@ public enum ResourceEnum {
     KAFKA(org.monkey.mmq.config.driver.KafkaDriver.class),
     SQLSERVER(org.monkey.mmq.config.driver.SqlServerDriver.class),
     POSTGRESQL(org.monkey.mmq.config.driver.PostgresqlDriver.class),
+    MQTT_BROKER(org.monkey.mmq.config.driver.MQTTDriver.class),
     TDENGINE(org.monkey.mmq.config.driver.TDengineDriver.class),
     INFLUXDB(org.monkey.mmq.config.driver.InfluxDBDriver.class);
 
