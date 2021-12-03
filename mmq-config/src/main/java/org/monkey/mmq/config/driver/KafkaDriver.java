@@ -53,7 +53,7 @@ public class KafkaDriver implements ResourceDriver<Producer<String, String>> {
         prop.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         prop.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         try {
-            KafkaConsumer<String, String> consumer = new KafkaConsumer<>(prop);
+            KafkaProducer<String, String> consumer = new KafkaProducer<>(prop);
         } catch (Exception e) {
             return;
         }
@@ -77,7 +77,7 @@ public class KafkaDriver implements ResourceDriver<Producer<String, String>> {
             prop.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, resourcesMateData.getResource().get("server"));
             prop.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
             prop.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-            KafkaConsumer<String, String> consumer = new KafkaConsumer<>(prop);
+            KafkaProducer<String, String> consumer = new KafkaProducer<>(prop);
             return true;
         } catch (Exception e) {
             return false;
