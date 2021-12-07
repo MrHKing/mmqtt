@@ -59,6 +59,11 @@ public final class RuleEngineManager extends Subscriber<RuleEngineEvent> {
 
     @Autowired
     MysqlDriver mysqlDriver;
+    
+    /**
+     * 处理线程池
+     */
+    private static ExecutorService executor = Executors.newCachedThreadPool();
 
     private final int queueMaxSize = 65539;
 
@@ -76,91 +81,93 @@ public final class RuleEngineManager extends Subscriber<RuleEngineEvent> {
         //List<RuleEngineMateData> ruleEngineMateDataList = ruleEngineService.getAllRuleEngine().values().stream().filter(x->x.getEnable()).collect(Collectors.toList());
         Collection<RuleEngineMateData> ruleEngineMateDataList = ruleEngineService.getAllRuleEngine().values();
         if (ruleEngineMateDataList.size() == 0) return;
-        ruleEngineMateDataList.forEach(rule -> {
+        executor.submit(()->{ 
+            ruleEngineMateDataList.forEach(rule -> {
 
-            // 获得引擎的SQL，进行处理
-            ReactorQL.builder()
-                    .sql(rule.getSql())
-                    .build()
-                    .start(name -> event.getMessage().getTopic().startsWith(name.split("#")[0]) ?
-                            Flux.just((new ObjectMapper().convertValue(JacksonUtils.toObj(new String(event.getMessage().getMessageBytes().toByteArray())),Map.class))) : Flux.just())
-                    .doOnNext(map -> {
-                        // 如果不为空则触发响应
-                        if (map != null && rule.getResourcesMateDatas().size() != 0) {
-                            // 根据规则获得规则的响应
-                            rule.getResourcesMateDatas().forEach(resource -> {
-                                Object driver = null;
-                                try {
-                                    driver = DriverFactory.getResourceDriverByEnum(resource.getType()).getDriver(resource.getResourceID());
-                                } catch (Exception e) {
-                                    Loggers.BROKER_SERVER.error(e.getMessage());
-                                }
-                                switch (resource.getType()) {
-                                    case POSTGRESQL:
-                                    case MYSQL:
-                                    case SQLSERVER:
-                                    case TDENGINE:
-                                        try {
-                                            this.setProperty(map);
-                                            Connection connection = (Connection)driver;
-                                            if (connection != null) {
-                                                String sql = resource.getResource().get("sql").toString();
-                                                ExpressionParser parser = new SpelExpressionParser();
-                                                TemplateParserContext parserContext = new TemplateParserContext();
-                                                String content = parser.parseExpression(sql, parserContext).getValue(map, String.class);
-                                                connection.createStatement().execute(content);
-                                                connection.close();
+                // 获得引擎的SQL，进行处理
+                ReactorQL.builder()
+                        .sql(rule.getSql())
+                        .build()
+                        .start(name -> event.getMessage().getTopic().startsWith(name.split("#")[0]) ?
+                                Flux.just((new ObjectMapper().convertValue(JacksonUtils.toObj(new String(event.getMessage().getMessageBytes().toByteArray())),Map.class))) : Flux.just())
+                        .doOnNext(map -> {
+                            // 如果不为空则触发响应
+                            if (map != null && rule.getResourcesMateDatas().size() != 0) {
+                                // 根据规则获得规则的响应
+                                rule.getResourcesMateDatas().forEach(resource -> {
+                                    Object driver = null;
+                                    try {
+                                        driver = DriverFactory.getResourceDriverByEnum(resource.getType()).getDriver(resource.getResourceID());
+                                    } catch (Exception e) {
+                                        Loggers.BROKER_SERVER.error(e.getMessage());
+                                    }
+                                    switch (resource.getType()) {
+                                        case POSTGRESQL:
+                                        case MYSQL:
+                                        case SQLSERVER:
+                                        case TDENGINE:
+                                            try {
+                                                this.setProperty(map);
+                                                Connection connection = (Connection)driver;
+                                                if (connection != null) {
+                                                    String sql = resource.getResource().get("sql").toString();
+                                                    ExpressionParser parser = new SpelExpressionParser();
+                                                    TemplateParserContext parserContext = new TemplateParserContext();
+                                                    String content = parser.parseExpression(sql, parserContext).getValue(map, String.class);
+                                                    connection.createStatement().execute(content);
+                                                    connection.close();
+                                                }
+                                            } catch (Exception e) {
+                                                Loggers.BROKER_SERVER.error(e.getMessage());
+                                                SysMessageEvent sysMessageEvent = new SysMessageEvent();
+                                                sysMessageEvent.setTopic(RULE_ENGINE);
+                                                sysMessageEvent.setPayload(e.getMessage());
+                                                sysMessageEvent.setMqttQoS(MqttQoS.AT_LEAST_ONCE);
+                                                NotifyCenter.publishEvent(sysMessageEvent);
                                             }
-                                        } catch (Exception e) {
-                                            Loggers.BROKER_SERVER.error(e.getMessage());
-                                            SysMessageEvent sysMessageEvent = new SysMessageEvent();
-                                            sysMessageEvent.setTopic(RULE_ENGINE);
-                                            sysMessageEvent.setPayload(e.getMessage());
-                                            sysMessageEvent.setMqttQoS(MqttQoS.AT_LEAST_ONCE);
-                                            NotifyCenter.publishEvent(sysMessageEvent);
-                                        }
-                                        break;
-                                    case INFLUXDB:
-                                    case KAFKA:
-                                        try {
-                                            Producer<String, String> producer = (Producer<String, String>)driver;
-                                            Map<String, Object> payload = new HashMap<>();
-                                            payload.put("topic", event.getMessage().getTopic());
-                                            payload.put("payload", map);
-                                            payload.put("address", event.getMessage().getAddress());
-                                            payload.put("qos", event.getMessage().getMqttQoS());
-                                            producer.send(new ProducerRecord<>(resource.getResource().get("topic").toString(), JacksonUtils.toJson(payload)));
-                                        } catch (Exception e) {
-                                            Loggers.BROKER_SERVER.error(e.getMessage());
-                                            SysMessageEvent sysMessageEvent = new SysMessageEvent();
-                                            sysMessageEvent.setTopic(RULE_ENGINE);
-                                            sysMessageEvent.setPayload(e.getMessage());
-                                            sysMessageEvent.setMqttQoS(MqttQoS.AT_LEAST_ONCE);
-                                            NotifyCenter.publishEvent(sysMessageEvent);
-                                        }
-                                        break;
-                                    case MQTT_BROKER:
-                                        MqttClient mqttClient = (MqttClient)driver;
-                                        try {
-                                            mqttClient.publish(event.getMessage().getTopic(),
-                                                    JSON.toJSONString(map).getBytes(),
-                                                    event.getMessage().getMqttQoS(), false);
-                                        } catch (MqttException e) {
-                                            Loggers.BROKER_SERVER.error(e.getMessage());
-                                            SysMessageEvent sysMessageEvent = new SysMessageEvent();
-                                            sysMessageEvent.setTopic(RULE_ENGINE);
-                                            sysMessageEvent.setPayload(e.getMessage());
-                                            sysMessageEvent.setMqttQoS(MqttQoS.AT_LEAST_ONCE);
-                                            NotifyCenter.publishEvent(sysMessageEvent);
-                                        }
-                                        break;
-                                    default:
-                                        break;
-                                }
-                            });
-                        }
-                    }).subscribe();
-        });
+                                            break;
+                                        case INFLUXDB:
+                                        case KAFKA:
+                                            try {
+                                                Producer<String, String> producer = (Producer<String, String>)driver;
+                                                Map<String, Object> payload = new HashMap<>();
+                                                payload.put("topic", event.getMessage().getTopic());
+                                                payload.put("payload", map);
+                                                payload.put("address", event.getMessage().getAddress());
+                                                payload.put("qos", event.getMessage().getMqttQoS());
+                                                producer.send(new ProducerRecord<>(resource.getResource().get("topic").toString(), JacksonUtils.toJson(payload)));
+                                            } catch (Exception e) {
+                                                Loggers.BROKER_SERVER.error(e.getMessage());
+                                                SysMessageEvent sysMessageEvent = new SysMessageEvent();
+                                                sysMessageEvent.setTopic(RULE_ENGINE);
+                                                sysMessageEvent.setPayload(e.getMessage());
+                                                sysMessageEvent.setMqttQoS(MqttQoS.AT_LEAST_ONCE);
+                                                NotifyCenter.publishEvent(sysMessageEvent);
+                                            }
+                                            break;
+                                        case MQTT_BROKER:
+                                            MqttClient mqttClient = (MqttClient)driver;
+                                            try {
+                                                mqttClient.publish(event.getMessage().getTopic(),
+                                                        JSON.toJSONString(map).getBytes(),
+                                                        event.getMessage().getMqttQoS(), false);
+                                            } catch (MqttException e) {
+                                                Loggers.BROKER_SERVER.error(e.getMessage());
+                                                SysMessageEvent sysMessageEvent = new SysMessageEvent();
+                                                sysMessageEvent.setTopic(RULE_ENGINE);
+                                                sysMessageEvent.setPayload(e.getMessage());
+                                                sysMessageEvent.setMqttQoS(MqttQoS.AT_LEAST_ONCE);
+                                                NotifyCenter.publishEvent(sysMessageEvent);
+                                            }
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                });
+                            }
+                        }).subscribe();
+            });
+         });
     }
 
     @Override
