@@ -79,7 +79,7 @@ public abstract class BasePersistentServiceProcessor extends RequestProcessor4CP
         }
     }
     
-    protected final KvStorage kvStorage;
+    protected final MmqKvStorage kvStorage;
     
     protected final Serializer serializer;
 
