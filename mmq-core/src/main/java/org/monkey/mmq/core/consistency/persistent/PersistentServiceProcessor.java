@@ -65,7 +65,8 @@ public class PersistentServiceProcessor extends BasePersistentServiceProcessor {
     private volatile boolean hasLeader = false;
     
     public PersistentServiceProcessor(ProtocolManager protocolManager, String kvStorageBaseDir,
-                                      String raftGroup, Function<String, Class<? extends Record>> getClassOfRecordFromKey)
+                                      String raftGroup,
+                                      Function<String, Class<? extends Record>> getClassOfRecordFromKey)
             throws Exception {
         super(kvStorageBaseDir, raftGroup, getClassOfRecordFromKey);
         this.raftGroup = raftGroup;
@@ -152,6 +153,13 @@ public class PersistentServiceProcessor extends BasePersistentServiceProcessor {
     @Override
     public void listen(String key, RecordListener listener) throws MmqException {
         notifier.registerListener(key, listener);
+        while (!kvStorage.isSnapshotLoad()) {
+            Loggers.RAFT.info("Waiting SnapshotLoad ...");
+            try {
+                TimeUnit.MILLISECONDS.sleep(500);
+            } catch (InterruptedException ignored) {
+            }
+        }
         notifierAllServiceMeta(listener);
     }
     
