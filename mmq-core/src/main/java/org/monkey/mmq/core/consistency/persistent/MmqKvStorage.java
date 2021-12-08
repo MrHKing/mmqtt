@@ -32,6 +32,7 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 /**
@@ -51,11 +52,19 @@ public class MmqKvStorage extends MemoryKvStorage {
 
     private final Map<String, KvStorage> mqttKvStorage;
 
+    private boolean isSnapshotLoad = false;
+
+    public boolean isSnapshotLoad() {
+        return this.isSnapshotLoad;
+    }
+
     public MmqKvStorage(final String baseDir) throws Exception {
         this.baseDir = baseDir;
         this.baseDirStorage = StorageFactory.createKvStorage(KvStorage.KvType.File, LABEL, baseDir);
         this.mqttKvStorage = new ConcurrentHashMap<>(16);
     }
+
+
     
     @Override
     public byte[] get(byte[] key) throws KvStorageException {
@@ -147,6 +156,7 @@ public class MmqKvStorage extends MemoryKvStorage {
             baseDirStorage.snapshotLoad(path);
             loadSnapshotFromActualStorage(baseDirStorage);
             loadNamespaceSnapshot();
+            this.isSnapshotLoad = true;
         } finally {
             TimerContext.end(LOAD_SNAPSHOT, Loggers.RAFT);
         }
@@ -187,10 +197,6 @@ public class MmqKvStorage extends MemoryKvStorage {
     @Override
     public List<byte[]> allKeys() {
         try {
-//            if (super.allKeys().size() > 0) {
-//                return super.allKeys();
-//            }
-
             KvStorage storage = createActualStorageIfAbsent(org.apache.commons.lang3.StringUtils.EMPTY);
             return storage.allKeys();
         } catch (Exception e) {
