@@ -82,7 +82,7 @@ public class PersistentServiceProcessor extends BasePersistentServiceProcessor {
                 return;
             }
             Object leader = ((ProtocolMetaData.ValueItem) o).getData();
-            hasLeader = StringUtils.isNotBlank(String.valueOf(leader));
+            hasLeader =  StringUtils.isNotEmpty((String) leader);
             Loggers.RAFT.info("Raft group {} has leader {}", raftGroup, leader);
         });
         this.protocol.addRequestProcessors(Collections.singletonList(this));
