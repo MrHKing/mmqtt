@@ -16,6 +16,7 @@
 package org.monkey.mmq.config.driver;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.taosdata.jdbc.TSDBDriver;
 import org.monkey.mmq.config.matedata.ResourcesMateData;
 import org.monkey.mmq.core.utils.StringUtils;
 import org.springframework.expression.ExpressionParser;
@@ -29,6 +30,7 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -58,27 +60,24 @@ public class TDengineDriver implements ResourceDriver {
         if (StringUtils.isEmpty(resource.get("databaseName").toString())) return;
         if (StringUtils.isEmpty(resource.get("username").toString())) return;
         if (StringUtils.isEmpty(resource.get("password").toString())) return;
-        DruidDataSource dataSource = new DruidDataSource();
-        // jdbc properties
-        dataSource.setDriverClassName(JDBC_DRIVER);
-        dataSource.setUrl(String.format("jdbc:TAOS-RS://%s:%s/%s",
+        String url = String.format("jdbc:TAOS-RS://%s:%s/%s",
                 resource.get("ip").toString(),
                 resource.get("port").toString(),
-                resource.get("databaseName").toString())); // 设置数据库的连接地址
-        dataSource.setUsername(resource.get("username").toString());
-        dataSource.setPassword(resource.get("password").toString());
-        // pool configurations
-        dataSource.setInitialSize(10);
-        dataSource.setMinIdle(10);
-        dataSource.setMaxActive(10);
-        dataSource.setMaxWait(30000);
-        dataSource.setValidationQuery("select server_status()");
+                resource.get("databaseName").toString());
         try {
-            connection = dataSource.getConnection();
-        } catch (SQLException throwables) {
+            Class.forName(JDBC_DRIVER);
+            Properties connProps = new Properties();
+            connProps.setProperty(TSDBDriver.PROPERTY_KEY_CHARSET, "UTF-8");
+            connProps.setProperty(TSDBDriver.PROPERTY_KEY_LOCALE, "en_US.UTF-8");
+            connProps.setProperty(TSDBDriver.PROPERTY_KEY_TIME_ZONE, "UTC-8");
+            Connection conn = null;
+            conn = DriverManager.getConnection(url, connProps);
+            dataSources.put(resourceId, conn);
+        } catch (Exception throwables) {
             return;
         }
-        dataSources.put(resourceId, connection);
+
+
     }
 
     @Override
