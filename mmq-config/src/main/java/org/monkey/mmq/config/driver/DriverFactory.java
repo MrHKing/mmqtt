@@ -18,11 +18,29 @@ package org.monkey.mmq.config.driver;
 import org.monkey.mmq.config.matedata.ResourceEnum;
 import org.monkey.mmq.core.utils.ApplicationUtils;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Map;
+import java.util.UUID;
+
 /**
  * @author solley
  */
 public class DriverFactory {
     public static ResourceDriver getResourceDriverByEnum(ResourceEnum resourceEnum) {
         return (ResourceDriver) ApplicationUtils.getBean(resourceEnum.getName());
+    }
+
+    public static void setProperty(Map property) {
+        property.put("uuid", UUID.randomUUID().toString());
+
+        Date date = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        property.put("date", sdf.format(date));
+        sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        property.put("datetime", sdf.format(date));
+        sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        property.put("utc", sdf.format(date));
+
     }
 }

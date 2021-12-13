@@ -14,4 +14,7 @@ public interface ResourceDriver<T> {
     T getDriver(String resourceId) throws Exception;
 
     boolean testConnect(ResourcesMateData resourcesMateData);
+
+    void handle(Map property, ResourcesMateData resourcesMateData,
+                String topic, int qos, String address) throws Exception;
 }

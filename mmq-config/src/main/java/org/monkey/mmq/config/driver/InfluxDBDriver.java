@@ -42,4 +42,10 @@ public class InfluxDBDriver implements ResourceDriver{
     public boolean testConnect(ResourcesMateData resourcesMateData) {
         return false;
     }
+
+    @Override
+    public void handle(Map property, ResourcesMateData resourcesMateData,
+                       String topic, int qos, String address) {
+
+    }
 }

@@ -18,12 +18,18 @@ package org.monkey.mmq.config.driver;
 import com.alibaba.druid.pool.DruidDataSource;
 import org.monkey.mmq.config.matedata.ResourcesMateData;
 import org.monkey.mmq.core.utils.StringUtils;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.common.TemplateParserContext;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -71,6 +77,8 @@ public class SqlServerDriver implements ResourceDriver<Connection>{
 
     @Override
     public void deleteDriver(String resourceId) {
+        DruidDataSource druidDataSource = dataSources.get(resourceId);
+        druidDataSource.close();
         dataSources.remove(resourceId);
     }
 
@@ -98,4 +106,20 @@ public class SqlServerDriver implements ResourceDriver<Connection>{
             return false;
         }
     }
+
+    @Override
+    public void handle(Map property, ResourcesMateData resourcesMateData,
+                       String topic, int qos, String address) throws Exception{
+        Connection connection = (Connection)this.getDriver(resourcesMateData.getResourceID());
+        if (connection != null) {
+            DriverFactory.setProperty(property);
+            String sql = resourcesMateData.getResource().get("sql").toString();
+            ExpressionParser parser = new SpelExpressionParser();
+            TemplateParserContext parserContext = new TemplateParserContext();
+            String content = parser.parseExpression(sql, parserContext).getValue(property, String.class);
+            connection.createStatement().execute(content);
+            connection.close();
+        }
+    }
+
 }

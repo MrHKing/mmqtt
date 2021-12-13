@@ -97,73 +97,18 @@ public final class RuleEngineManager extends Subscriber<RuleEngineEvent> {
                             if (map != null && rule.getResourcesMateDatas().size() != 0) {
                                 // 根据规则获得规则的响应
                                 rule.getResourcesMateDatas().forEach(resource -> {
-                                    Object driver = null;
                                     try {
-                                        driver = DriverFactory.getResourceDriverByEnum(resource.getType()).getDriver(resource.getResourceID());
+                                        DriverFactory.getResourceDriverByEnum(resource.getType()).handle(map, resource,
+                                                event.getMessage().getTopic(),
+                                                event.getMessage().getMqttQoS(),
+                                                event.getMessage().getAddress());
                                     } catch (Exception e) {
                                         Loggers.BROKER_SERVER.error(e.getMessage());
-                                    }
-                                    switch (resource.getType()) {
-                                        case POSTGRESQL:
-                                        case MYSQL:
-                                        case SQLSERVER:
-                                        case TDENGINE:
-                                            try {
-                                                this.setProperty(map);
-                                                Connection connection = (Connection)driver;
-                                                if (connection != null) {
-                                                    String sql = resource.getResource().get("sql").toString();
-                                                    ExpressionParser parser = new SpelExpressionParser();
-                                                    TemplateParserContext parserContext = new TemplateParserContext();
-                                                    String content = parser.parseExpression(sql, parserContext).getValue(map, String.class);
-                                                    connection.createStatement().execute(content);
-                                                    connection.close();
-                                                }
-                                            } catch (Exception e) {
-                                                Loggers.BROKER_SERVER.error(e.getMessage());
-                                                SysMessageEvent sysMessageEvent = new SysMessageEvent();
-                                                sysMessageEvent.setTopic(RULE_ENGINE);
-                                                sysMessageEvent.setPayload(e.getMessage());
-                                                sysMessageEvent.setMqttQoS(MqttQoS.AT_LEAST_ONCE);
-                                                NotifyCenter.publishEvent(sysMessageEvent);
-                                            }
-                                            break;
-                                        case INFLUXDB:
-                                        case KAFKA:
-                                            try {
-                                                Producer<String, String> producer = (Producer<String, String>)driver;
-                                                Map<String, Object> payload = new HashMap<>();
-                                                payload.put("topic", event.getMessage().getTopic());
-                                                payload.put("payload", map);
-                                                payload.put("address", event.getMessage().getAddress());
-                                                payload.put("qos", event.getMessage().getMqttQoS());
-                                                producer.send(new ProducerRecord<>(resource.getResource().get("topic").toString(), JacksonUtils.toJson(payload)));
-                                            } catch (Exception e) {
-                                                Loggers.BROKER_SERVER.error(e.getMessage());
-                                                SysMessageEvent sysMessageEvent = new SysMessageEvent();
-                                                sysMessageEvent.setTopic(RULE_ENGINE);
-                                                sysMessageEvent.setPayload(e.getMessage());
-                                                sysMessageEvent.setMqttQoS(MqttQoS.AT_LEAST_ONCE);
-                                                NotifyCenter.publishEvent(sysMessageEvent);
-                                            }
-                                            break;
-                                        case MQTT_BROKER:
-                                            MqttClient mqttClient = (MqttClient)driver;
-                                            try {
-                                                mqttClient.publish(event.getMessage().getTopic(),
-                                                        JSON.toJSONString(map).getBytes(),
-                                                        event.getMessage().getMqttQoS(), false);
-                                            } catch (MqttException e) {
-                                                Loggers.BROKER_SERVER.error(e.getMessage());
-                                                SysMessageEvent sysMessageEvent = new SysMessageEvent();
-                                                sysMessageEvent.setTopic(RULE_ENGINE);
-                                                sysMessageEvent.setPayload(e.getMessage());
-                                                sysMessageEvent.setMqttQoS(MqttQoS.AT_LEAST_ONCE);
-                                                NotifyCenter.publishEvent(sysMessageEvent);
-                                            }
-                                            break;
-                                        default:
-                                            break;
+                                        SysMessageEvent sysMessageEvent = new SysMessageEvent();
+                                        sysMessageEvent.setTopic(RULE_ENGINE);
+                                        sysMessageEvent.setPayload(e.getMessage());
+                                        sysMessageEvent.setMqttQoS(MqttQoS.AT_LEAST_ONCE);
+                                        NotifyCenter.publishEvent(sysMessageEvent);
                                     }
                                 });
                             }
@@ -177,16 +122,5 @@ public final class RuleEngineManager extends Subscriber<RuleEngineEvent> {
         return RuleEngineEvent.class;
     }
 
-    private void setProperty(Map property) {
-        property.put("uuid", UUID.randomUUID().toString());
 
-        Date date = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        property.put("date", sdf.format(date));
-        sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        property.put("datetime", sdf.format(date));
-        sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-        property.put("utc", sdf.format(date));
-
-    }
 }

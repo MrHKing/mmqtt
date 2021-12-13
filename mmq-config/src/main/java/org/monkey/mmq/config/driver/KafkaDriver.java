@@ -20,13 +20,16 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.monkey.mmq.config.matedata.ResourcesMateData;
+import org.monkey.mmq.core.utils.JacksonUtils;
 import org.monkey.mmq.core.utils.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -62,6 +65,8 @@ public class KafkaDriver implements ResourceDriver<Producer<String, String>> {
 
     @Override
     public void deleteDriver(String resourceId) {
+        Producer<String, String> producer = producers.get(resourceId);
+        producer.close();
         producers.remove(resourceId);
     }
 
@@ -82,5 +87,17 @@ public class KafkaDriver implements ResourceDriver<Producer<String, String>> {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    @Override
+    public void handle(Map property, ResourcesMateData resourcesMateData,
+                       String topic, int qos, String address) throws Exception {
+        Producer<String, String> producer = (Producer<String, String>)this.getDriver(resourcesMateData.getResourceID());
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("topic", topic);
+        payload.put("payload", property);
+        payload.put("address", address);
+        payload.put("qos", qos);
+        producer.send(new ProducerRecord<>(resourcesMateData.getResource().get("topic").toString(), JacksonUtils.toJson(payload)));
     }
 }

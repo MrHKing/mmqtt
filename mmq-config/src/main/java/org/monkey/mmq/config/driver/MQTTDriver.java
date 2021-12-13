@@ -1,6 +1,7 @@
 package org.monkey.mmq.config.driver;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.alibaba.fastjson.JSON;
 import io.netty.handler.codec.mqtt.MqttQoS;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -113,5 +114,14 @@ public class MQTTDriver implements ResourceDriver<MqttClient> {
         } catch (MqttException e) {
             return false;
         }
+    }
+
+    @Override
+    public void handle(Map property, ResourcesMateData resourcesMateData,
+                       String topic, int qos, String address) throws Exception {
+        MqttClient mqttClient = this.getDriver(resourcesMateData.getResourceID());
+        mqttClient.publish(topic,
+                JSON.toJSONString(property).getBytes(),
+                qos, false);
     }
 }

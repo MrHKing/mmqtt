@@ -18,11 +18,18 @@ package org.monkey.mmq.config.driver;
 import com.alibaba.druid.pool.DruidDataSource;
 import org.monkey.mmq.config.matedata.ResourcesMateData;
 import org.monkey.mmq.core.utils.StringUtils;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.common.TemplateParserContext;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.stereotype.Component;
 
+import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -31,15 +38,19 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class TDengineDriver implements ResourceDriver {
 
-    private ConcurrentHashMap<String, DruidDataSource> dataSources = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, Connection> dataSources = new ConcurrentHashMap<>();
 
     static final String JDBC_DRIVER = "com.taosdata.jdbc.rs.RestfulDriver";
 
     @Override
     public void addDriver(String resourceId, Map resource) {
-        DruidDataSource druidDataSource = dataSources.get(resourceId);
-        if (druidDataSource != null) {
-            druidDataSource.close();
+        Connection connection = dataSources.get(resourceId);
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
             dataSources.remove(resourceId);
         }
 
@@ -62,19 +73,31 @@ public class TDengineDriver implements ResourceDriver {
         dataSource.setMaxActive(10);
         dataSource.setMaxWait(30000);
         dataSource.setValidationQuery("select server_status()");
+        try {
+            connection = dataSource.getConnection();
+        } catch (SQLException throwables) {
+            return;
+        }
+        dataSources.put(resourceId, connection);
     }
 
     @Override
     public void deleteDriver(String resourceId) {
-        dataSources.remove(resourceId);
+        Connection connection = dataSources.get(resourceId);
+        try {
+            connection.close();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        } finally {
+            dataSources.remove(resourceId);
+        }
     }
 
     @Override
     public Object getDriver(String resourceId) throws Exception {
         if (dataSources == null) return null;
         if (dataSources.get(resourceId) == null) return null;
-        if (!dataSources.get(resourceId).isInited()) return null;
-        return dataSources.get(resourceId).getConnection();
+        return dataSources.get(resourceId);
     }
 
     @Override
@@ -90,6 +113,20 @@ public class TDengineDriver implements ResourceDriver {
             return true;
         } catch (Exception e) {
             return false;
+        }
+    }
+
+    @Override
+    public void handle(Map property, ResourcesMateData resourcesMateData,
+                       String topic, int qos, String address) throws Exception{
+        Connection connection = (Connection)this.getDriver(resourcesMateData.getResourceID());
+        if (connection != null) {
+            DriverFactory.setProperty(property);
+            String sql = resourcesMateData.getResource().get("sql").toString();
+            ExpressionParser parser = new SpelExpressionParser();
+            TemplateParserContext parserContext = new TemplateParserContext();
+            String content = parser.parseExpression(sql, parserContext).getValue(property, String.class);
+            connection.createStatement().execute(content);
         }
     }
 }
