@@ -83,6 +83,10 @@ const columns = [
     dataIndex: 'address'
   },
   {
+    title: '节点地址',
+    dataIndex: 'nodeIp'
+  },
+  {
     title: '连接时间',
     dataIndex: 'connectTiem',
     sorter: true

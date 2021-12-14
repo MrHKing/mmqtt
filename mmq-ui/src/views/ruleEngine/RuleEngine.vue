@@ -98,33 +98,33 @@ export default {
     STable,
     Ellipsis
   },
-  data () {
+  data() {
     this.columns = columns
     return {
       // 高级搜索 展开/关闭
       advanced: false,
       dataSource: [],
+      loading: true,
       // 查询参数
       queryParam: {},
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
+        this.loading = true
         const requestParameters = Object.assign({}, parameter, this.queryParam)
         console.log('loadData request parameters:', requestParameters)
-        return getAction('/v1/ruleEngine/ruleEngines', requestParameters)
-          .then(res => {
-            this.dataSource = res.data.data
-            return res.data
-          })
+        return getAction('/v1/ruleEngine/ruleEngines', requestParameters).then(res => {
+          this.dataSource = res.data.data
+          this.loading = false
+          return res.data
+        })
       },
       selectedRowKeys: [],
       selectedRows: []
     }
   },
-  created () {
-
-  },
+  created() {},
   computed: {
-    rowSelection () {
+    rowSelection() {
       return {
         selectedRowKeys: this.selectedRowKeys,
         onChange: this.onSelectChange
@@ -132,17 +132,17 @@ export default {
     }
   },
   methods: {
-    onSelectChange (selectedRowKeys, selectedRows) {
+    onSelectChange(selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys
       this.selectedRows = selectedRows
     },
-    toggleAdvanced () {
+    toggleAdvanced() {
       this.advanced = !this.advanced
     },
-    resetSearchForm () {
+    resetSearchForm() {
       this.queryParam = {}
     },
-    handleEnable (record) {
+    handleEnable(record) {
       record.enable = !record.enable
       postAction('/v1/ruleEngine', record).then(res => {
         if (res.code === 200) {
@@ -153,7 +153,7 @@ export default {
         }
       })
     },
-    handleDelete (record) {
+    handleDelete(record) {
       console.log(record)
       deleteAction('/v1/ruleEngine', { ruleId: record.ruleId }).then(res => {
         if (res.code === 200) {
@@ -164,7 +164,7 @@ export default {
         }
       })
     },
-    handleSave (record) {
+    handleSave(record) {
       this.$router.push({ name: 'RuleEngineModel', params: { id: record.ruleId } })
     }
   }

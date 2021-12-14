@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <parent>
@@ -47,6 +47,7 @@
         <plugins>
           <plugin>
             <artifactId>maven-assembly-plugin</artifactId>
+            <version>3.0.0</version>
             <executions>
               <execution>
                 <id>make-assembly</id>
@@ -54,6 +55,12 @@
                 <goals>
                   <goal>single</goal>
                 </goals>
+                <configuration>
+                  <descriptors>
+                    <descriptor>release-mmq.xml</descriptor>
+                  </descriptors>
+                  <tarLongFileMode>posix</tarLongFileMode>
+                </configuration>
               </execution>
             </executions>
             <configuration>
@@ -65,10 +72,17 @@
           </plugin>
         </plugins>
       </build>
+      <properties>
+        <os.detected.name>windows</os.detected.name>
+        <os.detected.classifier>windows-x86_64</os.detected.classifier>
+        <os.detected.arch>x86_64</os.detected.arch>
+      </properties>
       <dependencies>
         <dependency>
-          <groupId>${project.groupId}</groupId>
+          <groupId>org.monkey.mmq</groupId>
           <artifactId>mmq-web</artifactId>
+          <version>1.0-SNAPSHOT</version>
+          <scope>compile</scope>
         </dependency>
       </dependencies>
     </profile>

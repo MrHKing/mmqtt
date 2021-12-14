@@ -24,6 +24,7 @@ package org.monkey.mmq.service;
 import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.cluster.ServerMemberManager;
 import org.monkey.mmq.core.entity.RejectClient;
+import org.monkey.mmq.core.env.EnvUtil;
 import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.core.notify.NotifyCenter;
 import org.monkey.mmq.core.utils.InetUtils;
@@ -46,7 +47,6 @@ import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListMap;
 
 @Service
 public class SessionStoreService implements RecordListener<ClientMateData> {
@@ -57,9 +57,15 @@ public class SessionStoreService implements RecordListener<ClientMateData> {
     @Autowired
     private SystemInfoStoreService systemInfoStoreService;
 
+    private final ServerMemberManager memberManager;
+
     private final Map<String, SessionMateData> storage = new ConcurrentHashMap<>();
 
     private final Map<String, ClientMateData> clientStory = new ConcurrentHashMap<>();
+
+    public SessionStoreService(ServerMemberManager memberManager) {
+        this.memberManager = memberManager;
+    }
 
     /**
      * Init
@@ -82,7 +88,7 @@ public class SessionStoreService implements RecordListener<ClientMateData> {
         InetSocketAddress clientIpSocket = (InetSocketAddress)sessionStore.getChannel().remoteAddress();
         String clientIp = clientIpSocket.getAddress().getHostAddress();
         consistencyService.put(UtilsAndCommons.SESSION_STORE + clientId,
-                new ClientMateData(clientId, sessionStore.getUser(), clientIp, InetUtils.getSelfIP()));
+                new ClientMateData(clientId, sessionStore.getUser(), clientIp, this.memberManager.getSelf().getIp(), this.memberManager.getSelf().getPort()));
     }
 
     public SessionMateData get(String clientId) {
@@ -95,10 +101,21 @@ public class SessionStoreService implements RecordListener<ClientMateData> {
         if (sessionMateData != null) {
             sessionMateData.getChannel().close();
         } else {
+            ClientMateData clientMateData = clientStory.get(UtilsAndCommons.SESSION_STORE + clientId);
+            if (clientMateData == null) {
+                try {
+                    consistencyService.remove(UtilsAndCommons.SESSION_STORE + clientId);
+                } catch (MmqException e) {
+                    Loggers.BROKER_SERVER.error("remove session key failed.", e);
+                }
+            }
             PublishEvent publishEvent = new PublishEvent();
             publishEvent.setPublicEventType(PublicEventType.REJECT_CLIENT);
             publishEvent.setRejectClient(RejectClient.newBuilder().setClientId(clientId).build());
+            publishEvent.setNodeIp(clientMateData.getNodeIp());
+            publishEvent.setNodePort(clientMateData.getNodePort());
             NotifyCenter.publishEvent(publishEvent);
+
         }
 
     }

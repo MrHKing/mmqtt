@@ -39,16 +39,19 @@ public class ClientMateData implements Record, Serializable {
 
     private String nodeIp;
 
+    private int nodePort;
+
     public ClientMateData() {
 
     }
 
-    public ClientMateData(String clientId, String user, String address, String nodeId) {
+    public ClientMateData(String clientId, String user, String address, String nodeId, int nodePort) {
         this.clientId = clientId;
         this.user = user;
         this.address = address;
         this.connectTiem = new Date();
         this.nodeIp = nodeId;
+        this.nodePort = nodePort;
     }
 
     public static long getSerialVersionUID() {
@@ -93,5 +96,13 @@ public class ClientMateData implements Record, Serializable {
 
     public void setNodeIp(String nodeIp) {
         this.nodeIp = nodeIp;
+    }
+
+    public int getNodePort() {
+        return nodePort;
+    }
+
+    public void setNodePort(int nodePort) {
+        this.nodePort = nodePort;
     }
 }

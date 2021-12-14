@@ -2,7 +2,7 @@
   <a-card :bordered="false">
     <!-- <a-button type="primary" @click="handleSave({})">添加</a-button> -->
     <div class="table-operator"></div>
-    <a-list :grid="{ gutter: 24, lg: 3, md: 2, sm: 1, xs: 1 }" :data-source="data">
+    <a-list :grid="{ gutter: 24, lg: 3, md: 2, sm: 1, xs: 1 }" :loading="loading" :data-source="data">
       <a-list-item slot="renderItem" slot-scope="item">
         <template v-if="!item || item.resourceID === undefined">
           <a-button @click="handleSave({})" class="new-btn" type="dashed">
@@ -46,14 +46,18 @@ export default {
   },
   methods: {
     loadData() {
-      return getAction('/v1/resources/resources', {}).then(res => {
-        this.data = res.data
-        this.data.unshift({})
-        //   res.data.forEach(resource => {
-        //     this.data.push(resource)
-        //   })
-        console.log(this.data)
-      })
+      this.loading = true
+      setTimeout(() => {
+        return getAction('/v1/resources/resources', {}).then(res => {
+          this.data = res.data
+          this.data.unshift({})
+          this.loading = false
+          //   res.data.forEach(resource => {
+          //     this.data.push(resource)
+          //   })
+          console.log(this.data)
+        })
+      }, 1000)
     },
     getDescription(item) {
       return (
