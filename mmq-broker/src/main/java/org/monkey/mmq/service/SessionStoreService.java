@@ -26,6 +26,7 @@ import org.monkey.mmq.core.cluster.ServerMemberManager;
 import org.monkey.mmq.core.entity.RejectClient;
 import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.core.notify.NotifyCenter;
+import org.monkey.mmq.core.utils.InetUtils;
 import org.monkey.mmq.core.utils.StringUtils;
 import org.monkey.mmq.metadata.KeyBuilder;
 import org.monkey.mmq.core.consistency.matedata.RecordListener;
@@ -78,9 +79,10 @@ public class SessionStoreService implements RecordListener<ClientMateData> {
 
     public void put(String clientId, SessionMateData sessionStore) throws MmqException {
         storage.put(clientId, sessionStore);
-        InetSocketAddress ipSocket = (InetSocketAddress)sessionStore.getChannel().remoteAddress();
-        String clientIp = ipSocket.getAddress().getHostAddress();
-        consistencyService.put(UtilsAndCommons.SESSION_STORE + clientId, new ClientMateData(clientId, sessionStore.getUser(), clientIp));
+        InetSocketAddress clientIpSocket = (InetSocketAddress)sessionStore.getChannel().remoteAddress();
+        String clientIp = clientIpSocket.getAddress().getHostAddress();
+        consistencyService.put(UtilsAndCommons.SESSION_STORE + clientId,
+                new ClientMateData(clientId, sessionStore.getUser(), clientIp, InetUtils.getSelfIP()));
     }
 
     public SessionMateData get(String clientId) {
@@ -123,7 +125,23 @@ public class SessionStoreService implements RecordListener<ClientMateData> {
 
     @Override
     public void onChange(String key, ClientMateData value) throws Exception {
-        clientStory.put(key, value);
+
+        // 节点IP为空则删除
+        if (StringUtils.isEmpty(value.getNodeIp())) {
+            this.delete(value.getClientId());
+        }
+
+        // 判断是否是连接本节点的客户端
+        if (InetUtils.getSelfIP().equals(value.getNodeIp())) {
+            SessionMateData sessionMateData = storage.get(value.getClientId());
+            if (sessionMateData != null) {
+                clientStory.put(key, value);
+            } else {
+                this.delete(value.getClientId());
+            }
+        } else {
+            clientStory.put(key, value);
+        }
 
         SystemInfoMateData systemInfoMateData = systemInfoStoreService.getSystemInfo();
         systemInfoMateData.setClientCount(clientStory.size());

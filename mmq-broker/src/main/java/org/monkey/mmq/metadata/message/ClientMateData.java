@@ -37,15 +37,18 @@ public class ClientMateData implements Record, Serializable {
 
     private String address;
 
+    private String nodeIp;
+
     public ClientMateData() {
 
     }
 
-    public ClientMateData(String clientId, String user, String address) {
+    public ClientMateData(String clientId, String user, String address, String nodeId) {
         this.clientId = clientId;
         this.user = user;
         this.address = address;
         this.connectTiem = new Date();
+        this.nodeIp = nodeId;
     }
 
     public static long getSerialVersionUID() {
@@ -84,4 +87,11 @@ public class ClientMateData implements Record, Serializable {
         this.connectTiem = connectTiem;
     }
 
+    public String getNodeIp() {
+        return nodeIp;
+    }
+
+    public void setNodeIp(String nodeIp) {
+        this.nodeIp = nodeIp;
+    }
 }
