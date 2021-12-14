@@ -70,8 +70,10 @@ public class TDengineDriver implements ResourceDriver {
             connProps.setProperty(TSDBDriver.PROPERTY_KEY_CHARSET, "UTF-8");
             connProps.setProperty(TSDBDriver.PROPERTY_KEY_LOCALE, "en_US.UTF-8");
             connProps.setProperty(TSDBDriver.PROPERTY_KEY_TIME_ZONE, "UTC-8");
+
             Connection conn = null;
-            conn = DriverManager.getConnection(url, connProps);
+            conn = DriverManager.getConnection(url, resource.get("username").toString(),
+                    resource.get("password").toString());
             dataSources.put(resourceId, conn);
         } catch (Exception throwables) {
             return;
