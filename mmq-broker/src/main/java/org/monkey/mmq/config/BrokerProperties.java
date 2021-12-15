@@ -49,7 +49,7 @@ public class BrokerProperties {
 	/**
 	 * SSL密钥文件密码
 	 */
-	private String sslPassword = "mmq@123";
+	private String sslPassword = "mmq";
 
 	/**
 	 * SSL是否启用

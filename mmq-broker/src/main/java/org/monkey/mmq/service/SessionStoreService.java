@@ -21,8 +21,10 @@ package org.monkey.mmq.service;
  * @author solley
  */
 
+import com.google.protobuf.ByteString;
 import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.cluster.ServerMemberManager;
+import org.monkey.mmq.core.entity.InternalMessage;
 import org.monkey.mmq.core.entity.RejectClient;
 import org.monkey.mmq.core.env.EnvUtil;
 import org.monkey.mmq.core.exception.MmqException;
@@ -35,9 +37,11 @@ import org.monkey.mmq.metadata.UtilsAndCommons;
 import org.monkey.mmq.metadata.message.ClientMateData;
 import org.monkey.mmq.metadata.message.SessionMateData;
 import org.monkey.mmq.metadata.system.SystemInfoMateData;
+import org.monkey.mmq.notifier.ClientEvent;
 import org.monkey.mmq.notifier.PublicEventType;
 import org.monkey.mmq.notifier.PublishEvent;
 import org.monkey.mmq.core.consistency.persistent.ConsistencyService;
+import org.monkey.mmq.notifier.RuleEngineEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -87,8 +91,13 @@ public class SessionStoreService implements RecordListener<ClientMateData> {
         storage.put(clientId, sessionStore);
         InetSocketAddress clientIpSocket = (InetSocketAddress)sessionStore.getChannel().remoteAddress();
         String clientIp = clientIpSocket.getAddress().getHostAddress();
-        consistencyService.put(UtilsAndCommons.SESSION_STORE + clientId,
-                new ClientMateData(clientId, sessionStore.getUser(), clientIp, this.memberManager.getSelf().getIp(), this.memberManager.getSelf().getPort()));
+
+        // 客户端信息
+        ClientEvent clientEvent = new ClientEvent();
+        clientEvent.setClientMateData(new ClientMateData(clientId, sessionStore.getUser(), clientIp, this.memberManager.getSelf().getIp(), this.memberManager.getSelf().getPort()));
+		NotifyCenter.publishEvent(clientEvent);
+//        consistencyService.put(UtilsAndCommons.SESSION_STORE + clientId,
+//                new ClientMateData(clientId, sessionStore.getUser(), clientIp, this.memberManager.getSelf().getIp(), this.memberManager.getSelf().getPort()));
     }
 
     public SessionMateData get(String clientId) {

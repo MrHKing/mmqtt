@@ -85,7 +85,7 @@ public class SSLBrokerServer {
 		bossGroup = brokerProperties.isUseEpoll() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
 		workerGroup = brokerProperties.isUseEpoll() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
 		KeyStore keyStore = KeyStore.getInstance("PKCS12");
-		InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("keystore/mmqtt.pfx");
+		InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("keystore/mmq.pfx");
 		keyStore.load(inputStream, brokerProperties.getSslPassword().toCharArray());
 		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
 		kmf.init(keyStore, brokerProperties.getSslPassword().toCharArray());

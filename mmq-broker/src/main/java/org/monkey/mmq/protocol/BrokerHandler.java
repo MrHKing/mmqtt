@@ -25,6 +25,7 @@ import io.netty.handler.codec.mqtt.*;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.AttributeKey;
+import io.netty.util.ReferenceCountUtil;
 import javafx.util.Pair;
 import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.exception.MmqException;
@@ -54,118 +55,123 @@ public class BrokerHandler extends ChannelInboundHandlerAdapter {
 	}
 
 	@Override
-	public void channelRead(ChannelHandlerContext ctx, Object  obj) throws Exception {
+	public void channelRead(ChannelHandlerContext ctx, Object  obj) {
+		// Do something with msg
 		MqttMessage msg = (MqttMessage) obj;
-		// 消息解码器出现异常
-		if (msg.decoderResult().isFailure()) {
-			Throwable cause = msg.decoderResult().cause();
-			Loggers.BROKER_SERVER.error(cause.getMessage());
-			if (cause instanceof MqttUnacceptableProtocolVersionException) {
-				// 不支持的协议版本
-				MqttConnAckMessage connAckMessage = (MqttConnAckMessage) MqttMessageFactory.newMessage(
-						new MqttFixedHeader(MqttMessageType.CONNACK, false, MqttQoS.AT_MOST_ONCE, false, 0),
-						new MqttConnAckVariableHeader(MqttConnectReturnCode.CONNECTION_REFUSED_UNACCEPTABLE_PROTOCOL_VERSION, false), null);
-				ctx.writeAndFlush(connAckMessage);
-				ctx.close();
-				return;
-			} else if (cause instanceof MqttIdentifierRejectedException) {
-				// 不合格的clientId
-				MqttConnAckMessage connAckMessage = (MqttConnAckMessage) MqttMessageFactory.newMessage(
-						new MqttFixedHeader(MqttMessageType.CONNACK, false, MqttQoS.AT_MOST_ONCE, false, 0),
-						new MqttConnAckVariableHeader(MqttConnectReturnCode.CONNECTION_REFUSED_IDENTIFIER_REJECTED, false), null);
-				ctx.writeAndFlush(connAckMessage);
+		try {
+			// 消息解码器出现异常
+			if (msg.decoderResult().isFailure()) {
+				Throwable cause = msg.decoderResult().cause();
+				Loggers.BROKER_SERVER.error(cause.getMessage());
+				if (cause instanceof MqttUnacceptableProtocolVersionException) {
+					// 不支持的协议版本
+					MqttConnAckMessage connAckMessage = (MqttConnAckMessage) MqttMessageFactory.newMessage(
+							new MqttFixedHeader(MqttMessageType.CONNACK, false, MqttQoS.AT_MOST_ONCE, false, 0),
+							new MqttConnAckVariableHeader(MqttConnectReturnCode.CONNECTION_REFUSED_UNACCEPTABLE_PROTOCOL_VERSION, false), null);
+					ctx.writeAndFlush(connAckMessage);
+					ctx.close();
+					return;
+				} else if (cause instanceof MqttIdentifierRejectedException) {
+					// 不合格的clientId
+					MqttConnAckMessage connAckMessage = (MqttConnAckMessage) MqttMessageFactory.newMessage(
+							new MqttFixedHeader(MqttMessageType.CONNACK, false, MqttQoS.AT_MOST_ONCE, false, 0),
+							new MqttConnAckVariableHeader(MqttConnectReturnCode.CONNECTION_REFUSED_IDENTIFIER_REJECTED, false), null);
+					ctx.writeAndFlush(connAckMessage);
+					ctx.close();
+					return;
+				}
 				ctx.close();
 				return;
 			}
-			ctx.close();
-			return;
-		}
-		switch (msg.fixedHeader().messageType()) {
-			case CONNECT:
-				//protocolProcess.getConnectExecutor().submit(() -> {
-					try {
-						protocolProcess.connect().processConnect(ctx.channel(), (MqttConnectMessage) msg);
-					} catch (MmqException e) {
-						Loggers.BROKER_SERVER.error(e.getErrMsg());
-					}
-				//});
-				break;
-			case CONNACK:
-				break;
-			case PUBLISH:
-				//protocolProcess.getPubExecutor().submit(() -> {
-					try {
-						protocolProcess.publish().processPublish(ctx.channel(), (MqttPublishMessage) msg);
-					} catch (MmqException e) {
-						Loggers.BROKER_SERVER.error(e.getErrMsg());
-					}
-				//});
-				break;
-			case PUBACK:
-//				protocolProcess.getPubExecutor().submit(() -> {
-					try {
-						protocolProcess.pubAck().processPubAck(ctx.channel(), (MqttMessageIdVariableHeader) msg.variableHeader());
-					} catch (MmqException e) {
-						Loggers.BROKER_SERVER.error(e.getErrMsg());
-					}
-//				});
-				break;
-			case PUBREC:
-//				protocolProcess.getSubExecutor().submit(() -> {
-					try {
-						protocolProcess.pubRec().processPubRec(ctx.channel(), (MqttMessageIdVariableHeader) msg.variableHeader());
-					} catch (MmqException e) {
-						Loggers.BROKER_SERVER.error(e.getErrMsg());
-					}
-//				});
+			switch (msg.fixedHeader().messageType()) {
+				case CONNECT:
+					//protocolProcess.getConnectExecutor().submit(() -> {
+						try {
+							protocolProcess.connect().processConnect(ctx.channel(), (MqttConnectMessage) msg);
+						} catch (MmqException e) {
+							Loggers.BROKER_SERVER.error(e.getErrMsg());
+						}
+					//});
+					break;
+				case CONNACK:
+					break;
+				case PUBLISH:
+					//protocolProcess.getPubExecutor().submit(() -> {
+						try {
+							protocolProcess.publish().processPublish(ctx.channel(), (MqttPublishMessage) msg);
+						} catch (MmqException e) {
+							Loggers.BROKER_SERVER.error(e.getErrMsg());
+						}
+					//});
+					break;
+				case PUBACK:
+	//				protocolProcess.getPubExecutor().submit(() -> {
+						try {
+							protocolProcess.pubAck().processPubAck(ctx.channel(), (MqttMessageIdVariableHeader) msg.variableHeader());
+						} catch (MmqException e) {
+							Loggers.BROKER_SERVER.error(e.getErrMsg());
+						}
+	//				});
+					break;
+				case PUBREC:
+	//				protocolProcess.getSubExecutor().submit(() -> {
+						try {
+							protocolProcess.pubRec().processPubRec(ctx.channel(), (MqttMessageIdVariableHeader) msg.variableHeader());
+						} catch (MmqException e) {
+							Loggers.BROKER_SERVER.error(e.getErrMsg());
+						}
+	//				});
 
-				break;
-			case PUBREL:
-//				protocolProcess.getPubExecutor().submit(() -> {
-					protocolProcess.pubRel().processPubRel(ctx.channel(), (MqttMessageIdVariableHeader) msg.variableHeader());
-//				});
-				break;
-			case PUBCOMP:
-//				protocolProcess.getSubExecutor().submit(() -> {
-					try {
-						protocolProcess.pubComp().processPubComp(ctx.channel(), (MqttMessageIdVariableHeader) msg.variableHeader());
-					} catch (MmqException e) {
-						Loggers.BROKER_SERVER.error(e.getErrMsg());
-					}
-//				});
-				break;
-			case SUBSCRIBE:
-//				protocolProcess.getSubExecutor().submit(() -> {
-					protocolProcess.subscribe().processSubscribe(ctx.channel(), (MqttSubscribeMessage) msg);
-//				});
-				break;
-			case SUBACK:
-				break;
-			case UNSUBSCRIBE:
-//				protocolProcess.getSubExecutor().submit(() -> {
-					protocolProcess.unSubscribe().processUnSubscribe(ctx.channel(), (MqttUnsubscribeMessage) msg);
-//				});
-				break;
-			case UNSUBACK:
-				break;
-			case PINGREQ:
-//				protocolProcess.getPingExecutor().submit(() -> {
-					protocolProcess.pingReq().processPingReq(ctx.channel(), msg);
-//				});
-				break;
-			case PINGRESP:
-				break;
-			case DISCONNECT:
-//				protocolProcess.getConnectExecutor().submit(() -> {
-					try {
-						protocolProcess.disConnect().processDisConnect(ctx.channel(), msg);
-					} catch (MmqException e) {
-						Loggers.BROKER_SERVER.error(e.getErrMsg());
-					}
-//				});
-				break;
-			default:
-				break;
+					break;
+				case PUBREL:
+	//				protocolProcess.getPubExecutor().submit(() -> {
+						protocolProcess.pubRel().processPubRel(ctx.channel(), (MqttMessageIdVariableHeader) msg.variableHeader());
+	//				});
+					break;
+				case PUBCOMP:
+	//				protocolProcess.getSubExecutor().submit(() -> {
+						try {
+							protocolProcess.pubComp().processPubComp(ctx.channel(), (MqttMessageIdVariableHeader) msg.variableHeader());
+						} catch (MmqException e) {
+							Loggers.BROKER_SERVER.error(e.getErrMsg());
+						}
+	//				});
+					break;
+				case SUBSCRIBE:
+	//				protocolProcess.getSubExecutor().submit(() -> {
+						protocolProcess.subscribe().processSubscribe(ctx.channel(), (MqttSubscribeMessage) msg);
+	//				});
+					break;
+				case SUBACK:
+					break;
+				case UNSUBSCRIBE:
+	//				protocolProcess.getSubExecutor().submit(() -> {
+						protocolProcess.unSubscribe().processUnSubscribe(ctx.channel(), (MqttUnsubscribeMessage) msg);
+	//				});
+					break;
+				case UNSUBACK:
+					break;
+				case PINGREQ:
+	//				protocolProcess.getPingExecutor().submit(() -> {
+						protocolProcess.pingReq().processPingReq(ctx.channel(), msg);
+	//				});
+					break;
+				case PINGRESP:
+					break;
+				case DISCONNECT:
+	//				protocolProcess.getConnectExecutor().submit(() -> {
+						try {
+							protocolProcess.disConnect().processDisConnect(ctx.channel(), msg);
+						} catch (MmqException e) {
+							Loggers.BROKER_SERVER.error(e.getErrMsg());
+						}
+	//				});
+					break;
+				default:
+					break;
+			}
+		} finally {
+			ReferenceCountUtil.release(msg);
 		}
 	}
 

@@ -61,7 +61,7 @@ public final class RuleEngineManager extends Subscriber<RuleEngineEvent> {
 
     @Autowired
     MysqlDriver mysqlDriver;
-    
+
     /**
      * 处理线程池
      */
@@ -83,7 +83,7 @@ public final class RuleEngineManager extends Subscriber<RuleEngineEvent> {
         //List<RuleEngineMateData> ruleEngineMateDataList = ruleEngineService.getAllRuleEngine().values().stream().filter(x->x.getEnable()).collect(Collectors.toList());
         Collection<RuleEngineMateData> ruleEngineMateDataList = ruleEngineService.getAllRuleEngine().values();
         if (ruleEngineMateDataList.size() == 0) return;
-        executor.submit(()->{ 
+//
             ruleEngineMateDataList.forEach(rule -> {
 
                 // 获得引擎的SQL，进行处理
@@ -97,24 +97,25 @@ public final class RuleEngineManager extends Subscriber<RuleEngineEvent> {
                             if (map != null && rule.getResourcesMateDatas().size() != 0) {
                                 // 根据规则获得规则的响应
                                 rule.getResourcesMateDatas().forEach(resource -> {
-                                    try {
-                                        DriverFactory.getResourceDriverByEnum(resource.getType()).handle(map, resource,
-                                                event.getMessage().getTopic(),
-                                                event.getMessage().getMqttQoS(),
-                                                event.getMessage().getAddress());
-                                    } catch (Exception e) {
-                                        Loggers.BROKER_SERVER.error(e.getMessage());
-                                        SysMessageEvent sysMessageEvent = new SysMessageEvent();
-                                        sysMessageEvent.setTopic(RULE_ENGINE);
-                                        sysMessageEvent.setPayload(e.getMessage());
-                                        sysMessageEvent.setMqttQoS(MqttQoS.AT_LEAST_ONCE);
-                                        NotifyCenter.publishEvent(sysMessageEvent);
-                                    }
+                                    executor.submit(() -> {
+                                        try {
+                                            DriverFactory.getResourceDriverByEnum(resource.getType()).handle(map, resource,
+                                                    event.getMessage().getTopic(),
+                                                    event.getMessage().getMqttQoS(),
+                                                    event.getMessage().getAddress());
+                                        } catch (Exception e) {
+                                            Loggers.BROKER_SERVER.error(e.getMessage());
+                                            SysMessageEvent sysMessageEvent = new SysMessageEvent();
+                                            sysMessageEvent.setTopic(RULE_ENGINE);
+                                            sysMessageEvent.setPayload(e.getMessage());
+                                            sysMessageEvent.setMqttQoS(MqttQoS.AT_LEAST_ONCE);
+                                            NotifyCenter.publishEvent(sysMessageEvent);
+                                        }
+                                    });
                                 });
                             }
                         }).subscribe();
             });
-         });
     }
 
     @Override
