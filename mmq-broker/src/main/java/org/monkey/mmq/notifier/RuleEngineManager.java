@@ -34,6 +34,7 @@ import org.monkey.mmq.core.notify.Event;
 import org.monkey.mmq.core.notify.NotifyCenter;
 import org.monkey.mmq.core.notify.listener.Subscriber;
 import org.monkey.mmq.core.utils.JacksonUtils;
+import org.monkey.mmq.metadata.message.ClientMateData;
 import org.monkey.mmq.protocol.Connect;
 import org.monkey.mmq.rule.engine.ReactorQL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,21 +98,11 @@ public final class RuleEngineManager extends Subscriber<RuleEngineEvent> {
                             if (map != null && rule.getResourcesMateDatas().size() != 0) {
                                 // 根据规则获得规则的响应
                                 rule.getResourcesMateDatas().forEach(resource -> {
-                                    executor.submit(() -> {
-                                        try {
-                                            DriverFactory.getResourceDriverByEnum(resource.getType()).handle(map, resource,
-                                                    event.getMessage().getTopic(),
-                                                    event.getMessage().getMqttQoS(),
-                                                    event.getMessage().getAddress());
-                                        } catch (Exception e) {
-                                            Loggers.BROKER_SERVER.error(e.getMessage());
-                                            SysMessageEvent sysMessageEvent = new SysMessageEvent();
-                                            sysMessageEvent.setTopic(RULE_ENGINE);
-                                            sysMessageEvent.setPayload(e.getMessage());
-                                            sysMessageEvent.setMqttQoS(MqttQoS.AT_LEAST_ONCE);
-                                            NotifyCenter.publishEvent(sysMessageEvent);
-                                        }
-                                    });
+                                    DriverEvent driverEvent = new DriverEvent();
+                                    driverEvent.setProperty(map);
+                                    driverEvent.setResourcesMateData(resource);
+                                    driverEvent.setRuleEngineEvent(event);
+                                    NotifyCenter.publishEvent(driverEvent);
                                 });
                             }
                         }).subscribe();

@@ -90,10 +90,10 @@ public class SystemInfoController {
                                                    @RequestParam(required = false, defaultValue = "") String address) {
         Collection<ClientMateData> datas = sessionStoreService.getClients();
         return new ResponsePage<>(pageSize, pageNo,
-                datas.size() / pageSize,
                 datas.size(),
+                datas.size() / pageSize,
                 datas.stream().filter(x -> x.getClientId().contains(clientId) && x.getAddress().contains(address))
-                        .skip(pageNo - 1).limit(pageSize).collect(Collectors.toList()));
+                        .skip((pageNo - 1) * pageSize).limit(pageSize).collect(Collectors.toList()));
     }
 
     /**
@@ -107,10 +107,10 @@ public class SystemInfoController {
                                                    @RequestParam(required = false, defaultValue = "") String topic) {
         List<SubscribeMateData> subscribes = subscribeStoreService.getSubscribes();
         return new ResponsePage<>(pageSize, pageNo,
-                subscribes.size() / pageSize,
                 subscribes.size(),
+                subscribes.size() / pageSize,
                 subscribes.stream().filter(x -> x.getClientId().contains(clientId) && x.getTopicFilter().contains(topic))
-                        .skip(pageNo - 1).limit(pageSize).collect(Collectors.toList()));
+                        .skip((pageNo - 1) * pageSize).limit(pageSize).collect(Collectors.toList()));
     }
 
     @GetMapping("/rejectClient")

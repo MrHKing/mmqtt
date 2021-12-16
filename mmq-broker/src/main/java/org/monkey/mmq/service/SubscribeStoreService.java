@@ -73,6 +73,8 @@ public class SubscribeStoreService implements RecordListener<SubscribeMateData> 
 
     public void put(String topicFilter, SubscribeMateData subscribeStore) throws MmqException {
         String key = UtilsAndCommons.SUBSCRIBE_STORE + topicFilter + subscribeStore.getClientId();
+        key = key.replaceAll("/","-");
+        key = key.replaceAll("\\\\","-");
         subscribeStore.setKey(key);
         subscribeStore.setNodeIp(memberManager.getSelf().getIp());
         subscribeStore.setNodePort(memberManager.getSelf().getPort());
@@ -81,7 +83,10 @@ public class SubscribeStoreService implements RecordListener<SubscribeMateData> 
 
     @Async
     public void delete(String topicFilter, String clientId) throws MmqException {
-        consistencyService.remove(UtilsAndCommons.SUBSCRIBE_STORE + topicFilter + clientId);
+        String key = UtilsAndCommons.SUBSCRIBE_STORE + topicFilter + clientId;
+        key = key.replaceAll("/","-");
+        key = key.replaceAll("\\\\","-");
+        consistencyService.remove(key);
     }
 
     public List<SubscribeMateData> getSubscribes() {

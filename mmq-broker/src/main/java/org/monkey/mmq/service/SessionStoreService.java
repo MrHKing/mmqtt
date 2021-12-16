@@ -153,22 +153,22 @@ public class SessionStoreService implements RecordListener<ClientMateData> {
     public void onChange(String key, ClientMateData value) throws Exception {
 
         // 节点IP为空则删除
-        if (StringUtils.isEmpty(value.getNodeIp())) {
-            this.delete(value.getClientId());
-        }
-
-        // 判断是否是连接本节点的客户端
-        if (InetUtils.getSelfIP().equals(value.getNodeIp())) {
-            SessionMateData sessionMateData = storage.get(value.getClientId());
-            if (sessionMateData != null) {
-                clientStory.put(key, value);
-            } else {
-                this.delete(value.getClientId());
-            }
-        } else {
-            clientStory.put(key, value);
-        }
-
+//        if (StringUtils.isEmpty(value.getNodeIp())) {
+//            this.delete(value.getClientId());
+//        }
+//
+//        // 判断是否是连接本节点的客户端
+//        if (InetUtils.getSelfIP().equals(value.getNodeIp())) {
+//            SessionMateData sessionMateData = storage.get(value.getClientId());
+//            if (sessionMateData != null) {
+//                clientStory.put(key, value);
+//            } else {
+//                // this.delete(value.getClientId());
+//            }
+//        } else {
+//            clientStory.put(key, value);
+//        }
+        clientStory.put(key, value);
         SystemInfoMateData systemInfoMateData = systemInfoStoreService.getSystemInfo();
         systemInfoMateData.setClientCount(clientStory.size());
         systemInfoStoreService.put(systemInfoMateData);
