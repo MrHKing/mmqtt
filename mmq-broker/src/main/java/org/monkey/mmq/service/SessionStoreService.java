@@ -52,6 +52,9 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static org.monkey.mmq.metadata.UtilsAndCommons.CLIENT_PUT;
+import static org.monkey.mmq.metadata.UtilsAndCommons.CLIENT_REMOVE;
+
 @Service
 public class SessionStoreService implements RecordListener<ClientMateData> {
 
@@ -94,6 +97,7 @@ public class SessionStoreService implements RecordListener<ClientMateData> {
 
         // 客户端信息
         ClientEvent clientEvent = new ClientEvent();
+        clientEvent.setOperationType(CLIENT_PUT);
         clientEvent.setClientMateData(new ClientMateData(clientId, sessionStore.getUser(), clientIp, this.memberManager.getSelf().getIp(), this.memberManager.getSelf().getPort()));
 		NotifyCenter.publishEvent(clientEvent);
 //        consistencyService.put(UtilsAndCommons.SESSION_STORE + clientId,
@@ -136,7 +140,13 @@ public class SessionStoreService implements RecordListener<ClientMateData> {
 
     public void delete(String clientId) throws MmqException {
         storage.remove(clientId);
-        consistencyService.remove(UtilsAndCommons.SESSION_STORE + clientId);
+        ClientEvent clientEvent = new ClientEvent();
+        clientEvent.setOperationType(CLIENT_REMOVE);
+        ClientMateData clientMateData = new ClientMateData();
+        clientMateData.setClientId(clientId);
+        clientEvent.setClientMateData(clientMateData);
+        NotifyCenter.publishEvent(clientEvent);
+//        consistencyService.remove(UtilsAndCommons.SESSION_STORE + clientId);
     }
 
     @Override

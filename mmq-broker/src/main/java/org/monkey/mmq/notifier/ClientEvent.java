@@ -12,6 +12,10 @@ import org.monkey.mmq.metadata.message.ClientMateData;
  **/
 public class ClientEvent extends Event {
 
+    public ClientMateData clientMateData;
+
+    private int operationType;
+
     public ClientMateData getClientMateData() {
         return clientMateData;
     }
@@ -20,5 +24,12 @@ public class ClientEvent extends Event {
         this.clientMateData = clientMateData;
     }
 
-    public ClientMateData clientMateData;
+    public int getOperationType() {
+        return operationType;
+    }
+
+    public void setOperationType(int operationType) {
+        this.operationType = operationType;
+    }
+
 }

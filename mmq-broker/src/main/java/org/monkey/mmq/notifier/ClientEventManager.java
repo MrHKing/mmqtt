@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import static org.monkey.mmq.metadata.UtilsAndCommons.CLIENT_PUT;
+import static org.monkey.mmq.metadata.UtilsAndCommons.CLIENT_REMOVE;
+
 /**
  * @ClassNameClientEventManager
  * @Description
@@ -21,6 +24,8 @@ import javax.annotation.Resource;
  **/
 @Component
 public class ClientEventManager extends Subscriber<ClientEvent> {
+
+
 
     @Resource(name = "mqttPersistentConsistencyServiceDelegate")
     private ConsistencyService consistencyService;
@@ -36,10 +41,13 @@ public class ClientEventManager extends Subscriber<ClientEvent> {
     @Override
     public void onEvent(ClientEvent event) {
         try {
-            consistencyService.put(UtilsAndCommons.SESSION_STORE + event.getClientMateData().getClientId(),
-                    new ClientMateData(event.getClientMateData().getClientId(), event.getClientMateData().getUser(),
-                            event.getClientMateData().getAddress(), event.getClientMateData().getNodeIp(),
-                            event.getClientMateData().getNodePort()));
+            if (CLIENT_PUT == event.getOperationType()) {
+                consistencyService.put(UtilsAndCommons.SESSION_STORE + event.getClientMateData().getClientId(),
+                        event.getClientMateData());
+            } else if (CLIENT_REMOVE == event.getOperationType()){
+                consistencyService.remove(UtilsAndCommons.SESSION_STORE + event.getClientMateData().getClientId());
+            }
+
         } catch (MmqException e) {
 
         }
