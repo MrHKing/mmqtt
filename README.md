@@ -96,8 +96,8 @@ mmq.broker.default.user=admin
 mmq.broker.default.password=admin@mmq
 mmq.broker.default.anonymous=true
 ```
-### Dashboard
-启动后访问 http://ip:8888/dashboard/monitor
+### Dashboard --单机演示
+启动后访问 http://101.43.4.211:8888/
 
 默认账户：mmq
 
