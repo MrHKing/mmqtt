@@ -23,7 +23,9 @@ cd mmq/bin
 ```
 
 #### Docker安装
-
+```bash
+docker run --name mmq -p 2883:2883 1883:3883 8888:8888  paperman/mmq:v1.0.7
+```
 #### Kubernetes安装
 
 # 快速入门
