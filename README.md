@@ -24,7 +24,7 @@ cd mmq/bin
 
 #### Docker安装
 ```bash
-docker run --name mmq -p 2883:2883 1883:3883 8888:8888  paperman/mmq:v1.0.7
+docker run -d --name mmq -p 2883:2883 -p 1883:3883 -p 8888:8888  paperman/mmq:v1.0.7
 ```
 #### Kubernetes安装
 
@@ -96,8 +96,8 @@ mmq.broker.default.user=admin
 mmq.broker.default.password=admin@mmq
 mmq.broker.default.anonymous=true
 ```
-### Dashboard
-启动后访问 http://ip:8888/dashboard/monitor
+### Dashboard --单机演示
+启动后访问 http://101.43.4.211:8888/
 
 默认账户：mmq
 
