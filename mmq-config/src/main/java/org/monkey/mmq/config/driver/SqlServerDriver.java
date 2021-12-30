@@ -112,7 +112,7 @@ public class SqlServerDriver implements ResourceDriver<Connection>{
                        String topic, int qos, String address) throws Exception{
         Connection connection = (Connection)this.getDriver(resourcesMateData.getResourceID());
         if (connection != null) {
-            DriverFactory.setProperty(property);
+            DriverFactory.setProperty(property, topic);
             String sql = resourcesMateData.getResource().get("sql").toString();
             ExpressionParser parser = new SpelExpressionParser();
             TemplateParserContext parserContext = new TemplateParserContext();

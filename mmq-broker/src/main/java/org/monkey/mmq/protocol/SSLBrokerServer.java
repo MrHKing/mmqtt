@@ -134,7 +134,7 @@ public class SSLBrokerServer {
 					});
 					channelPipeline.addLast("ssl", new SslHandler(sslEngine));
 
-					channelPipeline.addLast("decoder", new MqttDecoder());
+					channelPipeline.addLast("decoder", new MqttDecoder(Integer.MAX_VALUE));
 					channelPipeline.addLast("encoder", MqttEncoder.INSTANCE);
 					channelPipeline.addLast("broker", new BrokerHandler(protocolProcess));
 				}
@@ -180,7 +180,7 @@ public class SSLBrokerServer {
 					channelPipeline.addLast("compressor ", new HttpContentCompressor());
 					channelPipeline.addLast("protocol", new WebSocketServerProtocolHandler(brokerProperties.getWebsocketPath(), "mqtt,mqttv3.1,mqttv3.1.1", true, 65536));
 					channelPipeline.addLast("mqttWebSocket", new MqttWebSocketCodec());
-					channelPipeline.addLast("decoder", new MqttDecoder());
+					channelPipeline.addLast("decoder", new MqttDecoder(Integer.MAX_VALUE));
 					channelPipeline.addLast("encoder", MqttEncoder.INSTANCE);
 					channelPipeline.addLast("broker", new BrokerHandler(protocolProcess));
 				}

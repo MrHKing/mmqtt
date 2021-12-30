@@ -110,9 +110,9 @@ public class MysqlDriver implements ResourceDriver<Connection>{
     @Override
     public void handle(Map property, ResourcesMateData resourcesMateData,
                        String topic, int qos, String address) throws Exception {
-        Connection connection = (Connection)this.getDriver(resourcesMateData.getResourceID());
+        Connection connection = this.getDriver(resourcesMateData.getResourceID());
         if (connection != null) {
-            DriverFactory.setProperty(property);
+            DriverFactory.setProperty(property, topic);
             String sql = resourcesMateData.getResource().get("sql").toString();
             ExpressionParser parser = new SpelExpressionParser();
             TemplateParserContext parserContext = new TemplateParserContext();

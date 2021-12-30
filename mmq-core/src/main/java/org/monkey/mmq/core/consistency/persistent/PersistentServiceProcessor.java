@@ -153,13 +153,6 @@ public class PersistentServiceProcessor extends BasePersistentServiceProcessor {
     @Override
     public void listen(String key, RecordListener listener) throws MmqException {
         notifier.registerListener(key, listener);
-//        while (!kvStorage.isSnapshotLoad()) {
-//            Loggers.RAFT.info("Waiting SnapshotLoad ...");
-//            try {
-//                TimeUnit.MILLISECONDS.sleep(500);
-//            } catch (InterruptedException ignored) {
-//            }
-//        }
         notifierAllServiceMeta(listener);
     }
     

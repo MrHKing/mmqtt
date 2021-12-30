@@ -114,7 +114,7 @@ public class BrokerServer {
 					ChannelPipeline channelPipeline = socketChannel.pipeline();
 					// Netty提供的心跳检测
 					channelPipeline.addFirst("idle", new IdleStateHandler(0, 0, brokerProperties.getKeepAlive()));
-					channelPipeline.addLast("decoder", new MqttDecoder());
+					channelPipeline.addLast("decoder", new MqttDecoder(Integer.MAX_VALUE));
 					channelPipeline.addLast("encoder", MqttEncoder.INSTANCE);
 					channelPipeline.addLast("broker", new BrokerHandler(protocolProcess));
 				}
@@ -148,7 +148,7 @@ public class BrokerServer {
 					channelPipeline.addLast("compressor ", new HttpContentCompressor());
 					channelPipeline.addLast("protocol", new WebSocketServerProtocolHandler(brokerProperties.getWebsocketPath(), "mqtt,mqttv3.1,mqttv3.1.1", true, 65536));
 					channelPipeline.addLast("mqttWebSocket", new MqttWebSocketCodec());
-					channelPipeline.addLast("decoder", new MqttDecoder());
+					channelPipeline.addLast("decoder", new MqttDecoder(Integer.MAX_VALUE));
 					channelPipeline.addLast("encoder", MqttEncoder.INSTANCE);
 					channelPipeline.addLast("broker", new BrokerHandler(protocolProcess));
 				}

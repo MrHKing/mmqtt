@@ -31,7 +31,7 @@ public class DriverFactory {
         return (ResourceDriver) ApplicationUtils.getBean(resourceEnum.getName());
     }
 
-    public static void setProperty(Map property) {
+    public static void setProperty(Map property, String topic) {
         property.put("uuid", UUID.randomUUID().toString());
 
         Date date = new Date();
@@ -41,6 +41,16 @@ public class DriverFactory {
         property.put("datetime", sdf.format(date));
         sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
         property.put("utc", sdf.format(date));
+        property.put("timestamp", date.getTime());
 
+        if (topic == null) return;
+        property.put("topic", topic);
+
+        String[] topics = topic.split("/");
+        if (topics == null) return;
+
+        for (int i = 0; i < topics.length; i++) {
+            property.put("topic" + i, topics[i]);
+        }
     }
 }
