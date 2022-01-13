@@ -32,6 +32,14 @@ public class KeyBuilder {
         return key.startsWith(UtilsAndCommons.RULE_ENGINE_STORE);
     }
 
+    public static boolean matchModulesKey(String key) {
+        return key.startsWith(UtilsAndCommons.MODULES_STORE);
+    }
+
+    public static String getModulesKey() {
+        return UtilsAndCommons.MODULES_STORE;
+    }
+
     public static String getResourcesKey() {
         return UtilsAndCommons.RESOURCES_STORE;
     }

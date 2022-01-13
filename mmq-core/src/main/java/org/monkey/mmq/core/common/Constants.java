@@ -44,4 +44,6 @@ public class Constants {
     public static final String SYSTOPIC = "$SYS";
 
     public static final String RULE_ENGINE =  SYSTOPIC + "/RULE";
+
+    public static final String MODULES =  SYSTOPIC + "/MODULES";
 }

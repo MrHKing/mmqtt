@@ -21,6 +21,10 @@ import org.monkey.mmq.auth.exception.AccessException;
 import org.monkey.mmq.auth.model.Permission;
 import org.monkey.mmq.auth.model.User;
 import org.monkey.mmq.auth.service.IAuthService;
+import org.monkey.mmq.config.matedata.ModelEnum;
+import org.monkey.mmq.config.modules.IModule;
+import org.monkey.mmq.config.modules.ModuleFactory;
+import org.monkey.mmq.config.modules.auth.AuthParam;
 import org.monkey.mmq.core.env.EnvUtil;
 import org.springframework.stereotype.Service;
 
@@ -57,11 +61,21 @@ public class MqttAuthServiceImpl implements IAuthService {
 	}
 
 	@Override
-	public boolean checkValid(String username, String password) {
+	public boolean checkValid(String username, String password) throws Exception {
+
+		IModule authModule = ModuleFactory.getResourceDriverByEnum(ModelEnum.AUTH);
+		if (authModule.getEnable()) {
+			if (StrUtil.isBlank(username)) return false;
+			if (StrUtil.isBlank(password)) return false;
+			AuthParam authParam = new AuthParam();
+			authParam.setPassword(password);
+			authParam.setUsername(username);
+			return authModule.handle(authParam);
+		}
+
 		if ("true".equals(this.getAnonymous())) return true;
 		if (StrUtil.isBlank(username)) return false;
 		if (StrUtil.isBlank(password)) return false;
-
 		if (this.getUser().equals(username) && this.getPassword().equals(password)) return true;
 //		RSA rsa = new RSA(privateKey, null);
 //		String value = rsa.encryptBcd(username, KeyType.PrivateKey);

@@ -42,6 +42,16 @@ public class SqlServerDriver implements ResourceDriver<Connection>{
 
     static final String JDBC_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
 
+    static final String IP = "ip";
+
+    static final String DATABASE_NAME = "databaseName";
+
+    static final String USERNAME = "username";
+
+    static final String PASSWORD = "password";
+
+    static final String PORT = "port";
+
     @Override
     public void addDriver(String resourceId, Map<String, Object> resource) {
         DruidDataSource druidDataSource = dataSources.get(resourceId);
@@ -50,19 +60,19 @@ public class SqlServerDriver implements ResourceDriver<Connection>{
             dataSources.remove(resourceId);
         }
 
-        if (StringUtils.isEmpty(resource.get("ip").toString())) return;
-        if (StringUtils.isEmpty(resource.get("databaseName").toString())) return;
-        if (StringUtils.isEmpty(resource.get("username").toString())) return;
-        if (StringUtils.isEmpty(resource.get("password").toString())) return;
+        if (StringUtils.isEmpty(resource.get(IP).toString())) return;
+        if (StringUtils.isEmpty(resource.get(DATABASE_NAME).toString())) return;
+        if (StringUtils.isEmpty(resource.get(USERNAME).toString())) return;
+        if (StringUtils.isEmpty(resource.get(PASSWORD).toString())) return;
 
         DruidDataSource dataSource = new DruidDataSource(); // 创建Druid连接池
         dataSource.setDriverClassName(JDBC_DRIVER); // 设置连接池的数据库驱动
         dataSource.setUrl(String.format("jdbc:sqlserver://%s:%s;DatabaseName=%s",
-                resource.get("ip").toString(),
-                resource.get("port").toString(),
-                resource.get("databaseName").toString())); // 设置数据库的连接地址
-        dataSource.setUsername(resource.get("username").toString()); // 数据库的用户名
-        dataSource.setPassword(resource.get("password").toString()); // 数据库的密码
+                resource.get(IP).toString(),
+                resource.get(PORT).toString(),
+                resource.get(DATABASE_NAME).toString())); // 设置数据库的连接地址
+        dataSource.setUsername(resource.get(USERNAME).toString()); // 数据库的用户名
+        dataSource.setPassword(resource.get(PASSWORD).toString()); // 数据库的密码
         dataSource.setValidationQuery("select 'x'");
         dataSource.setInitialSize(8); // 设置连接池的初始大小
         dataSource.setMinIdle(1); // 设置连接池大小的下限
@@ -96,11 +106,11 @@ public class SqlServerDriver implements ResourceDriver<Connection>{
         try {
             Class.forName(JDBC_DRIVER);
             DriverManager.getConnection(String.format("jdbc:sqlserver://%s:%s;DatabaseName=%s",
-                    resourcesMateData.getResource().get("ip").toString(),
-                    resourcesMateData.getResource().get("port").toString(),
-                    resourcesMateData.getResource().get("databaseName").toString()),
-                    resourcesMateData.getResource().get("username").toString(),
-                    resourcesMateData.getResource().get("password").toString());
+                    resourcesMateData.getResource().get(IP).toString(),
+                    resourcesMateData.getResource().get(PORT).toString(),
+                    resourcesMateData.getResource().get(DATABASE_NAME).toString()),
+                    resourcesMateData.getResource().get(USERNAME).toString(),
+                    resourcesMateData.getResource().get(PASSWORD).toString());
             return true;
         } catch (Exception e) {
             return false;

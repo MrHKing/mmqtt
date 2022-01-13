@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 /**
- * Health Controller.
+ * 嵌入权限管理
  *
  * @author solley
  */

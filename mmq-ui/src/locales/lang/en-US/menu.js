@@ -8,5 +8,7 @@ export default {
     'menu.dashboard.subscription': 'Subscription',
     'menu.ruleEngine': 'RuleEngine',
     'menu.ruleEngine.resources': 'Resources',
-    'menu.ruleEngine.ruleEngine': 'RuleEngine'
+    'menu.ruleEngine.ruleEngine': 'RuleEngine',
+    'menu.modules': 'Modules',
+    'menu.modules.modules': 'Modules'
 }

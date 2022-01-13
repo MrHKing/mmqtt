@@ -27,17 +27,22 @@ import org.monkey.mmq.auth.service.IAuthService;
 import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.exception.KvStorageException;
 import org.monkey.mmq.core.exception.MmqException;
+import org.monkey.mmq.core.notify.NotifyCenter;
 import org.monkey.mmq.core.utils.LoggerUtils;
 import org.monkey.mmq.core.utils.StringUtils;
 import org.monkey.mmq.metadata.message.DupPubRelMessageMateData;
 import org.monkey.mmq.metadata.message.DupPublishMessageMateData;
 import org.monkey.mmq.metadata.message.SessionMateData;
+import org.monkey.mmq.notifier.SysMessageEvent;
 import org.monkey.mmq.service.DupPubRelMessageStoreService;
 import org.monkey.mmq.service.DupPublishMessageStoreService;
 import org.monkey.mmq.service.SessionStoreService;
 import org.monkey.mmq.service.SubscribeStoreService;
 
 import java.util.List;
+
+import static org.monkey.mmq.core.common.Constants.MODULES;
+import static org.monkey.mmq.core.common.Constants.RULE_ENGINE;
 
 /**
  * CONNECT连接处理
@@ -99,12 +104,28 @@ public class Connect {
 		// 用户名和密码验证, 这里要求客户端连接时必须提供用户名和密码, 不管是否设置用户名标志和密码标志为1, 此处没有参考标准协议实现
 		String username = msg.payload().userName();
 		String password = msg.payload().passwordInBytes() == null ? null : new String(msg.payload().passwordInBytes(), CharsetUtil.UTF_8);
-		if (!authService.checkValid(username, password)) {
+		try {
+			if (!authService.checkValid(username, password)) {
+				MqttConnAckMessage connAckMessage = (MqttConnAckMessage) MqttMessageFactory.newMessage(
+					new MqttFixedHeader(MqttMessageType.CONNACK, false, MqttQoS.AT_MOST_ONCE, false, 0),
+					new MqttConnAckVariableHeader(MqttConnectReturnCode.CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD, false), null);
+				channel.writeAndFlush(connAckMessage);
+				channel.close();
+				return;
+			}
+		} catch (Exception exception) {
 			MqttConnAckMessage connAckMessage = (MqttConnAckMessage) MqttMessageFactory.newMessage(
-				new MqttFixedHeader(MqttMessageType.CONNACK, false, MqttQoS.AT_MOST_ONCE, false, 0),
-				new MqttConnAckVariableHeader(MqttConnectReturnCode.CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD, false), null);
+					new MqttFixedHeader(MqttMessageType.CONNACK, false, MqttQoS.AT_MOST_ONCE, false, 0),
+					new MqttConnAckVariableHeader(MqttConnectReturnCode.CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD, false), null);
 			channel.writeAndFlush(connAckMessage);
 			channel.close();
+			Loggers.BROKER_PROTOCOL.error(exception.getMessage());
+			SysMessageEvent sysMessageEvent = new SysMessageEvent();
+			sysMessageEvent.setTopic(MODULES);
+			sysMessageEvent.setPayload(exception.getMessage());
+			sysMessageEvent.setMqttQoS(MqttQoS.AT_LEAST_ONCE);
+			NotifyCenter.publishEvent(sysMessageEvent);
+
 			return;
 		}
 		// 如果会话中已存储这个新连接的clientId, 就关闭之前该clientId的连接

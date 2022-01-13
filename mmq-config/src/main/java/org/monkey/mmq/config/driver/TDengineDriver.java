@@ -44,6 +44,16 @@ public class TDengineDriver implements ResourceDriver {
 
     static final String JDBC_DRIVER = "com.taosdata.jdbc.rs.RestfulDriver";
 
+    static final String IP = "ip";
+
+    static final String DATABASE_NAME = "databaseName";
+
+    static final String USERNAME = "username";
+
+    static final String PASSWORD = "password";
+
+    static final String PORT = "port";
+
     @Override
     public void addDriver(String resourceId, Map resource) {
         Connection connection = dataSources.get(resourceId);
@@ -56,14 +66,14 @@ public class TDengineDriver implements ResourceDriver {
             dataSources.remove(resourceId);
         }
 
-        if (StringUtils.isEmpty(resource.get("ip").toString())) return;
-        if (StringUtils.isEmpty(resource.get("databaseName").toString())) return;
-        if (StringUtils.isEmpty(resource.get("username").toString())) return;
-        if (StringUtils.isEmpty(resource.get("password").toString())) return;
+        if (StringUtils.isEmpty(resource.get(IP).toString())) return;
+        if (StringUtils.isEmpty(resource.get(DATABASE_NAME).toString())) return;
+        if (StringUtils.isEmpty(resource.get(USERNAME).toString())) return;
+        if (StringUtils.isEmpty(resource.get(PASSWORD).toString())) return;
         String url = String.format("jdbc:TAOS-RS://%s:%s/%s",
-                resource.get("ip").toString(),
-                resource.get("port").toString(),
-                resource.get("databaseName").toString());
+                resource.get(IP).toString(),
+                resource.get(PORT).toString(),
+                resource.get(DATABASE_NAME).toString());
         try {
             Class.forName(JDBC_DRIVER);
             Properties connProps = new Properties();
@@ -72,8 +82,8 @@ public class TDengineDriver implements ResourceDriver {
             connProps.setProperty(TSDBDriver.PROPERTY_KEY_TIME_ZONE, "UTC-8");
 
             Connection conn = null;
-            conn = DriverManager.getConnection(url, resource.get("username").toString(),
-                    resource.get("password").toString());
+            conn = DriverManager.getConnection(url, resource.get(USERNAME).toString(),
+                    resource.get(PASSWORD).toString());
             dataSources.put(resourceId, conn);
         } catch (Exception throwables) {
             return;
@@ -106,11 +116,11 @@ public class TDengineDriver implements ResourceDriver {
         try {
             Class.forName(JDBC_DRIVER);
             DriverManager.getConnection(String.format("jdbc:TAOS-RS://%s:%s/%s",
-                    resourcesMateData.getResource().get("ip").toString(),
-                    resourcesMateData.getResource().get("port").toString(),
-                    resourcesMateData.getResource().get("databaseName").toString()),
-                    resourcesMateData.getResource().get("username").toString(),
-                    resourcesMateData.getResource().get("password").toString());
+                    resourcesMateData.getResource().get(IP).toString(),
+                    resourcesMateData.getResource().get(PORT).toString(),
+                    resourcesMateData.getResource().get(DATABASE_NAME).toString()),
+                    resourcesMateData.getResource().get(USERNAME).toString(),
+                    resourcesMateData.getResource().get(PASSWORD).toString());
             return true;
         } catch (Exception e) {
             return false;

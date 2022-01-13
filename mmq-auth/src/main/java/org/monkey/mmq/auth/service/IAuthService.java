@@ -30,7 +30,7 @@ public interface IAuthService {
     /**
      * 验证用户名和密码是否正确
      */
-    boolean checkValid(String username, String password);
+    boolean checkValid(String username, String password) throws Exception;
 
     /**
      * Authentication of request, identify the user who request the resource.

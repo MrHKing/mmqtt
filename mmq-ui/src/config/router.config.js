@@ -71,6 +71,20 @@ export const asyncRouterMap = [
                     }
 
                 ]
+            },
+            {
+                path: '/modules',
+                name: 'modules',
+                component: RouteView,
+                meta: { title: 'menu.modules', keepAlive: true, icon: bxAnaalyse, permission: ['modules'] },
+                children: [
+                    {
+                        path: '/modules/modulesManager',
+                        name: 'modules',
+                        component: () => import('@/views/modules/ModulesManager'),
+                        meta: { title: 'menu.modules.modules', keepAlive: true, permission: ['modules'] }
+                    }
+                ]
             }
             // other
             /*

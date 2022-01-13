@@ -41,6 +41,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class KafkaDriver implements ResourceDriver<Producer<String, String>> {
     private ConcurrentHashMap<String, Producer<String, String>> producers = new ConcurrentHashMap<>();
 
+    static final String SERVER = "server";
+
     @Override
     public void addDriver(String resourceId, Map resource) {
         Producer<String, String> producer = producers.get(resourceId);
@@ -49,10 +51,10 @@ public class KafkaDriver implements ResourceDriver<Producer<String, String>> {
             producers.remove(resourceId);
         }
 
-        if (StringUtils.isEmpty(resource.get("server").toString())) return;
+        if (StringUtils.isEmpty(resource.get(SERVER).toString())) return;
 
         Properties prop = new Properties();
-        prop.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, resource.get("server"));
+        prop.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, resource.get(SERVER));
         prop.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         prop.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         try {
@@ -79,7 +81,7 @@ public class KafkaDriver implements ResourceDriver<Producer<String, String>> {
     public boolean testConnect(ResourcesMateData resourcesMateData) {
         try {
             Properties prop = new Properties();
-            prop.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, resourcesMateData.getResource().get("server"));
+            prop.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, resourcesMateData.getResource().get(SERVER));
             prop.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
             prop.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
             KafkaProducer<String, String> consumer = new KafkaProducer<>(prop);

@@ -1,0 +1,187 @@
+<template>
+  <a-drawer
+    :confirmLoading="confirmLoading"
+    title="保存新资源"
+    :width="720"
+    :visible="visible"
+    :body-style="{ paddingBottom: '80px' }"
+    @close="onClose"
+  >
+    <a-form :form="form" layout="vertical" hide-required-mark>
+      <a-form-item label="资源类型">
+        <a-select
+          @change="typeChange"
+          v-decorator="[
+            'configs.resourceType',
+            {
+              rules: [{ required: true, message: '请选择资源类型' }]
+            }
+          ]"
+          placeholder="请选择资源类型"
+        >
+          <a-select-option value="MYSQL"> Mysql </a-select-option>
+          <a-select-option value="POSTGRESQL"> Postgresql </a-select-option>
+          <a-select-option value="SQLSERVER"> SqlServer </a-select-option>
+        </a-select>
+      </a-form-item>
+      <a-form-item label="资源id">
+        <a-select
+          v-decorator="[
+            'configs.resourceId',
+            {
+              rules: [{ required: true, message: '请选择资源id' }]
+            }
+          ]"
+          placeholder="请选择资源id"
+        >
+          <a-select-option v-for="(resource, index) in selectResources" :key="index" :value="resource.resourceID">
+            {{ resource.resourceID }}
+          </a-select-option>
+        </a-select>
+      </a-form-item>
+      <a-form-item label="表名">
+        <a-input
+          v-decorator="['configs.table', { rules: [{ required: true, message: '请输入表名' }] }]"
+          placeholder="请输入表名"
+        />
+      </a-form-item>
+      <a-form-item label="账户字段">
+        <a-input
+          v-decorator="['configs.username', { rules: [{ required: true, message: '请输入账户字段' }] }]"
+          placeholder="请输入账户字段"
+        />
+      </a-form-item>
+      <a-form-item label="密码字段">
+        <a-input
+          v-decorator="['configs.password', { rules: [{ required: true, message: '请输入密码字段' }] }]"
+          placeholder="请输入密码字段"
+        />
+      </a-form-item>
+    </a-form>
+    <div
+      :style="{
+        position: 'absolute',
+        right: 0,
+        bottom: 0,
+        width: '100%',
+        borderTop: '1px solid #e9e9e9',
+        padding: '10px 16px',
+        background: '#fff',
+        textAlign: 'right',
+        zIndex: 1
+      }"
+    >
+      <a-button :style="{ marginRight: '8px' }" @click="onClose"> Cancel </a-button>
+      <a-button type="primary" @click="handleOk"> Submit </a-button>
+    </div>
+  </a-drawer>
+</template>
+
+<script>
+import { getAction, putAction } from '@/api/manage'
+export default {
+  data() {
+    return {
+      title: '操作',
+      visible: false,
+      curRecord: null,
+      confirmLoading: false,
+      curResources: [],
+      selectResources: [],
+      type: '',
+      form: this.$form.createForm(this),
+      url: {
+        listResources: '/v1/resources/resources',
+        update: '/v1/modules'
+      }
+    }
+  },
+  created() {
+    this.listResources()
+  },
+  methods: {
+    listResources() {
+      getAction(this.url.listResources, {}).then(res => {
+        this.curResources = []
+        res.data.forEach(resource => {
+          this.curResources.push(resource)
+        })
+        console.log(this.curResources)
+      })
+    },
+    update(record) {
+      console.log(record)
+      this.form.resetFields()
+      this.visible = true
+      this.curRecord = record
+      if (record) {
+        this.key = record.key
+        this.$nextTick(() => {
+          this.form.setFieldsValue({
+            key: record.key,
+            enable: record.enable,
+            description: record.description,
+            icon: record.icon,
+            modelEnum: record.modelEnum,
+            configs: {
+              resourceType: record.configs.resourceType,
+              resourceId: record.configs.resourceId,
+              table: record.configs.table,
+              username: record.configs.username,
+              password: record.configs.password
+            }
+          })
+        })
+      }
+    },
+    typeChange(value) {
+      console.log(value)
+      this.selectResources = this.curResources.filter(x => value === x.type)
+      this.curType = value
+    },
+    onClose() {
+      this.visible = false
+    },
+    handleOk() {
+      const that = this
+      // 触发表单验证
+      this.form.validateFields((err, values) => {
+        console.log(err)
+        if (!err) {
+          that.confirmLoading = true
+          console.log(values)
+          this.curRecord.configs = values.configs
+          const formData = Object.assign({}, this.curRecord)
+          console.log(formData)
+          const obj = putAction(this.url.update, formData)
+          obj
+            .then(res => {
+              if (res.code === 200) {
+                that.$message.success(res.message)
+                that.$emit('ok')
+              } else {
+                that.$message.warning(res.message)
+              }
+            })
+            .finally(() => {
+              that.confirmLoading = false
+              that.onClose()
+            })
+        }
+      })
+    },
+    filterOption(input, option) {
+      if (!option.componentOptions.children[0].text) {
+        return false
+      }
+      return option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
+    },
+    handleCancel() {
+      this.onClose()
+    }
+  }
+}
+</script>
+
+<style scoped>
+</style>

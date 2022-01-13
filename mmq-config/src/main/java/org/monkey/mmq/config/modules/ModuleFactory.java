@@ -13,28 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.monkey.mmq.config.modules;
 
-package org.monkey.mmq.config.matedata;
+import org.monkey.mmq.config.driver.ResourceDriver;
+import org.monkey.mmq.config.matedata.ModelEnum;
+import org.monkey.mmq.config.matedata.ResourceEnum;
+import org.monkey.mmq.core.utils.ApplicationUtils;
 
-
-import org.monkey.mmq.core.env.EnvUtil;
-
-import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Map;
+import java.util.UUID;
 
 /**
- * Naming utils and common values.
- *
  * @author solley
  */
-@SuppressWarnings("PMD.ThreadPoolCreationle")
-public class UtilsAndCommons {
-
-    public static final String RESOURCES_STORE = "00-00---000-RESOURCES_STORE-000---00-00";
-
-    public static final String RULE_ENGINE_STORE = "00-00---000-RULE_ENGINE_STORE-000---00-00";
-
-    public static final String MODULES_STORE = "00-00---000-MODULES_STORE-000---00-00";
-
-    public static final String DATA_BASE_DIR =
-            EnvUtil.getMmqHome() + File.separator + "data" + File.separator + "config";
+public class ModuleFactory {
+    public static IModule getResourceDriverByEnum(ModelEnum modelEnum) {
+        return (IModule) ApplicationUtils.getBean(modelEnum.getName());
+    }
 }
