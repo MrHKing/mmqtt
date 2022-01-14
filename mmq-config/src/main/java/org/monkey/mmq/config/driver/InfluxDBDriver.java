@@ -45,7 +45,7 @@ public class InfluxDBDriver implements ResourceDriver{
 
     @Override
     public void handle(Map property, ResourcesMateData resourcesMateData,
-                       String topic, int qos, String address) {
+                       String topic, int qos, String address, String username) {
 
     }
 }

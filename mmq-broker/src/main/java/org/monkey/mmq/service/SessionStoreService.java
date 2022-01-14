@@ -50,6 +50,7 @@ import javax.annotation.Resource;
 import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.monkey.mmq.metadata.UtilsAndCommons.CLIENT_PUT;
@@ -107,6 +108,16 @@ public class SessionStoreService implements RecordListener<ClientMateData> {
     public SessionMateData get(String clientId) {
         if (StringUtils.isEmpty(clientId)) return null;
         return storage.get(clientId);
+    }
+
+    public SessionMateData getByChannelId(String id) {
+        Collection<SessionMateData> sessionMateDataCollection = storage.values();
+        Optional<SessionMateData> sessionMateData = sessionMateDataCollection.stream().filter(x -> x.getChannel().id().asLongText().equals(id)).findFirst();
+        if (sessionMateData.isPresent()) {
+            return sessionMateData.get();
+        } else {
+            return null;
+        }
     }
 
     public void rejectClient(String clientId) {

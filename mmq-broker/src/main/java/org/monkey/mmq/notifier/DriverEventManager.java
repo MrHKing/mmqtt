@@ -33,11 +33,13 @@ public class DriverEventManager extends Subscriber<DriverEvent> {
     @Override
     public void onEvent(DriverEvent event) {
         try {
+
             DriverFactory.getResourceDriverByEnum(event.getResourcesMateData().getType()).handle(event.getProperty(),
                     event.getResourcesMateData(),
                     event.getRuleEngineEvent().getMessage().getTopic(),
                     event.getRuleEngineEvent().getMessage().getMqttQoS(),
-                    event.getRuleEngineEvent().getMessage().getAddress());
+                    event.getRuleEngineEvent().getMessage().getAddress(),
+                    event.getRuleEngineEvent().getUsername());
         } catch (Exception e) {
             Loggers.BROKER_SERVER.error(e.getMessage());
             SysMessageEvent sysMessageEvent = new SysMessageEvent();

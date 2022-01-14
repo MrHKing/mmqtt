@@ -118,7 +118,7 @@ public class MQTTDriver implements ResourceDriver<MqttClient> {
 
     @Override
     public void handle(Map property, ResourcesMateData resourcesMateData,
-                       String topic, int qos, String address) throws Exception {
+                       String topic, int qos, String address, String username) throws Exception {
         MqttClient mqttClient = this.getDriver(resourcesMateData.getResourceID());
         mqttClient.publish(topic,
                 JSON.toJSONString(property).getBytes(),

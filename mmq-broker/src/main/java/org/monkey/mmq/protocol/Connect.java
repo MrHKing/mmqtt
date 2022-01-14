@@ -142,7 +142,8 @@ public class Connect {
 			previous.close();
 		}
 		// 处理遗嘱信息
-		SessionMateData sessionStore = new SessionMateData(msg.payload().clientIdentifier(), channel, msg.variableHeader().isCleanSession(), null);
+		SessionMateData sessionStore = new SessionMateData(msg.payload().clientIdentifier(),
+				channel, msg.variableHeader().isCleanSession(), null, username);
 		if (msg.variableHeader().isWillFlag()) {
 			MqttPublishMessage willMessage = (MqttPublishMessage) MqttMessageFactory.newMessage(
 				new MqttFixedHeader(MqttMessageType.PUBLISH, false, MqttQoS.valueOf(msg.variableHeader().willQos()), msg.variableHeader().isWillRetain(), 0),

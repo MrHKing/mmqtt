@@ -93,7 +93,7 @@ public class KafkaDriver implements ResourceDriver<Producer<String, String>> {
 
     @Override
     public void handle(Map property, ResourcesMateData resourcesMateData,
-                       String topic, int qos, String address) throws Exception {
+                       String topic, int qos, String address, String username) throws Exception {
         Producer<String, String> producer = this.getDriver(resourcesMateData.getResourceID());
         Map<String, Object> payload = new HashMap<>();
         payload.put("topic", topic);

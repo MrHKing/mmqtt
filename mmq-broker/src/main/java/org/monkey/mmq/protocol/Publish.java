@@ -71,7 +71,12 @@ public class Publish {
 		}
 
 		// 规则引擎
+		channel.id();
+		SessionMateData sessionStore = sessionStoreService.getByChannelId(channel.id().asLongText());
+		if (sessionStore == null) return;
+
 		RuleEngineEvent ruleEngineEvent = new RuleEngineEvent();
+		ruleEngineEvent.setUsername(sessionStore.getUser());
 		ruleEngineEvent.setMessage(InternalMessage.newBuilder()
 				.setTopic(msg.variableHeader().topicName())
 				.setMqttQoS(msg.fixedHeader().qosLevel().value())

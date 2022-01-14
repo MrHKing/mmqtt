@@ -40,11 +40,14 @@ public class SessionMateData implements Record, Serializable {
 
 	private MqttPublishMessage willMessage;
 
-	public SessionMateData(String clientId, Channel channel, boolean cleanSession, MqttPublishMessage willMessage) {
+	public SessionMateData(String clientId, Channel channel,
+						   boolean cleanSession, MqttPublishMessage willMessage,
+						   String user) {
 		this.clientId = clientId;
 		this.channel = channel;
 		this.cleanSession = cleanSession;
 		this.willMessage = willMessage;
+		this.user = user;
 	}
 
 	public String getClientId() {
