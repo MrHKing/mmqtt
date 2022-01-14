@@ -20,6 +20,7 @@ import com.google.protobuf.ByteString;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.*;
+import io.netty.util.AttributeKey;
 import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.entity.InternalMessage;
 import org.monkey.mmq.core.exception.MmqException;
@@ -71,8 +72,8 @@ public class Publish {
 		}
 
 		// 规则引擎
-		channel.id();
-		SessionMateData sessionStore = sessionStoreService.getByChannelId(channel.id().asLongText());
+		String clientId = (String) channel.attr(AttributeKey.valueOf("clientId")).get();
+		SessionMateData sessionStore = sessionStoreService.get(clientId);
 		if (sessionStore == null) return;
 
 		RuleEngineEvent ruleEngineEvent = new RuleEngineEvent();
