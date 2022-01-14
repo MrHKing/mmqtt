@@ -103,6 +103,10 @@ mmq.broker.default.anonymous=true
 
 默认密码：aaaaaa
 
+mqtt tcp端口默认：1883
+
+mqtt websocket端口：2883
+
 ## 测试及规则引擎
 详细参见
 [wiki](https://github.com/MrHKing/mmq/wiki)
