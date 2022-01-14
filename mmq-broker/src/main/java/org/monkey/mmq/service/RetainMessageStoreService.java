@@ -44,11 +44,17 @@ public class RetainMessageStoreService implements RecordListener<RetainMessageMa
     private Map<String, RetainMessageMateData> retainMessageMateDataConcurrentHashMap = new ConcurrentHashMap<>();
 
     public void put(String topic, RetainMessageMateData retainMessageStore) throws MmqException {
-        consistencyService.put(UtilsAndCommons.RETAIN_STORE + topic, retainMessageStore);
+        String key = UtilsAndCommons.RETAIN_STORE + topic;
+        key = key.replaceAll("/","-");
+        key = key.replaceAll("\\\\","-");
+        consistencyService.put(key, retainMessageStore);
     }
 
     public void remove(String topic) throws MmqException {
-        consistencyService.remove(UtilsAndCommons.RETAIN_STORE + topic);
+        String key = UtilsAndCommons.RETAIN_STORE + topic;
+        key = key.replaceAll("/","-");
+        key = key.replaceAll("\\\\","-");
+        consistencyService.remove(key);
     }
 
     public List<RetainMessageMateData> search(String topicFilter) {
