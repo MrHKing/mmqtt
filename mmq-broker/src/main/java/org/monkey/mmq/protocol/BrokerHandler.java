@@ -29,11 +29,15 @@ import io.netty.util.ReferenceCountUtil;
 import javafx.util.Pair;
 import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.exception.MmqException;
+import org.monkey.mmq.core.notify.NotifyCenter;
 import org.monkey.mmq.metadata.message.SessionMateData;
+import org.monkey.mmq.notifier.SysMessageEvent;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.*;
+
+import static org.monkey.mmq.core.common.Constants.MODULES;
 
 /**
  * MQTT消息处理
@@ -90,6 +94,13 @@ public class BrokerHandler extends ChannelInboundHandlerAdapter {
 							protocolProcess.connect().processConnect(ctx.channel(), (MqttConnectMessage) msg);
 						} catch (MmqException e) {
 							Loggers.BROKER_SERVER.error(e.getErrMsg());
+//							SysMessageEvent sysMessageEvent = new SysMessageEvent();
+//							sysMessageEvent.setTopic(MODULES);
+//							sysMessageEvent.setPayload(e.getMessage());
+//							sysMessageEvent.setMqttQoS(MqttQoS.AT_LEAST_ONCE);
+//							NotifyCenter.publishEvent(sysMessageEvent);
+							//此处对断网进行了处理
+							ctx.channel().close();
 						}
 					//});
 					break;

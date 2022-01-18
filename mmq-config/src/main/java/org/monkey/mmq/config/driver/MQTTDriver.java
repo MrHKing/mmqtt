@@ -8,11 +8,13 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.monkey.mmq.config.matedata.ResourcesMateData;
+import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.core.notify.NotifyCenter;
 import org.monkey.mmq.core.utils.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -118,10 +120,14 @@ public class MQTTDriver implements ResourceDriver<MqttClient> {
 
     @Override
     public void handle(Map property, ResourcesMateData resourcesMateData,
-                       String topic, int qos, String address, String username) throws Exception {
-        MqttClient mqttClient = this.getDriver(resourcesMateData.getResourceID());
-        mqttClient.publish(topic,
-                JSON.toJSONString(property).getBytes(),
-                qos, false);
+                       String topic, int qos, String address, String username) throws MmqException {
+        try {
+            MqttClient mqttClient = this.getDriver(resourcesMateData.getResourceID());
+            mqttClient.publish(topic,
+                    JSON.toJSONString(property).getBytes(),
+                    qos, false);
+        } catch (Exception e) {
+            throw new MmqException(e.hashCode(), e.getMessage());
+        }
     }
 }

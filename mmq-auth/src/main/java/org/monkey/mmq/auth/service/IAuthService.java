@@ -20,6 +20,7 @@ package org.monkey.mmq.auth.service;
 import org.monkey.mmq.auth.exception.AccessException;
 import org.monkey.mmq.auth.model.Permission;
 import org.monkey.mmq.auth.model.User;
+import org.monkey.mmq.core.exception.MmqException;
 
 /**
  * 用户和密码认证服务接口
@@ -30,7 +31,7 @@ public interface IAuthService {
     /**
      * 验证用户名和密码是否正确
      */
-    boolean checkValid(String username, String password) throws Exception;
+    boolean checkValid(String username, String password) throws MmqException;
 
     /**
      * Authentication of request, identify the user who request the resource.

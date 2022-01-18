@@ -26,6 +26,7 @@ import org.monkey.mmq.config.modules.IModule;
 import org.monkey.mmq.config.modules.ModuleFactory;
 import org.monkey.mmq.config.modules.auth.AuthParam;
 import org.monkey.mmq.core.env.EnvUtil;
+import org.monkey.mmq.core.exception.MmqException;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -61,7 +62,7 @@ public class MqttAuthServiceImpl implements IAuthService {
 	}
 
 	@Override
-	public boolean checkValid(String username, String password) throws Exception {
+	public boolean checkValid(String username, String password) throws MmqException {
 
 		IModule authModule = ModuleFactory.getResourceDriverByEnum(ModelEnum.AUTH);
 		if (authModule.getEnable()) {

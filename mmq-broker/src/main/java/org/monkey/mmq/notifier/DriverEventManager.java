@@ -3,6 +3,7 @@ package org.monkey.mmq.notifier;
 import io.netty.handler.codec.mqtt.MqttQoS;
 import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.config.driver.DriverFactory;
+import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.core.notify.Event;
 import org.monkey.mmq.core.notify.NotifyCenter;
 import org.monkey.mmq.core.notify.listener.Subscriber;
@@ -40,7 +41,7 @@ public class DriverEventManager extends Subscriber<DriverEvent> {
                     event.getRuleEngineEvent().getMessage().getMqttQoS(),
                     event.getRuleEngineEvent().getMessage().getAddress(),
                     event.getRuleEngineEvent().getUsername());
-        } catch (Exception e) {
+        } catch (MmqException e) {
             Loggers.BROKER_SERVER.error(e.getMessage());
             SysMessageEvent sysMessageEvent = new SysMessageEvent();
             sysMessageEvent.setTopic(RULE_ENGINE);

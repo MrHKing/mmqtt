@@ -18,6 +18,7 @@ package org.monkey.mmq.config.driver;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.taosdata.jdbc.TSDBDriver;
 import org.monkey.mmq.config.matedata.ResourcesMateData;
+import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.core.utils.StringUtils;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.common.TemplateParserContext;
@@ -129,15 +130,26 @@ public class TDengineDriver implements ResourceDriver {
 
     @Override
     public void handle(Map property, ResourcesMateData resourcesMateData,
-                       String topic, int qos, String address, String username) throws Exception{
-        Connection connection = (Connection)this.getDriver(resourcesMateData.getResourceID());
-        if (connection != null) {
-            DriverFactory.setProperty(property, topic, username);
-            String sql = resourcesMateData.getResource().get("sql").toString();
-            ExpressionParser parser = new SpelExpressionParser();
-            TemplateParserContext parserContext = new TemplateParserContext();
-            String content = parser.parseExpression(sql, parserContext).getValue(property, String.class);
-            connection.createStatement().execute(content);
+                       String topic, int qos, String address, String username) throws MmqException {
+        Connection connection = null;
+        try {
+            connection = (Connection) this.getDriver(resourcesMateData.getResourceID());
+            if (connection != null) {
+                DriverFactory.setProperty(property, topic, username);
+                String sql = resourcesMateData.getResource().get("sql").toString();
+                ExpressionParser parser = new SpelExpressionParser();
+                TemplateParserContext parserContext = new TemplateParserContext();
+                String content = parser.parseExpression(sql, parserContext).getValue(property, String.class);
+                connection.createStatement().execute(content);
+            }
+        } catch (Exception e) {
+            throw new MmqException(e.hashCode(), e.getMessage());
+        } finally {
+            try {
+                connection.close();
+            } catch (SQLException throwables) {
+                throw new MmqException(throwables.hashCode(), throwables.getMessage());
+            }
         }
     }
 }

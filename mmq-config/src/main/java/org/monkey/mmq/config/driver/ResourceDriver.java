@@ -1,6 +1,7 @@
 package org.monkey.mmq.config.driver;
 
 import org.monkey.mmq.config.matedata.ResourcesMateData;
+import org.monkey.mmq.core.exception.MmqException;
 
 import java.sql.SQLException;
 import java.util.Map;
@@ -16,5 +17,5 @@ public interface ResourceDriver<T> {
     boolean testConnect(ResourcesMateData resourcesMateData);
 
     void handle(Map property, ResourcesMateData resourcesMateData,
-                String topic, int qos, String address, String username) throws Exception;
+                String topic, int qos, String address, String username) throws MmqException;
 }

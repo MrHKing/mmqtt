@@ -1,6 +1,7 @@
 package org.monkey.mmq.config.modules;
 
 import org.monkey.mmq.config.matedata.ModelMateData;
+import org.monkey.mmq.core.exception.MmqException;
 
 /**
  * @ClassNameIModule
@@ -13,7 +14,7 @@ public interface IModule<Param> {
 
     void update(ModelMateData config);
 
-    boolean handle(Param param) throws Exception;
+    boolean handle(Param param) throws MmqException;
 
     ModelMateData getConfig();
 

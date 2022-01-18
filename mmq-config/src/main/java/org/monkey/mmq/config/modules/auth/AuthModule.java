@@ -5,12 +5,14 @@ import org.monkey.mmq.config.matedata.ModelEnum;
 import org.monkey.mmq.config.matedata.ModelMateData;
 import org.monkey.mmq.config.matedata.ResourceEnum;
 import org.monkey.mmq.config.modules.IModule;
+import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.core.utils.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
@@ -67,7 +69,7 @@ public class AuthModule implements IModule<AuthParam> {
     }
 
     @Override
-    public boolean handle(AuthParam authParam) throws Exception {
+    public boolean handle(AuthParam authParam) throws MmqException {
         if (!this.modelMateData.getEnable()) return true;
 
         if (authParam == null) return false;
@@ -92,24 +94,35 @@ public class AuthModule implements IModule<AuthParam> {
         // 密码字段
         String password = (String) this.modelMateData.getConfigs().get(PASSWORD);
         if (StringUtils.isEmpty(password)) return false;
-
-        // 获取连接
-        Connection connection = (Connection) DriverFactory.getResourceDriverByEnum(resourceEnum).getDriver(resourceId);
-        if (connection == null) return false;
-
         // 查询SQL
-        String sql = String.format(sqlFormat, table,
-                username, authParam.getUsername(), password, authParam.getPassword());
-        Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_UPDATABLE);
-        ResultSet resultSet = stmt.executeQuery(sql);
-        resultSet.last();
-        boolean ret = resultSet.getLong("total") > 0;
-        stmt.close();
-        connection.close();
+        Connection connection = null;
+        Statement stmt = null;
+        try {
+            // 获取连接
+            connection = (Connection) DriverFactory.getResourceDriverByEnum(resourceEnum).getDriver(resourceId);
+            if (connection == null) return false;
 
-        // 返回结果
-        if (ret) return true;
-        return false;
+            String sql = String.format(sqlFormat, table,
+                    username, authParam.getUsername(), password, authParam.getPassword());
+            stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            ResultSet resultSet = stmt.executeQuery(sql);
+            resultSet.last();
+            boolean ret = resultSet.getLong("total") > 0;
+
+
+            // 返回结果
+            if (ret) return true;
+            return false;
+        } catch (Exception e) {
+            throw new MmqException(e.hashCode(), e.getMessage());
+        } finally {
+            try {
+                stmt.close();
+                connection.close();
+            } catch (SQLException throwables) {
+                throw new MmqException(throwables.hashCode(), throwables.getMessage());
+            }
+        }
     }
 
     @Override

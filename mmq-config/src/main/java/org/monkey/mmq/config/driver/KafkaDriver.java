@@ -23,6 +23,7 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.monkey.mmq.config.matedata.ResourcesMateData;
+import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.core.utils.JacksonUtils;
 import org.monkey.mmq.core.utils.StringUtils;
 import org.springframework.stereotype.Component;
@@ -93,13 +94,17 @@ public class KafkaDriver implements ResourceDriver<Producer<String, String>> {
 
     @Override
     public void handle(Map property, ResourcesMateData resourcesMateData,
-                       String topic, int qos, String address, String username) throws Exception {
-        Producer<String, String> producer = this.getDriver(resourcesMateData.getResourceID());
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("topic", topic);
-        payload.put("payload", property);
-        payload.put("address", address);
-        payload.put("qos", qos);
-        producer.send(new ProducerRecord<>(resourcesMateData.getResource().get("topic").toString(), JacksonUtils.toJson(payload)));
+                       String topic, int qos, String address, String username) throws MmqException {
+        try {
+            Producer<String, String> producer = this.getDriver(resourcesMateData.getResourceID());
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("topic", topic);
+            payload.put("payload", property);
+            payload.put("address", address);
+            payload.put("qos", qos);
+            producer.send(new ProducerRecord<>(resourcesMateData.getResource().get("topic").toString(), JacksonUtils.toJson(payload)));
+        } catch (Exception e) {
+            throw new MmqException(e.hashCode(), e.getMessage());
+        }
     }
 }
