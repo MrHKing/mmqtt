@@ -60,7 +60,7 @@ public class MmqKvStorage extends MemoryKvStorage {
 
     public MmqKvStorage(final String baseDir) throws Exception {
         this.baseDir = baseDir;
-        this.baseDirStorage = StorageFactory.createKvStorage(KvStorage.KvType.File, LABEL, baseDir);
+        this.baseDirStorage = StorageFactory.createKvStorage(KvType.RocksDB, LABEL, baseDir);
         this.mqttKvStorage = new ConcurrentHashMap<>(16);
     }
 
@@ -227,7 +227,7 @@ public class MmqKvStorage extends MemoryKvStorage {
         Function<String, KvStorage> kvStorageBuilder = key -> {
             try {
                 String namespacePath = Paths.get(baseDir, key).toString();
-                return StorageFactory.createKvStorage(KvType.File, LABEL, namespacePath);
+                return StorageFactory.createKvStorage(KvType.RocksDB, LABEL, namespacePath);
             } catch (Exception e) {
                 throw new MmqRuntimeException(MmqException.SERVER_ERROR, e);
             }

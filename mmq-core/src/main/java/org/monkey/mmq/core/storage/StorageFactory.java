@@ -19,6 +19,7 @@ package org.monkey.mmq.core.storage;
 import org.monkey.mmq.core.storage.kv.FileKvStorage;
 import org.monkey.mmq.core.storage.kv.KvStorage;
 import org.monkey.mmq.core.storage.kv.MemoryKvStorage;
+import org.monkey.mmq.core.storage.kv.RocksDBStorage;
 
 /**
  * Ket-value Storage factory.
@@ -44,6 +45,7 @@ public final class StorageFactory {
             case Memory:
                 return new MemoryKvStorage();
             case RocksDB:
+                return new RocksDBStorage(baseDir);
             default:
                 throw new IllegalArgumentException("this kv type : [" + type.name() + "] not support");
         }
