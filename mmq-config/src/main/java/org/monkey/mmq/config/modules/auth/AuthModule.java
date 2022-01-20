@@ -4,6 +4,7 @@ import org.monkey.mmq.config.driver.DriverFactory;
 import org.monkey.mmq.config.matedata.ModelEnum;
 import org.monkey.mmq.config.matedata.ModelMateData;
 import org.monkey.mmq.config.matedata.ResourceEnum;
+import org.monkey.mmq.config.modules.BaseModule;
 import org.monkey.mmq.config.modules.IModule;
 import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.core.utils.StringUtils;
@@ -25,9 +26,7 @@ import java.util.Map;
  * @Version V1.0
  **/
 @Component
-public class AuthModule implements IModule<AuthParam> {
-
-    private ModelMateData modelMateData;
+public class AuthModule extends BaseModule<AuthParam> {
 
     private static final String RESOURCE_TYPE = "resourceType";
 
@@ -57,15 +56,6 @@ public class AuthModule implements IModule<AuthParam> {
         modelMateData.setEnable(false);
         modelMateData.setIcon("auth-icon");
         modelMateData.setModuleName("认证鉴权");
-    }
-
-    @Override
-    public void update(ModelMateData modelMateData) {
-        if (modelMateData == null) return;
-        if (StringUtils.isEmpty(modelMateData.getDescription())) return;
-        if (StringUtils.isEmpty(modelMateData.getIcon())) return;
-        if (StringUtils.isEmpty(modelMateData.getModuleName())) return;
-        this.modelMateData = modelMateData;
     }
 
     @Override
@@ -109,7 +99,6 @@ public class AuthModule implements IModule<AuthParam> {
             resultSet.last();
             boolean ret = resultSet.getLong("total") > 0;
 
-
             // 返回结果
             if (ret) return true;
             return false;
@@ -123,15 +112,5 @@ public class AuthModule implements IModule<AuthParam> {
                 throw new MmqException(throwables.hashCode(), throwables.getMessage());
             }
         }
-    }
-
-    @Override
-    public ModelMateData getConfig() {
-        return this.modelMateData;
-    }
-
-    @Override
-    public boolean getEnable() {
-        return this.modelMateData.getEnable();
     }
 }

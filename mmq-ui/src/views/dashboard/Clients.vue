@@ -14,6 +14,16 @@
                 <a-input v-model="queryParam.address" placeholder="" />
               </a-form-item>
             </a-col>
+            <a-col :md="8" :sm="24">
+              <a-form-item label="账户">
+                <a-input v-model="queryParam.user" placeholder="" />
+              </a-form-item>
+            </a-col>
+            <a-col :md="8" :sm="24">
+              <a-form-item label="Topic">
+                <a-input v-model="queryParam.topic" placeholder="" />
+              </a-form-item>
+            </a-col>
             <template v-if="advanced"> </template>
             <a-col :md="(!advanced && 8) || 24" :sm="24">
               <span
@@ -124,39 +134,36 @@ export default {
     STable,
     Ellipsis
   },
-  data () {
+  data() {
     this.columns = columns
     return {
       // 高级搜索 展开/关闭
       advanced: false,
       // 查询参数
-      queryParam: {},
+      queryParam: { clientId: '', address: '', user: '', topic: '' },
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
         const requestParameters = Object.assign({}, parameter, this.queryParam)
         console.log('loadData request parameters:', requestParameters)
-        return getClients(requestParameters)
-          .then(res => {
-            return res.data
-          })
+        return getClients(requestParameters).then(res => {
+          return res.data
+        })
       },
       selectedRowKeys: [],
       selectedRows: []
     }
   },
   filters: {
-    statusFilter (type) {
+    statusFilter(type) {
       return statusMap[type].text
     },
-    statusTypeFilter (type) {
+    statusTypeFilter(type) {
       return statusMap[type].status
     }
   },
-  created () {
-
-  },
+  created() {},
   computed: {
-    rowSelection () {
+    rowSelection() {
       return {
         selectedRowKeys: this.selectedRowKeys,
         onChange: this.onSelectChange
@@ -164,17 +171,17 @@ export default {
     }
   },
   methods: {
-    onSelectChange (selectedRowKeys, selectedRows) {
+    onSelectChange(selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys
       this.selectedRows = selectedRows
     },
-    toggleAdvanced () {
+    toggleAdvanced() {
       this.advanced = !this.advanced
     },
-    resetSearchForm () {
+    resetSearchForm() {
       this.queryParam = {}
     },
-    handleReject (record) {
+    handleReject(record) {
       getAction('/v1/system/rejectClient', { clinetId: record.clientId }).then(res => {
         if (res.code === 200) {
           this.$message.info('踢出成功！')

@@ -16,6 +16,7 @@
 package org.monkey.mmq.web.controller;
 
 import com.google.protobuf.ByteString;
+import io.netty.util.internal.StringUtil;
 import org.monkey.mmq.core.cluster.Member;
 import org.monkey.mmq.core.cluster.ServerMemberManager;
 import org.monkey.mmq.core.entity.InternalMessage;
@@ -41,8 +42,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collection;
-import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -85,14 +86,33 @@ public class SystemInfoController {
      * @return system connect clients
      */
     @GetMapping("/clients")
-    public ResponsePage<ClientMateData> getClients(@RequestParam int pageNo, @RequestParam int pageSize,
-                                                   @RequestParam(required = false, defaultValue = "") String clientId,
-                                                   @RequestParam(required = false, defaultValue = "") String address) {
+    public Object getClients(@RequestParam int pageNo, @RequestParam int pageSize,
+                             @RequestParam(required = false, defaultValue = "") String clientId,
+                             @RequestParam(required = false, defaultValue = "") String address,
+                             @RequestParam(required = false, defaultValue = "") String user,
+                             @RequestParam(required = false, defaultValue = "") String topic,
+                             HttpServletRequest request) {
         Collection<ClientMateData> datas = sessionStoreService.getClients();
+        if (!StringUtil.isNullOrEmpty(topic)) {
+            List<SubscribeMateData> subscribeMateDataList = subscribeStoreService.getSubscribes();
+            Map<String, ClientMateData> clientMateDataMap = new HashMap<>();
+            Collection<ClientMateData> finalDatas = datas;
+            subscribeMateDataList.stream().filter(x -> x.getTopicFilter().contains(topic)).forEach(sub -> {
+                Optional<ClientMateData> optionalClientMateData = finalDatas.stream().filter(clinet->clinet.getClientId().equals(sub.getClientId())).findFirst();
+                if (optionalClientMateData.isPresent()) {
+                    clientMateDataMap.put(sub.getClientId(), optionalClientMateData.get());
+                }
+
+            });
+
+            datas = clientMateDataMap.values();
+        }
+
         return new ResponsePage<>(pageSize, pageNo,
                 datas.size(),
                 datas.size() / pageSize,
-                datas.stream().filter(x -> x.getClientId().contains(clientId) && x.getAddress().contains(address))
+                datas.stream().filter(x -> x.getClientId().contains(clientId)
+                        && x.getAddress().contains(address) && x.getUser().contains(user))
                         .skip((pageNo - 1) * pageSize).limit(pageSize).collect(Collectors.toList()));
     }
 
