@@ -2,6 +2,7 @@ package org.monkey.mmq.web.controller;
 
 import io.netty.util.internal.StringUtil;
 import org.monkey.mmq.core.consistency.model.ResponsePage;
+import org.monkey.mmq.core.consistency.model.RestResultUtils;
 import org.monkey.mmq.metadata.message.ClientMateData;
 import org.monkey.mmq.metadata.subscribe.SubscribeMateData;
 import org.monkey.mmq.service.SessionStoreService;
@@ -67,8 +68,18 @@ public class ApiController {
                 datas.size(),
                 datas.size() / pageSize,
                 datas.stream().filter(x -> x.getClientId().contains(clientId)
-                        && x.getAddress().contains(address) && x.getUser().equals(user))
+                        && x.getAddress().contains(address) && x.getUser().contains(user))
                         .skip((pageNo - 1) * pageSize).limit(pageSize).collect(Collectors.toList()));
+    }
+
+    /**
+     * reject connect client.
+     */
+    @BasicApi
+    @GetMapping("/rejectClient")
+    public Object rejectClient(@RequestParam String clientId, HttpServletRequest request) {
+        sessionStoreService.rejectClient(clientId);
+        return RestResultUtils.success();
     }
 
 }
