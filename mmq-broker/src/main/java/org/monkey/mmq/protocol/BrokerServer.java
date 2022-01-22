@@ -143,10 +143,10 @@ public class BrokerServer {
 					// 将请求和应答消息编码或解码为HTTP消息
 					channelPipeline.addLast("http-codec", new HttpServerCodec());
 					// 将HTTP消息的多个部分合成一条完整的HTTP消息
-					channelPipeline.addLast("aggregator", new HttpObjectAggregator(1048576));
+					channelPipeline.addLast("aggregator", new HttpObjectAggregator(65536));
 					// 将HTTP消息进行压缩编码
 					channelPipeline.addLast("compressor ", new HttpContentCompressor());
-					channelPipeline.addLast("protocol", new WebSocketServerProtocolHandler(brokerProperties.getWebsocketPath(), "mqtt,mqttv3.1,mqttv3.1.1", true, 65536));
+					channelPipeline.addLast("protocol", new WebSocketServerProtocolHandler(brokerProperties.getWebsocketPath(), "mqtt,mqttv3.1,mqttv3.1.1", true, Integer.MAX_VALUE));
 					channelPipeline.addLast("mqttWebSocket", new MqttWebSocketCodec());
 					channelPipeline.addLast("decoder", new MqttDecoder(Integer.MAX_VALUE));
 					channelPipeline.addLast("encoder", MqttEncoder.INSTANCE);
@@ -155,8 +155,8 @@ public class BrokerServer {
 			})
 			.option(ChannelOption.SO_BACKLOG, 512)
 //			.childOption(ChannelOption.TCP_NODELAY, false)
-//			.childOption(ChannelOption.SO_SNDBUF, 65536)
-//			.option(ChannelOption.SO_RCVBUF, 65536)
+//			.childOption(ChannelOption.SO_SNDBUF, Integer.MAX_VALUE)
+//			.option(ChannelOption.SO_RCVBUF, Integer.MAX_VALUE)
 //			.option(ChannelOption.SO_REUSEADDR, true)
 			.childOption(ChannelOption.SO_KEEPALIVE, brokerProperties.isSoKeepAlive());
 		websocketChannel = sb.bind(brokerProperties.getWebsocketPort()).sync().channel();

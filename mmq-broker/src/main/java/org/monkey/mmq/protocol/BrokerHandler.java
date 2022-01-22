@@ -17,10 +17,14 @@
 package org.monkey.mmq.protocol;
 
 import cn.hutool.core.thread.NamedThreadFactory;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.ContinuationWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.handler.codec.mqtt.*;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
@@ -47,7 +51,6 @@ public class BrokerHandler extends ChannelInboundHandlerAdapter {
 
 	private ProtocolProcess protocolProcess;
 
-
 	public BrokerHandler(ProtocolProcess protocolProcess) {
 		this.protocolProcess = protocolProcess;
 	}
@@ -59,9 +62,9 @@ public class BrokerHandler extends ChannelInboundHandlerAdapter {
 	}
 
 	@Override
-	public void channelRead(ChannelHandlerContext ctx, Object  obj) {
-		// Do something with msg
+	public void channelRead(ChannelHandlerContext ctx, Object obj) {
 		MqttMessage msg = (MqttMessage) obj;
+		// Do something with msg
 		try {
 			// 消息解码器出现异常
 			if (msg.decoderResult().isFailure()) {
@@ -94,11 +97,11 @@ public class BrokerHandler extends ChannelInboundHandlerAdapter {
 							protocolProcess.connect().processConnect(ctx.channel(), (MqttConnectMessage) msg);
 						} catch (MmqException e) {
 							Loggers.BROKER_SERVER.error(e.getErrMsg());
-//							SysMessageEvent sysMessageEvent = new SysMessageEvent();
-//							sysMessageEvent.setTopic(MODULES);
-//							sysMessageEvent.setPayload(e.getMessage());
-//							sysMessageEvent.setMqttQoS(MqttQoS.AT_LEAST_ONCE);
-//							NotifyCenter.publishEvent(sysMessageEvent);
+							SysMessageEvent sysMessageEvent = new SysMessageEvent();
+							sysMessageEvent.setTopic(MODULES);
+							sysMessageEvent.setPayload(e.getMessage());
+							sysMessageEvent.setMqttQoS(MqttQoS.AT_LEAST_ONCE);
+							NotifyCenter.publishEvent(sysMessageEvent);
 							//此处对断网进行了处理
 							ctx.channel().close();
 						}
@@ -215,5 +218,44 @@ public class BrokerHandler extends ChannelInboundHandlerAdapter {
 		} else {
 			super.userEventTriggered(ctx, evt);
 		}
+	}
+
+	@Override
+	public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+
+	}
+
+	@Override
+	public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
+
+	}
+
+	@Override
+	public void channelActive(ChannelHandlerContext ctx) throws Exception {
+
+	}
+
+	@Override
+	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+
+	}
+
+	@Override
+	public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+		System.out.println(info() + "channelReadComplete");
+	}
+
+	@Override
+	public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+
+	}
+
+	protected String info() {
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		return System.currentTimeMillis() + " " + this.getClass().getSimpleName() + ": ";
 	}
 }

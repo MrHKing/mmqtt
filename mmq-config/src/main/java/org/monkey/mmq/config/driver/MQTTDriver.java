@@ -3,9 +3,7 @@ package org.monkey.mmq.config.driver;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.fastjson.JSON;
 import io.netty.handler.codec.mqtt.MqttQoS;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.monkey.mmq.config.matedata.ResourcesMateData;
 import org.monkey.mmq.core.exception.MmqException;
@@ -99,6 +97,26 @@ public class MQTTDriver implements ResourceDriver<MqttClient> {
         try {
             MqttClient mqttClient = new MqttClient(resourcesMateData.getResource().get("server").toString(), UUID.randomUUID().toString(), new MemoryPersistence());
             MqttConnectOptions options = new MqttConnectOptions();
+            mqttClient.setCallback(new MqttCallback() {
+
+                @Override
+                public void connectionLost(Throwable cause) {
+                    try {
+                        mqttClient.reconnect();
+                    } catch (MqttException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void messageArrived(String topic, MqttMessage message) throws MqttException {
+
+                }
+
+                @Override
+                public void deliveryComplete(IMqttDeliveryToken token){
+                }
+            });
             // 如果想要断线这段时间的数据，要设置成false，并且重连后不用再次订阅，否则不会得到断线时间的数据
             options.setCleanSession(true);
             // 设置连接的用户名
@@ -123,9 +141,13 @@ public class MQTTDriver implements ResourceDriver<MqttClient> {
                        String topic, int qos, String address, String username) throws MmqException {
         try {
             MqttClient mqttClient = this.getDriver(resourcesMateData.getResourceID());
-            mqttClient.publish(topic,
-                    JSON.toJSONString(property).getBytes(),
-                    qos, false);
+            if (mqttClient.isConnected()) {
+                mqttClient.publish(topic,
+                        JSON.toJSONString(property).getBytes(),
+                        qos, false);
+            } else {
+                mqttClient.reconnect();
+            }
         } catch (Exception e) {
             throw new MmqException(e.hashCode(), e.getMessage());
         }

@@ -74,7 +74,7 @@ public class BrokerProperties {
 	/**
 	 * Socket参数, 是否开启心跳保活机制, 默认开启
 	 */
-	private boolean soKeepAlive = false;
+	private boolean soKeepAlive = true;
 
 	public int getPort() {
 		return Integer.parseInt(EnvUtil.getProperty(MMQ_BROKER_PORT_PROPERTY, DEFAULT_MMQ_BROKER_PORT));

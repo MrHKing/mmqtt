@@ -61,7 +61,7 @@ public class SysMessageManager extends Subscriber<SysMessageEvent> {
     public void onEvent(SysMessageEvent event) {
         // 处理消息
         this.sendPublishMessage(event.getTopic(), event.getMqttQoS(),
-                event.getPayload().getBytes(), false,
+                event.getPayload() == null ? new byte[0] : event.getPayload().getBytes(), false,
                 false, -1);
     }
 
