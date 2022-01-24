@@ -22,6 +22,7 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.*;
 import io.netty.util.AttributeKey;
 import org.monkey.mmq.config.Loggers;
+import org.monkey.mmq.core.cluster.Member;
 import org.monkey.mmq.core.entity.InternalMessage;
 import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.core.notify.NotifyCenter;
@@ -36,6 +37,7 @@ import org.monkey.mmq.notifier.RuleEngineEvent;
 import org.monkey.mmq.service.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * PUBLISH连接处理
@@ -51,13 +53,16 @@ public class Publish {
 
 	private DupPublishMessageStoreService dupPublishMessageStoreService;
 
+	private final Member local;
+
 	public Publish(SessionStoreService sessionStoreService, SubscribeStoreService subscribeStoreService,
 				   RetainMessageStoreService retainMessageStoreService,
-				   DupPublishMessageStoreService dupPublishMessageStoreService) {
+				   DupPublishMessageStoreService dupPublishMessageStoreService, Member local) {
 		this.sessionStoreService = sessionStoreService;
 		this.subscribeStoreService = subscribeStoreService;
 		this.retainMessageStoreService = retainMessageStoreService;
 		this.dupPublishMessageStoreService = dupPublishMessageStoreService;
+		this.local = local;
 	}
 
 	public void processPublish(Channel channel, MqttPublishMessage msg) throws MmqException {
@@ -99,15 +104,18 @@ public class Publish {
 
 	private void sendPublishMessage(String topic, MqttQoS mqttQoS, byte[] messageBytes, boolean retain, boolean dup, int packetId, Channel channel) {
 		List<SubscribeMateData> subscribeStores = subscribeStoreService.search(topic);
+
 		subscribeStores.forEach(subscribeStore -> {
 				// 订阅者收到MQTT消息的QoS级别, 最终取决于发布消息的QoS和主题订阅的QoS
 				MqttQoS respQoS = mqttQoS.value() > subscribeStore.getMqttQoS() ? MqttQoS.valueOf(subscribeStore.getMqttQoS()) : mqttQoS;
 				SessionMateData sessionStore = sessionStoreService.get(subscribeStore.getClientId());
-				if (sessionStore != null) {
+				if (sessionStore != null
+						&& this.local.getIp().equals(subscribeStore.getNodeIp())
+						&& subscribeStore.getNodePort() == this.local.getPort()) {
 					if (respQoS == MqttQoS.AT_MOST_ONCE) {
 						MqttPublishMessage publishMessage = (MqttPublishMessage) MqttMessageFactory.newMessage(
 							new MqttFixedHeader(MqttMessageType.PUBLISH, dup, respQoS, retain, 0),
-							new MqttPublishVariableHeader(topic, 0), Unpooled.buffer().writeBytes(messageBytes));
+							new MqttPublishVariableHeader(topic, packetId), Unpooled.buffer().writeBytes(messageBytes));
 						LoggerUtils.printIfDebugEnabled(Loggers.BROKER_PROTOCOL,"PUBLISH - clientId: {}, topic: {}, Qos: {}", subscribeStore.getClientId(), topic, respQoS.value());
 						sessionStore.getChannel().writeAndFlush(publishMessage);
 					}
@@ -139,6 +147,7 @@ public class Publish {
 					publishEvent.setInternalMessage(InternalMessage.newBuilder()
 							.setTopic(topic)
 							.setMqttQoS(respQoS.value())
+							.setClientId(subscribeStore.getClientId())
 							.setMessageBytes(ByteString.copyFrom(messageBytes))
 							.setDup(false).setRetain(false).setMessageId(packetId).build());
 					NotifyCenter.publishEvent(publishEvent);

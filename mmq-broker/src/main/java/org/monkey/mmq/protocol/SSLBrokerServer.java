@@ -178,7 +178,7 @@ public class SSLBrokerServer {
 					channelPipeline.addLast("aggregator", new HttpObjectAggregator(1048576));
 					// 将HTTP消息进行压缩编码
 					channelPipeline.addLast("compressor ", new HttpContentCompressor());
-					channelPipeline.addLast("protocol", new WebSocketServerProtocolHandler(brokerProperties.getWebsocketPath(), "mqtt,mqttv3.1,mqttv3.1.1", true, 65536));
+					channelPipeline.addLast("protocol", new WebSocketServerProtocolHandler(brokerProperties.getWebsocketPath(), "mqtt,mqttv3.1,mqttv3.1.1", true, Integer.MAX_VALUE));
 					channelPipeline.addLast("mqttWebSocket", new MqttWebSocketCodec());
 					channelPipeline.addLast("decoder", new MqttDecoder(Integer.MAX_VALUE));
 					channelPipeline.addLast("encoder", MqttEncoder.INSTANCE);

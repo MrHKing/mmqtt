@@ -17,6 +17,8 @@
 package org.monkey.mmq.protocol;
 
 import org.monkey.mmq.auth.service.IAuthService;
+import org.monkey.mmq.core.cluster.Member;
+import org.monkey.mmq.core.cluster.ServerMemberManager;
 import org.monkey.mmq.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -55,7 +57,11 @@ public class ProtocolProcess {
 	@Autowired
 	private DupPubRelMessageStoreService dupPubRelMessageStoreService;
 
+	public final ServerMemberManager memberManager;
 
+	public ProtocolProcess(ServerMemberManager memberManager) {
+		this.memberManager = memberManager;
+	}
 
 	private ExecutorService connectExecutor;
 	private ExecutorService pubExecutor;
@@ -164,7 +170,7 @@ public class ProtocolProcess {
 
 	public Publish publish() {
 		if (publish == null) {
-			publish = new Publish(sessionStoreService, subscribeStoreService, messageStoreService, dupPublishMessageStoreService);
+			publish = new Publish(sessionStoreService, subscribeStoreService, messageStoreService, dupPublishMessageStoreService, memberManager.getSelf());
 		}
 		return publish;
 	}

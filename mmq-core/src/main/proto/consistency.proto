@@ -43,6 +43,7 @@ message InternalMessage {
   bool retain = 6;
   bool dup = 7;
   int32 messageId = 8;
+  string clientId = 9;
 }
 
 message RejectClient {

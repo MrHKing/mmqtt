@@ -34,6 +34,7 @@ import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * 订阅一致性存储
@@ -73,8 +74,6 @@ public class SubscribeStoreService implements RecordListener<SubscribeMateData> 
 
     public void put(String topicFilter, SubscribeMateData subscribeStore) throws MmqException {
         String key = UtilsAndCommons.SUBSCRIBE_STORE + topicFilter + subscribeStore.getClientId();
-        key = key.replaceAll("/","-");
-        key = key.replaceAll("\\\\","-");
         subscribeStore.setKey(key);
         subscribeStore.setNodeIp(memberManager.getSelf().getIp());
         subscribeStore.setNodePort(memberManager.getSelf().getPort());
@@ -84,8 +83,6 @@ public class SubscribeStoreService implements RecordListener<SubscribeMateData> 
     @Async
     public void delete(String topicFilter, String clientId) throws MmqException {
         String key = UtilsAndCommons.SUBSCRIBE_STORE + topicFilter + clientId;
-        key = key.replaceAll("/","-");
-        key = key.replaceAll("\\\\","-");
         consistencyService.remove(key);
     }
 
@@ -163,6 +160,9 @@ public class SubscribeStoreService implements RecordListener<SubscribeMateData> 
                 }
             }
         });
+//        return subscribeStores.stream().collect(
+//                Collectors.collectingAndThen(
+//                        Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(SubscribeMateData::getClientId))), ArrayList::new));
         return subscribeStores;
     }
 

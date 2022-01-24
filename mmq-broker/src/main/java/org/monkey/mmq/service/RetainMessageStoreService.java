@@ -45,15 +45,11 @@ public class RetainMessageStoreService implements RecordListener<RetainMessageMa
 
     public void put(String topic, RetainMessageMateData retainMessageStore) throws MmqException {
         String key = UtilsAndCommons.RETAIN_STORE + topic;
-        key = key.replaceAll("/","-");
-        key = key.replaceAll("\\\\","-");
         consistencyService.put(key, retainMessageStore);
     }
 
     public void remove(String topic) throws MmqException {
         String key = UtilsAndCommons.RETAIN_STORE + topic;
-        key = key.replaceAll("/","-");
-        key = key.replaceAll("\\\\","-");
         consistencyService.remove(key);
     }
 

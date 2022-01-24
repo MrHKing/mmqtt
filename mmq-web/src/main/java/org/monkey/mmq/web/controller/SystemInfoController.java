@@ -133,6 +133,17 @@ public class SystemInfoController {
                         .skip((pageNo - 1) * pageSize).limit(pageSize).collect(Collectors.toList()));
     }
 
+    /**
+     * Get system connect clients.
+     *
+     * @return system connect clients
+     */
+    @GetMapping("/search/subscribes")
+    public List<SubscribeMateData> searchSubscribes(@RequestParam String topic) {
+        List<SubscribeMateData> subscribes = subscribeStoreService.search(topic);
+        return subscribes;
+    }
+
     @GetMapping("/rejectClient")
     public void rejectClient(@RequestParam String clinetId) {
         sessionStoreService.rejectClient(clinetId);

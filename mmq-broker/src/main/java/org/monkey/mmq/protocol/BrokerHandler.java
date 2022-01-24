@@ -66,6 +66,10 @@ public class BrokerHandler extends ChannelInboundHandlerAdapter {
 		MqttMessage msg = (MqttMessage) obj;
 		// Do something with msg
 		try {
+			if (msg == null) {
+				Loggers.BROKER_SERVER.error("解码错误");
+				return;
+			}
 			// 消息解码器出现异常
 			if (msg.decoderResult().isFailure()) {
 				Throwable cause = msg.decoderResult().cause();
@@ -242,7 +246,6 @@ public class BrokerHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-		System.out.println(info() + "channelReadComplete");
 	}
 
 	@Override
