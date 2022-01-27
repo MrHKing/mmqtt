@@ -341,6 +341,20 @@ export default {
             })
           })
           break
+        case 'MQTT_BROKER':
+          this.$nextTick(() => {
+            this.form.setFieldsValue({
+              resourceID: record.resourceID,
+              type: type,
+              description: record.description,
+              resource: {
+                server: record.resource.server,
+                password: record.resource.password,
+                username: record.resource.username
+              }
+            })
+          })
+          break
       }
     },
     typeChange(value) {

@@ -112,7 +112,7 @@ public class SystemInfoController {
                 datas.size(),
                 datas.size() / pageSize,
                 datas.stream().filter(x -> x.getClientId().contains(clientId)
-                        && x.getAddress().contains(address) && x.getUser().contains(user))
+                        && x.getAddress().contains(address) && (x.getUser() == null || x.getUser().contains(user)))
                         .skip((pageNo - 1) * pageSize).limit(pageSize).collect(Collectors.toList()));
     }
 
