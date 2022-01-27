@@ -19,7 +19,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.monkey.mmq</groupId>
   <artifactId>mmq</artifactId>
-  <version>1.0.9</version>
+  <version>1.1.0</version>
   <packaging>pom</packaging>
   <name>Monkey mmq ${project.version}</name>
   <description>Top mmq project pom.xml file</description>
@@ -113,7 +113,7 @@
     <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
     <servlet-api.version>3.0</servlet-api.version>
     <spring-boot-dependencies.version>2.1.6.RELEASE</spring-boot-dependencies.version>
-    <revision>1.0.9</revision>
+    <revision>1.1.0</revision>
   </properties>
   <dependencyManagement>
     <dependencies>
