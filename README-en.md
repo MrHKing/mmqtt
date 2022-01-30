@@ -119,7 +119,7 @@ You can learn about and consult the mqtt protocol through the following links:
 
 ## Open source license
 
-Apache License 2.0, 详见 [LICENSE](./LICENSE)。
+Apache License 2.0, See details [LICENSE](./LICENSE)。
 
 ## QQ Group number
 1016132679
