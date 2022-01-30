@@ -5,7 +5,7 @@ English| [简体中文](./README.md)
 
 *MMQ broker* Fully support mqtt v3 1 and v3 1.1。
 
-## 安装
+## Install
 
 *MMQ broker* It is cross platform and supports Linux, UNIX, MacOS and windows. This means that * MMQ broker * can be deployed in x86_ On a 64 architecture server. Due to the use of raft consistency algorithm, the cluster deploys more than 3 nodes.
 
@@ -16,7 +16,7 @@ cd mmq
 mvn -Prelease-mmq -Dmaven.test.skip=true clean install -U
 ```
 
-#### 直接安装
+#### Clone install
 You can download the mmq-server-$version.zip package from the latest stable version。
 
 ```bash
