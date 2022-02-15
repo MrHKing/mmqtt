@@ -1,3 +1,5 @@
+[![GitHub issues](https://img.shields.io/github/issues/MrHKing/mmqtt)](https://github.com/MrHKing/mmqtt/issues)
+[![Build Status](https://img.shields.io/github/license/MrHKing/mmqtt)](https://github.com/MrHKing/mmqtt/blob/main/LICENSE)
 简体中文 | [English](./README-en.md)
 
 # MMQ broker
