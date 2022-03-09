@@ -41,7 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class TDengineDriver implements ResourceDriver {
 
-    private ConcurrentHashMap<String, Connection> dataSources = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, DruidDataSource> dataSources = new ConcurrentHashMap<>();
 
     static final String JDBC_DRIVER = "com.taosdata.jdbc.rs.RestfulDriver";
 
@@ -57,13 +57,9 @@ public class TDengineDriver implements ResourceDriver {
 
     @Override
     public void addDriver(String resourceId, Map resource) {
-        Connection connection = dataSources.get(resourceId);
-        if (connection != null) {
-            try {
-                connection.close();
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            }
+        DruidDataSource druidDataSource = dataSources.get(resourceId);
+        if (druidDataSource != null) {
+            druidDataSource.close();
             dataSources.remove(resourceId);
         }
 
@@ -82,34 +78,36 @@ public class TDengineDriver implements ResourceDriver {
             connProps.setProperty(TSDBDriver.PROPERTY_KEY_LOCALE, "en_US.UTF-8");
             connProps.setProperty(TSDBDriver.PROPERTY_KEY_TIME_ZONE, "UTC-8");
 
-            Connection conn = null;
-            conn = DriverManager.getConnection(url, resource.get(USERNAME).toString(),
-                    resource.get(PASSWORD).toString());
-            dataSources.put(resourceId, conn);
+            // jdbc properties
+            DruidDataSource dataSource = new DruidDataSource(); // 创建Druid连接池
+            dataSource.setDriverClassName(JDBC_DRIVER);
+            dataSource.setUrl(url); // 设置数据库的连接地址
+            dataSource.setUsername(USERNAME);
+            dataSource.setPassword(PASSWORD);
+            // pool configurations
+            dataSource.setInitialSize(8);
+            dataSource.setMinIdle(1);
+            dataSource.setMaxActive(20);
+
+            dataSources.put(resourceId, dataSource);
         } catch (Exception throwables) {
             return;
         }
-
-
     }
 
     @Override
     public void deleteDriver(String resourceId) {
-        Connection connection = dataSources.get(resourceId);
-        try {
-            connection.close();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        } finally {
-            dataSources.remove(resourceId);
-        }
+        DruidDataSource druidDataSource = dataSources.get(resourceId);
+        druidDataSource.close();
+        dataSources.remove(resourceId);
     }
 
     @Override
-    public Object getDriver(String resourceId) throws Exception {
+    public Connection getDriver(String resourceId) throws Exception {
         if (dataSources == null) return null;
         if (dataSources.get(resourceId) == null) return null;
-        return dataSources.get(resourceId);
+        if (!dataSources.get(resourceId).isInited()) return null;
+        return dataSources.get(resourceId).getConnection();
     }
 
     @Override

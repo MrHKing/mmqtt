@@ -15,6 +15,7 @@
  */
 package org.monkey.mmq.notifier;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.protobuf.ByteString;
@@ -91,7 +92,7 @@ public final class RuleEngineManager extends Subscriber<RuleEngineEvent> {
                 ReactorQL.builder()
                         .sql(rule.getSql())
                         .build()
-                        .start(name -> event.getMessage().getTopic().startsWith(name.split("#")[0]) ?
+                        .start(name -> isTopic(event.getMessage().getTopic(), name) ?
                                 Flux.just((new ObjectMapper().convertValue(JacksonUtils.toObj(new String(event.getMessage().getMessageBytes().toByteArray())),Map.class))) : Flux.just())
                         .doOnNext(map -> {
                             // 如果不为空则触发响应
@@ -114,5 +115,30 @@ public final class RuleEngineManager extends Subscriber<RuleEngineEvent> {
         return RuleEngineEvent.class;
     }
 
+    private boolean isTopic(String topic, String topicFilter) {
+        if (StrUtil.split(topic, '/').size() >= StrUtil.split(topicFilter, '/').size()) {
+            List<String> splitTopics = StrUtil.split(topic, '/');//a
+            List<String> spliteTopicFilters = StrUtil.split(topicFilter, '/');//#
+            String newTopicFilter = "";
+            for (int i = 0; i < spliteTopicFilters.size(); i++) {
+                String value = spliteTopicFilters.get(i);
+                if (value.equals("+")) {
+                    newTopicFilter = newTopicFilter + "+/";
+                } else if (value.equals("#")) {
+                    newTopicFilter = newTopicFilter + "#/";
+                    break;
+                } else {
+                    newTopicFilter = newTopicFilter + splitTopics.get(i) + "/";
+                }
+            }
+            newTopicFilter = StrUtil.removeSuffix(newTopicFilter, "/");
+            if (topicFilter.equals(newTopicFilter)) {
+                return true;
+            }
+        } else if (topicFilter.equals(topic)) {
+            return true;
+        }
 
+        return false;
+    }
 }
