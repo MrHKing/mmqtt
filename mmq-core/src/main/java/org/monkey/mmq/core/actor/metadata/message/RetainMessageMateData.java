@@ -14,40 +14,50 @@
  * limitations under the License.
  */
 
-package org.monkey.mmq.metadata.message;
+package org.monkey.mmq.core.actor.metadata.message;
 
 import org.monkey.mmq.core.consistency.matedata.Record;
 
 import java.io.Serializable;
 
 /**
- * PUBREL重发消息存储元数据
+ * Retain标志消息存储元数据
  * @author Solley
  */
-public class DupPubRelMessageMateData implements Record, Serializable {
+public class RetainMessageMateData implements Record, Serializable {
 
-	private static final long serialVersionUID = -4111642532532950980L;
+	private static final long serialVersionUID = -7548204047370972779L;
 
-	private String clientId;
+	private String topic;
 
-	private int messageId;
+	private byte[] messageBytes;
 
-	public String getClientId() {
-		return clientId;
+	private int mqttQoS;
+
+	public String getTopic() {
+		return topic;
 	}
 
-	public DupPubRelMessageMateData setClientId(String clientId) {
-		this.clientId = clientId;
+	public RetainMessageMateData setTopic(String topic) {
+		this.topic = topic;
 		return this;
 	}
 
-	public int getMessageId() {
-		return messageId;
+	public byte[] getMessageBytes() {
+		return messageBytes;
 	}
 
-	public DupPubRelMessageMateData setMessageId(int messageId) {
-		this.messageId = messageId;
+	public RetainMessageMateData setMessageBytes(byte[] messageBytes) {
+		this.messageBytes = messageBytes;
 		return this;
 	}
 
+	public int getMqttQoS() {
+		return mqttQoS;
+	}
+
+	public RetainMessageMateData setMqttQoS(int mqttQoS) {
+		this.mqttQoS = mqttQoS;
+		return this;
+	}
 }

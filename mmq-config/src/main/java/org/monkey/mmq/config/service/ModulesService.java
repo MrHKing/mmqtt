@@ -4,6 +4,7 @@ import org.monkey.mmq.config.config.Loggers;
 import org.monkey.mmq.config.matedata.*;
 import org.monkey.mmq.config.modules.IModule;
 import org.monkey.mmq.config.modules.ModuleFactory;
+import org.monkey.mmq.config.modules.ModelMateData;
 import org.monkey.mmq.core.consistency.matedata.RecordListener;
 import org.monkey.mmq.core.consistency.persistent.ConsistencyService;
 import org.monkey.mmq.core.exception.MmqException;
@@ -14,7 +15,6 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**

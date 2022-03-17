@@ -80,12 +80,6 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>org.monkey.mmq</groupId>
-      <artifactId>mmq-rule-engine</artifactId>
-      <version>1.1.0</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
       <groupId>io.netty</groupId>
       <artifactId>netty-all</artifactId>
       <version>4.1.36.Final</version>

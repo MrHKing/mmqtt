@@ -23,7 +23,7 @@ import io.netty.util.AttributeKey;
 import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.core.utils.LoggerUtils;
-import org.monkey.mmq.metadata.message.DupPubRelMessageMateData;
+import org.monkey.mmq.core.actor.metadata.message.DupPubRelMessageMateData;
 import org.monkey.mmq.service.DupPubRelMessageStoreService;
 import org.monkey.mmq.service.DupPublishMessageStoreService;
 

@@ -14,18 +14,12 @@
  * limitations under the License.
  */
 
-package org.monkey.mmq.metadata;
+package org.monkey.mmq.config;
 
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import org.apache.commons.lang3.StringUtils;
 import org.monkey.mmq.core.env.EnvUtil;
-import org.monkey.mmq.core.utils.JacksonUtils;
-import org.monkey.mmq.core.utils.VersionUtils;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Naming utils and common values.
@@ -52,10 +46,6 @@ public class UtilsAndCommons {
     public static final String MESSAGE_Id_STORE = "00-00---000-MESSAGE_Id-000---00-00";
     
     public static final String CIDR_REGEX = "[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}/[0-9]+";
-
-    public static final int CLIENT_PUT = 1;
-
-    public static final int CLIENT_REMOVE = 2;
 
     public static final String DATA_BASE_DIR =
             EnvUtil.getMmqHome() + File.separator + "data" + File.separator + "mqtt";

@@ -50,5 +50,9 @@
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-tools</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>mmq-rule-engine</artifactId>
+        </dependency>
     </dependencies>
 </project>

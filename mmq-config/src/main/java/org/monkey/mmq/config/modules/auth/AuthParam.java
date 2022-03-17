@@ -1,7 +1,5 @@
 package org.monkey.mmq.config.modules.auth;
 
-import org.monkey.mmq.config.matedata.ResourceEnum;
-
 /**
  * @ClassNameAuthParam
  * @Description

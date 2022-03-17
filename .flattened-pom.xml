@@ -107,6 +107,7 @@
     <tomcat-embed-jasper.version>9.0.40</tomcat-embed-jasper.version>
     <grpc-java.version>1.24.0</grpc-java.version>
     <reflections.version>0.9.11</reflections.version>
+    <akka-actor.version>2.6.0-M5</akka-actor.version>
     <guava.version>30.1-jre</guava.version>
     <mysql-connector-java.version>8.0.21</mysql-connector-java.version>
     <log4j.version>2.13.3</log4j.version>
@@ -394,6 +395,11 @@
         <groupId>com.alibaba</groupId>
         <artifactId>druid</artifactId>
         <version>${druid-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.typesafe.akka</groupId>
+        <artifactId>akka-actor_2.12</artifactId>
+        <version>${akka-actor.version}</version>
       </dependency>
       <dependency>
         <groupId>com.alipay.sofa</groupId>

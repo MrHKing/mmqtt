@@ -16,7 +16,7 @@
 package org.monkey.mmq.service;
 
 import org.monkey.mmq.core.exception.MmqException;
-import org.monkey.mmq.metadata.system.SystemInfoMateData;
+import org.monkey.mmq.core.actor.metadata.system.SystemInfoMateData;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;

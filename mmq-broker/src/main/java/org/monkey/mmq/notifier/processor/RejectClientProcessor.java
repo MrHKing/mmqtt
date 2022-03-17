@@ -17,12 +17,8 @@ package org.monkey.mmq.notifier.processor;
 
 import com.alipay.remoting.BizContext;
 import com.alipay.remoting.rpc.protocol.SyncUserProcessor;
-import com.alipay.sofa.jraft.rpc.RpcContext;
-import com.alipay.sofa.jraft.rpc.RpcProcessor;
-import org.monkey.mmq.core.cluster.Member;
-import org.monkey.mmq.core.entity.InternalMessage;
 import org.monkey.mmq.core.entity.RejectClient;
-import org.monkey.mmq.metadata.message.SessionMateData;
+import org.monkey.mmq.core.actor.metadata.message.SessionMateData;
 import org.monkey.mmq.service.SessionStoreService;
 
 /**

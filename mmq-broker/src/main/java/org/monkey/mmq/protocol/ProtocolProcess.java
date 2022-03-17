@@ -16,6 +16,7 @@
 
 package org.monkey.mmq.protocol;
 
+import akka.actor.ActorSystem;
 import org.monkey.mmq.auth.service.IAuthService;
 import org.monkey.mmq.core.cluster.Member;
 import org.monkey.mmq.core.cluster.ServerMemberManager;
@@ -56,6 +57,9 @@ public class ProtocolProcess {
 
 	@Autowired
 	private DupPubRelMessageStoreService dupPubRelMessageStoreService;
+
+	@Autowired
+	private ActorSystem actorSystem;
 
 	public final ServerMemberManager memberManager;
 
@@ -170,7 +174,7 @@ public class ProtocolProcess {
 
 	public Publish publish() {
 		if (publish == null) {
-			publish = new Publish(sessionStoreService, subscribeStoreService, messageStoreService, dupPublishMessageStoreService, memberManager.getSelf());
+			publish = new Publish(sessionStoreService, subscribeStoreService, messageStoreService, dupPublishMessageStoreService, memberManager.getSelf(), actorSystem);
 		}
 		return publish;
 	}

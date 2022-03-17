@@ -15,6 +15,7 @@
  */
 package org.monkey.mmq.config.matedata;
 
+import org.monkey.mmq.config.matedata.ResourcesMateData;
 import org.monkey.mmq.core.consistency.matedata.Record;
 
 import java.io.Serializable;

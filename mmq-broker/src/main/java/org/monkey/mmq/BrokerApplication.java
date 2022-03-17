@@ -17,14 +17,11 @@
 package org.monkey.mmq;
 
 
-import org.monkey.mmq.core.env.Constants;
-import org.monkey.mmq.core.env.EnvUtil;
-import org.monkey.mmq.metadata.UtilsAndCommons;
+import akka.actor.ActorSystem;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
@@ -37,7 +34,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class BrokerApplication {
 
 	public static void main(String[] args) {
-
 		SpringApplication.run(BrokerApplication.class, args);
 	}
+
+
 }

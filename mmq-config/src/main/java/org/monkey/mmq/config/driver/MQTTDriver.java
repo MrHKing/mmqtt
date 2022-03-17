@@ -1,23 +1,16 @@
 package org.monkey.mmq.config.driver;
 
-import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.fastjson.JSON;
-import io.netty.handler.codec.mqtt.MqttQoS;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.monkey.mmq.config.matedata.ResourcesMateData;
 import org.monkey.mmq.core.exception.MmqException;
-import org.monkey.mmq.core.notify.NotifyCenter;
 import org.monkey.mmq.core.utils.StringUtils;
 import org.springframework.stereotype.Component;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static org.monkey.mmq.core.common.Constants.RULE_ENGINE;
 
 /**
  * @ClassNameMQTTDriver

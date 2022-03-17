@@ -13,34 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.monkey.mmq.notifier;
+package org.monkey.mmq.config.matedata;
 
-import org.monkey.mmq.config.matedata.RuleEngineMateData;
+import org.monkey.mmq.core.actor.ActorMsg;
+import org.monkey.mmq.core.actor.MsgType;
 import org.monkey.mmq.core.entity.InternalMessage;
-import org.monkey.mmq.core.notify.Event;
 
 /**
  * @author solley
  */
-public class RuleEngineEvent extends Event {
+public class UpdateRuleEngineMessage implements ActorMsg {
 
-    InternalMessage message;
 
-    String username;
+    RuleEngineMateData ruleEngineMateData;
 
-    public String getUsername() {
-        return username;
+    public RuleEngineMateData getRuleEngineMateData() {
+        return ruleEngineMateData;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setRuleEngineMateData(RuleEngineMateData ruleEngineMateData) {
+        this.ruleEngineMateData = ruleEngineMateData;
     }
 
-    public InternalMessage getMessage() {
-        return message;
-    }
-
-    public void setMessage(InternalMessage message) {
-        this.message = message;
+    @Override
+    public MsgType getMsgType() {
+        return MsgType.UPDATE_RULE_ENGINE;
     }
 }

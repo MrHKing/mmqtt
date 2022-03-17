@@ -15,20 +15,23 @@
  */
 package org.monkey.mmq.config.service;
 
+import akka.actor.*;
+import org.monkey.mmq.config.actor.RuleEngineActor;
 import org.monkey.mmq.config.config.Loggers;
 import org.monkey.mmq.config.matedata.KeyBuilder;
 import org.monkey.mmq.config.matedata.RuleEngineMateData;
+import org.monkey.mmq.config.matedata.UpdateRuleEngineMessage;
 import org.monkey.mmq.config.matedata.UtilsAndCommons;
 import org.monkey.mmq.core.consistency.matedata.RecordListener;
 import org.monkey.mmq.core.consistency.persistent.ConsistencyService;
 import org.monkey.mmq.core.exception.MmqException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * RuleEngine Service
@@ -39,6 +42,11 @@ import java.util.Map;
 public class RuleEngineService implements RecordListener<RuleEngineMateData> {
 
     Map<String, RuleEngineMateData> ruleEngineMateDataMap = new HashMap<>();
+
+    Map<String, ActorRef> actorRefMap = new HashMap<>();
+
+    @Resource
+    ActorSystem actorSystem;
 
     @Resource(name = "configPersistentConsistencyServiceDelegate")
     private ConsistencyService consistencyService;
@@ -92,10 +100,23 @@ public class RuleEngineService implements RecordListener<RuleEngineMateData> {
     @Override
     public void onChange(String key, RuleEngineMateData value) throws Exception {
         ruleEngineMateDataMap.put(key, value);
+        if (actorRefMap.get(value.getRuleId()) == null) {
+            ActorRef actorRef = actorSystem.actorOf((Props.create(RuleEngineActor.class, value, actorSystem)), "rule" + value.getRuleId());
+            actorRefMap.put(value.getRuleId(), actorRef);
+        } else {
+            UpdateRuleEngineMessage updateRuleEngineMessage = new UpdateRuleEngineMessage();
+            updateRuleEngineMessage.setRuleEngineMateData(value);
+            actorRefMap.get(value.getRuleId()).tell(updateRuleEngineMessage, ActorRef.noSender());
+        }
     }
 
     @Override
     public void onDelete(String key) throws Exception {
+        RuleEngineMateData ruleEngineMateData = ruleEngineMateDataMap.get(key);
+        if (actorRefMap.get(ruleEngineMateData.getRuleId()) != null) {
+            actorSystem.stop(actorRefMap.get(ruleEngineMateData.getRuleId()));
+            actorRefMap.remove(ruleEngineMateData.getRuleId());
+        }
         ruleEngineMateDataMap.remove(key);
     }
 }

@@ -17,10 +17,10 @@ package org.monkey.mmq.service;
 
 import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.exception.MmqException;
-import org.monkey.mmq.metadata.KeyBuilder;
+import org.monkey.mmq.config.KeyBuilder;
 import org.monkey.mmq.core.consistency.matedata.RecordListener;
-import org.monkey.mmq.metadata.UtilsAndCommons;
-import org.monkey.mmq.metadata.message.RetainMessageMateData;
+import org.monkey.mmq.config.UtilsAndCommons;
+import org.monkey.mmq.core.actor.metadata.message.RetainMessageMateData;
 import org.monkey.mmq.core.consistency.persistent.ConsistencyService;
 import org.springframework.stereotype.Service;
 

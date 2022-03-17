@@ -15,15 +15,8 @@
  */
 package org.monkey.mmq.config.modules;
 
-import org.monkey.mmq.config.driver.ResourceDriver;
 import org.monkey.mmq.config.matedata.ModelEnum;
-import org.monkey.mmq.config.matedata.ResourceEnum;
 import org.monkey.mmq.core.utils.ApplicationUtils;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * @author solley

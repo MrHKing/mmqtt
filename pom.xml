@@ -116,6 +116,7 @@
         <tomcat-embed-jasper.version>9.0.40</tomcat-embed-jasper.version>
         <taos.version>2.0.18</taos.version>
         <javatuples.version>1.2</javatuples.version>
+        <akka-actor.version>2.6.0-M5</akka-actor.version>
     </properties>
     <!-- == -->
     <!-- =========================================================Build plugins================================================ -->
@@ -655,6 +656,12 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid</artifactId>
                 <version>${druid-version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.typesafe.akka</groupId>
+                <artifactId>akka-actor_2.12</artifactId>
+                <version>${akka-actor.version}</version>
             </dependency>
 
             <!-- JRaft -->

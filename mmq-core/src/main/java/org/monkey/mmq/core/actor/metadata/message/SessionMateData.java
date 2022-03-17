@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.monkey.mmq.metadata.message;
+package org.monkey.mmq.core.actor.metadata.message;
 
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.MqttPublishMessage;

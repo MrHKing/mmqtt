@@ -15,17 +15,11 @@
  */
 package org.monkey.mmq.web.controller;
 
-import org.monkey.mmq.config.matedata.ModelMateData;
-import org.monkey.mmq.config.matedata.ResourcesMateData;
+import org.monkey.mmq.config.modules.ModelMateData;
 import org.monkey.mmq.config.service.ModulesService;
-import org.monkey.mmq.config.service.ResourcesService;
 import org.monkey.mmq.core.consistency.model.RestResultUtils;
-import org.monkey.mmq.core.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * @author solley

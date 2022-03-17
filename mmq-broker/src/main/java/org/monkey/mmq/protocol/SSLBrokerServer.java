@@ -17,6 +17,7 @@
 package org.monkey.mmq.protocol;
 
 
+import akka.actor.ActorSystem;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.epoll.EpollEventLoopGroup;
@@ -62,6 +63,9 @@ public class SSLBrokerServer {
 	 * 唯一主键
 	 */
 	public static final String id = UUID.randomUUID().toString();
+
+	@Autowired
+	private ActorSystem actorSystem;
 
 	@Autowired
 	private BrokerProperties brokerProperties;
@@ -136,7 +140,7 @@ public class SSLBrokerServer {
 
 					channelPipeline.addLast("decoder", new MqttDecoder(Integer.MAX_VALUE));
 					channelPipeline.addLast("encoder", MqttEncoder.INSTANCE);
-					channelPipeline.addLast("broker", new BrokerHandler(protocolProcess));
+					channelPipeline.addLast("broker", new BrokerHandler(protocolProcess, actorSystem));
 				}
 			})
 			.option(ChannelOption.SO_BACKLOG,512)
@@ -182,7 +186,7 @@ public class SSLBrokerServer {
 					channelPipeline.addLast("mqttWebSocket", new MqttWebSocketCodec());
 					channelPipeline.addLast("decoder", new MqttDecoder(Integer.MAX_VALUE));
 					channelPipeline.addLast("encoder", MqttEncoder.INSTANCE);
-					channelPipeline.addLast("broker", new BrokerHandler(protocolProcess));
+					channelPipeline.addLast("broker", new BrokerHandler(protocolProcess, actorSystem));
 				}
 			})
 			.option(ChannelOption.SO_BACKLOG, 512)

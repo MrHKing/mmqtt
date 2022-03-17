@@ -13,22 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.monkey.mmq.notifier;
+package org.monkey.mmq.core.actor.message;
 
-import org.monkey.mmq.core.entity.InternalMessage;
+import org.monkey.mmq.core.actor.ActorMsg;
+import org.monkey.mmq.core.actor.MsgType;
 import org.monkey.mmq.core.entity.RejectClient;
-import org.monkey.mmq.core.notify.Event;
 
 /**
  * 发布事件
  *
  * @author solley
  */
-public class PublishEvent extends Event {
-
-    public PublicEventType publicEventType;
-
-    public InternalMessage message;
+public class RejectMessage implements ActorMsg {
 
     public RejectClient rejectClient;
 
@@ -52,22 +48,6 @@ public class PublishEvent extends Event {
         this.nodePort = nodePort;
     }
 
-    public InternalMessage getInternalMessage() {
-        return message;
-    }
-
-    public void setInternalMessage(InternalMessage message) {
-        this.message = message;
-    }
-
-    public PublicEventType getPublicEventType() {
-        return publicEventType;
-    }
-
-    public void setPublicEventType(PublicEventType publicEventType) {
-        this.publicEventType = publicEventType;
-    }
-
     public RejectClient getRejectClient() {
         return rejectClient;
     }
@@ -76,4 +56,8 @@ public class PublishEvent extends Event {
         this.rejectClient = rejectClient;
     }
 
+    @Override
+    public MsgType getMsgType() {
+        return MsgType.REJECT_CLIENT;
+    }
 }

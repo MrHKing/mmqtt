@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.monkey.mmq.metadata.message;
+package org.monkey.mmq.core.actor.metadata.message;
 
 import org.monkey.mmq.core.consistency.matedata.Record;
 
@@ -33,7 +33,7 @@ public class ClientMateData implements Record, Serializable {
 
     private String user;
 
-    private Date connectTiem;
+    private Date connectTime;
 
     private String address;
 
@@ -49,7 +49,7 @@ public class ClientMateData implements Record, Serializable {
         this.clientId = clientId;
         this.user = user;
         this.address = address;
-        this.connectTiem = new Date();
+        this.connectTime = new Date();
         this.nodeIp = nodeId;
         this.nodePort = nodePort;
     }
@@ -82,12 +82,12 @@ public class ClientMateData implements Record, Serializable {
         this.address = address;
     }
 
-    public Date getConnectTiem() {
-        return connectTiem;
+    public Date getConnectTime() {
+        return connectTime;
     }
 
-    public void setConnectTiem(Date connectTiem) {
-        this.connectTiem = connectTiem;
+    public void setConnectTime(Date connectTime) {
+        this.connectTime = connectTime;
     }
 
     public String getNodeIp() {

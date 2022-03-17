@@ -1,12 +1,9 @@
 package org.monkey.mmq.config.modules.api;
 
 import org.monkey.mmq.config.matedata.ModelEnum;
-import org.monkey.mmq.config.matedata.ModelMateData;
+import org.monkey.mmq.config.modules.ModelMateData;
 import org.monkey.mmq.config.modules.BaseModule;
-import org.monkey.mmq.config.modules.IModule;
-import org.monkey.mmq.config.modules.auth.AuthParam;
 import org.monkey.mmq.core.exception.MmqException;
-import org.monkey.mmq.core.utils.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;

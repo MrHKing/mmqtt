@@ -25,24 +25,17 @@ import io.netty.util.AttributeKey;
 import io.netty.util.CharsetUtil;
 import org.monkey.mmq.auth.service.IAuthService;
 import org.monkey.mmq.config.Loggers;
-import org.monkey.mmq.core.exception.KvStorageException;
 import org.monkey.mmq.core.exception.MmqException;
-import org.monkey.mmq.core.notify.NotifyCenter;
-import org.monkey.mmq.core.utils.LoggerUtils;
 import org.monkey.mmq.core.utils.StringUtils;
-import org.monkey.mmq.metadata.message.DupPubRelMessageMateData;
-import org.monkey.mmq.metadata.message.DupPublishMessageMateData;
-import org.monkey.mmq.metadata.message.SessionMateData;
-import org.monkey.mmq.notifier.SysMessageEvent;
+import org.monkey.mmq.core.actor.metadata.message.DupPubRelMessageMateData;
+import org.monkey.mmq.core.actor.metadata.message.DupPublishMessageMateData;
+import org.monkey.mmq.core.actor.metadata.message.SessionMateData;
 import org.monkey.mmq.service.DupPubRelMessageStoreService;
 import org.monkey.mmq.service.DupPublishMessageStoreService;
 import org.monkey.mmq.service.SessionStoreService;
 import org.monkey.mmq.service.SubscribeStoreService;
 
 import java.util.List;
-
-import static org.monkey.mmq.core.common.Constants.MODULES;
-import static org.monkey.mmq.core.common.Constants.RULE_ENGINE;
 
 /**
  * CONNECT连接处理

@@ -17,7 +17,7 @@
 package org.monkey.mmq.persistent;
 
 
-import org.monkey.mmq.metadata.KeyBuilder;
+import org.monkey.mmq.config.KeyBuilder;
 import org.monkey.mmq.core.common.Constants;
 import org.monkey.mmq.core.consistency.persistent.BasePersistentServiceProcessor;
 import org.monkey.mmq.core.consistency.persistent.PersistentConsistencyService;
@@ -29,10 +29,10 @@ import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.core.consistency.matedata.Datum;
 import org.monkey.mmq.core.consistency.matedata.Record;
 import org.monkey.mmq.core.consistency.matedata.RecordListener;
-import org.monkey.mmq.metadata.UtilsAndCommons;
-import org.monkey.mmq.metadata.message.*;
-import org.monkey.mmq.metadata.subscribe.SubscribeMateData;
-import org.monkey.mmq.metadata.system.SystemInfoMateData;
+import org.monkey.mmq.config.UtilsAndCommons;
+import org.monkey.mmq.core.actor.metadata.message.*;
+import org.monkey.mmq.core.actor.metadata.subscribe.SubscribeMateData;
+import org.monkey.mmq.core.actor.metadata.system.SystemInfoMateData;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Paths;

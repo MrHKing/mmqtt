@@ -17,6 +17,7 @@
 package org.monkey.mmq.protocol;
 
 
+import akka.actor.ActorSystem;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.epoll.EpollEventLoopGroup;
@@ -69,6 +70,9 @@ public class BrokerServer {
 	@Autowired
 	private ProtocolProcess protocolProcess;
 
+	@Autowired
+	private ActorSystem actorSystem;
+
 	private EventLoopGroup bossGroup;
 
 	private EventLoopGroup workerGroup;
@@ -116,7 +120,7 @@ public class BrokerServer {
 					channelPipeline.addFirst("idle", new IdleStateHandler(0, 0, brokerProperties.getKeepAlive()));
 					channelPipeline.addLast("decoder", new MqttDecoder(Integer.MAX_VALUE));
 					channelPipeline.addLast("encoder", MqttEncoder.INSTANCE);
-					channelPipeline.addLast("broker", new BrokerHandler(protocolProcess));
+					channelPipeline.addLast("broker", new BrokerHandler(protocolProcess, actorSystem));
 				}
 			})
 			.option(ChannelOption.SO_BACKLOG,512)
@@ -150,7 +154,7 @@ public class BrokerServer {
 					channelPipeline.addLast("mqttWebSocket", new MqttWebSocketCodec());
 					channelPipeline.addLast("decoder", new MqttDecoder(Integer.MAX_VALUE));
 					channelPipeline.addLast("encoder", MqttEncoder.INSTANCE);
-					channelPipeline.addLast("broker", new BrokerHandler(protocolProcess));
+					channelPipeline.addLast("broker", new BrokerHandler(protocolProcess, actorSystem));
 				}
 			})
 			.option(ChannelOption.SO_BACKLOG, 512)

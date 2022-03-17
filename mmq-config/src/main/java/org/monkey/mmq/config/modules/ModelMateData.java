@@ -1,5 +1,6 @@
-package org.monkey.mmq.config.matedata;
+package org.monkey.mmq.config.modules;
 
+import org.monkey.mmq.config.matedata.ModelEnum;
 import org.monkey.mmq.core.consistency.matedata.Record;
 
 import java.io.Serializable;

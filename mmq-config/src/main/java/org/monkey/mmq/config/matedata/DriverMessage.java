@@ -1,7 +1,8 @@
-package org.monkey.mmq.notifier;
+package org.monkey.mmq.config.matedata;
 
-import org.monkey.mmq.config.matedata.ResourcesMateData;
-import org.monkey.mmq.core.notify.Event;
+import org.monkey.mmq.core.actor.ActorMsg;
+import org.monkey.mmq.core.actor.MsgType;
+
 
 import java.util.Map;
 
@@ -12,20 +13,20 @@ import java.util.Map;
  * @Date2021/12/16 15:13
  * @Version V1.0
  **/
-public class DriverEvent extends Event {
+public class DriverMessage implements ActorMsg {
 
-    public RuleEngineEvent ruleEngineEvent;
+    public RuleEngineMessage ruleEngineMessage;
 
     public ResourcesMateData resourcesMateData;
 
     Map property;
 
-    public RuleEngineEvent getRuleEngineEvent() {
-        return ruleEngineEvent;
+    public RuleEngineMessage getRuleEngineMessage() {
+        return ruleEngineMessage;
     }
 
-    public void setRuleEngineEvent(RuleEngineEvent ruleEngineEvent) {
-        this.ruleEngineEvent = ruleEngineEvent;
+    public void setRuleEngineMessage(RuleEngineMessage ruleEngineMessage) {
+        this.ruleEngineMessage = ruleEngineMessage;
     }
 
     public ResourcesMateData getResourcesMateData() {
@@ -44,4 +45,8 @@ public class DriverEvent extends Event {
         this.property = property;
     }
 
+    @Override
+    public MsgType getMsgType() {
+        return MsgType.DRIVER_BRIDGE;
+    }
 }

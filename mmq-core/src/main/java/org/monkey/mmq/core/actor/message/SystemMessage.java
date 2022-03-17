@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.monkey.mmq.notifier;
+package org.monkey.mmq.core.actor.message;
 
 import io.netty.handler.codec.mqtt.MqttQoS;
-import org.monkey.mmq.core.notify.Event;
+import org.monkey.mmq.core.actor.ActorMsg;
+import org.monkey.mmq.core.actor.MsgType;
 
 /**
  * @author solley
  */
-public class SysMessageEvent extends Event {
+public class SystemMessage implements ActorMsg {
     private String topic;
     private String payload;
     private MqttQoS mqttQoS;
@@ -50,4 +51,8 @@ public class SysMessageEvent extends Event {
         this.payload = payload;
     }
 
+    @Override
+    public MsgType getMsgType() {
+        return MsgType.SYSTEM_INFO;
+    }
 }

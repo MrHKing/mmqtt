@@ -18,6 +18,9 @@ package org.monkey.mmq.config.persistent;
 
 
 import org.monkey.mmq.config.matedata.*;
+import org.monkey.mmq.config.modules.ModelMateData;
+import org.monkey.mmq.config.matedata.ResourcesMateData;
+import org.monkey.mmq.config.matedata.RuleEngineMateData;
 import org.monkey.mmq.core.consistency.matedata.Datum;
 import org.monkey.mmq.core.consistency.matedata.Record;
 import org.monkey.mmq.core.consistency.matedata.RecordListener;

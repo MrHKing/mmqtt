@@ -1,6 +1,5 @@
 package org.monkey.mmq.config.modules;
 
-import org.monkey.mmq.config.matedata.ModelMateData;
 import org.monkey.mmq.core.utils.StringUtils;
 
 /**

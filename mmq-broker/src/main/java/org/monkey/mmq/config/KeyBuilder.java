@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package org.monkey.mmq.metadata;
-
-import org.apache.commons.lang3.StringUtils;
+package org.monkey.mmq.config;
 
 /**
  * Key operations for data.

@@ -16,6 +16,9 @@
 
 package org.monkey.mmq.protocol;
 
+import akka.actor.ActorRef;
+import akka.actor.ActorSelection;
+import akka.actor.ActorSystem;
 import com.google.protobuf.ByteString;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -25,19 +28,16 @@ import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.cluster.Member;
 import org.monkey.mmq.core.entity.InternalMessage;
 import org.monkey.mmq.core.exception.MmqException;
-import org.monkey.mmq.core.notify.NotifyCenter;
 import org.monkey.mmq.core.utils.LoggerUtils;
-import org.monkey.mmq.metadata.message.DupPublishMessageMateData;
-import org.monkey.mmq.metadata.message.RetainMessageMateData;
-import org.monkey.mmq.metadata.message.SessionMateData;
-import org.monkey.mmq.metadata.subscribe.SubscribeMateData;
-import org.monkey.mmq.notifier.PublicEventType;
-import org.monkey.mmq.notifier.PublishEvent;
-import org.monkey.mmq.notifier.RuleEngineEvent;
+import org.monkey.mmq.core.actor.metadata.message.DupPublishMessageMateData;
+import org.monkey.mmq.core.actor.metadata.message.RetainMessageMateData;
+import org.monkey.mmq.core.actor.metadata.message.SessionMateData;
+import org.monkey.mmq.core.actor.metadata.subscribe.SubscribeMateData;
+import org.monkey.mmq.core.actor.message.PublishMessage;
+import org.monkey.mmq.config.matedata.RuleEngineMessage;
 import org.monkey.mmq.service.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * PUBLISH连接处理
@@ -53,23 +53,29 @@ public class Publish {
 
 	private DupPublishMessageStoreService dupPublishMessageStoreService;
 
+	private ActorSystem actorSystem;
+
 	private final Member local;
 
 	public Publish(SessionStoreService sessionStoreService, SubscribeStoreService subscribeStoreService,
 				   RetainMessageStoreService retainMessageStoreService,
-				   DupPublishMessageStoreService dupPublishMessageStoreService, Member local) {
+				   DupPublishMessageStoreService dupPublishMessageStoreService,
+				   Member local,
+				   ActorSystem actorSystem) {
 		this.sessionStoreService = sessionStoreService;
 		this.subscribeStoreService = subscribeStoreService;
 		this.retainMessageStoreService = retainMessageStoreService;
 		this.dupPublishMessageStoreService = dupPublishMessageStoreService;
 		this.local = local;
+		this.actorSystem = actorSystem;
 	}
 
 	public void processPublish(Channel channel, MqttPublishMessage msg) throws MmqException {
 
 		byte[] messageBytes = new byte[msg.payload().readableBytes()];
+		String clientId = (String) channel.attr(AttributeKey.valueOf("clientId")).get();
 		msg.payload().getBytes(msg.payload().readerIndex(), messageBytes);
-		this.sendPublishMessage(msg.variableHeader().topicName(), msg.fixedHeader().qosLevel(), messageBytes, false, false, msg.variableHeader().packetId(), channel);
+		this.sendPublishMessage(clientId, msg.variableHeader().topicName(), msg.fixedHeader().qosLevel(), messageBytes, false, false, msg.variableHeader().packetId(), channel);
 		if (MqttQoS.AT_LEAST_ONCE == msg.fixedHeader().qosLevel()) {
 			sendPubAckMessage(channel, msg.variableHeader().packetId());
 		} else if (MqttQoS.EXACTLY_ONCE == msg.fixedHeader().qosLevel()) {
@@ -77,18 +83,18 @@ public class Publish {
 		}
 
 		// 规则引擎
-		String clientId = (String) channel.attr(AttributeKey.valueOf("clientId")).get();
 		SessionMateData sessionStore = sessionStoreService.get(clientId);
 		if (sessionStore == null) return;
 
-		RuleEngineEvent ruleEngineEvent = new RuleEngineEvent();
-		ruleEngineEvent.setUsername(sessionStore.getUser());
-		ruleEngineEvent.setMessage(InternalMessage.newBuilder()
+		RuleEngineMessage ruleEngineMessage = new RuleEngineMessage();
+		ruleEngineMessage.setUsername(sessionStore.getUser());
+		ruleEngineMessage.setMessage(InternalMessage.newBuilder()
 				.setTopic(msg.variableHeader().topicName())
 				.setMqttQoS(msg.fixedHeader().qosLevel().value())
 				.setMessageBytes(ByteString.copyFrom(messageBytes))
 				.setDup(false).setRetain(false).setMessageId(msg.variableHeader().packetId()).build());
-		NotifyCenter.publishEvent(ruleEngineEvent);
+		ActorSelection actorSelection = actorSystem.actorSelection("/user/rule*");
+		actorSelection.tell(ruleEngineMessage, ActorRef.noSender());
 		
 		// retain=1, 保留消息
 		if (msg.fixedHeader().isRetain()) {
@@ -102,7 +108,7 @@ public class Publish {
 		}
 	}
 
-	private void sendPublishMessage(String topic, MqttQoS mqttQoS, byte[] messageBytes, boolean retain, boolean dup, int packetId, Channel channel) {
+	private void sendPublishMessage(String clientId, String topic, MqttQoS mqttQoS, byte[] messageBytes, boolean retain, boolean dup, int packetId, Channel channel) {
 		List<SubscribeMateData> subscribeStores = subscribeStoreService.search(topic);
 
 		subscribeStores.forEach(subscribeStore -> {
@@ -140,17 +146,17 @@ public class Publish {
 						sessionStore.getChannel().writeAndFlush(publishMessage);
 					}
 				} else {
-					PublishEvent publishEvent = new PublishEvent();
-					publishEvent.setPublicEventType(PublicEventType.PUBLISH_MESSAGE);
-					publishEvent.setNodeIp(subscribeStore.getNodeIp());
-					publishEvent.setNodePort(subscribeStore.getNodePort());
-					publishEvent.setInternalMessage(InternalMessage.newBuilder()
+					PublishMessage publishMessage = new PublishMessage();
+					publishMessage.setNodeIp(subscribeStore.getNodeIp());
+					publishMessage.setNodePort(subscribeStore.getNodePort());
+					publishMessage.setInternalMessage(InternalMessage.newBuilder()
 							.setTopic(topic)
 							.setMqttQoS(respQoS.value())
 							.setClientId(subscribeStore.getClientId())
 							.setMessageBytes(ByteString.copyFrom(messageBytes))
 							.setDup(false).setRetain(false).setMessageId(packetId).build());
-					NotifyCenter.publishEvent(publishEvent);
+					ActorSelection actorSelection = actorSystem.actorSelection("/user/" + clientId);
+					actorSelection.tell(publishMessage, ActorRef.noSender());
 				}
 		});
 	}

@@ -16,26 +16,16 @@
 
 package org.monkey.mmq.service;
 
-import org.monkey.mmq.config.Loggers;
-import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.core.utils.StringUtils;
-import org.monkey.mmq.metadata.KeyBuilder;
-import org.monkey.mmq.core.consistency.matedata.RecordListener;
-import org.monkey.mmq.metadata.UtilsAndCommons;
-import org.monkey.mmq.metadata.message.DupPubRelMessageMateData;
-import org.monkey.mmq.core.consistency.persistent.ConsistencyService;
-import org.monkey.mmq.metadata.message.DupPublishMessageMateData;
+import org.monkey.mmq.core.actor.metadata.message.DupPubRelMessageMateData;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 /**
  * PubRel指令

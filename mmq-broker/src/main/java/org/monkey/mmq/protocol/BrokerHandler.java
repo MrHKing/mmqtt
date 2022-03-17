@@ -16,30 +16,23 @@
 
 package org.monkey.mmq.protocol;
 
-import cn.hutool.core.thread.NamedThreadFactory;
-import io.netty.buffer.ByteBuf;
+import akka.actor.ActorRef;
+import akka.actor.ActorSelection;
+import akka.actor.ActorSystem;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
-import io.netty.handler.codec.http.websocketx.ContinuationWebSocketFrame;
-import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.handler.codec.mqtt.*;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
-import javafx.util.Pair;
 import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.exception.MmqException;
-import org.monkey.mmq.core.notify.NotifyCenter;
-import org.monkey.mmq.metadata.message.SessionMateData;
-import org.monkey.mmq.notifier.SysMessageEvent;
+import org.monkey.mmq.core.actor.metadata.message.SessionMateData;
+import org.monkey.mmq.core.actor.message.SystemMessage;
 
 import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.*;
 
 import static org.monkey.mmq.core.common.Constants.MODULES;
 
@@ -51,8 +44,11 @@ public class BrokerHandler extends ChannelInboundHandlerAdapter {
 
 	private ProtocolProcess protocolProcess;
 
-	public BrokerHandler(ProtocolProcess protocolProcess) {
+	private ActorSystem actorSystem;
+
+	public BrokerHandler(ProtocolProcess protocolProcess, ActorSystem actorSystem) {
 		this.protocolProcess = protocolProcess;
+		this.actorSystem = actorSystem;
 	}
 
 	@Override
@@ -101,11 +97,12 @@ public class BrokerHandler extends ChannelInboundHandlerAdapter {
 							protocolProcess.connect().processConnect(ctx.channel(), (MqttConnectMessage) msg);
 						} catch (MmqException e) {
 							Loggers.BROKER_SERVER.error(e.getErrMsg());
-							SysMessageEvent sysMessageEvent = new SysMessageEvent();
-							sysMessageEvent.setTopic(MODULES);
-							sysMessageEvent.setPayload(e.getMessage());
-							sysMessageEvent.setMqttQoS(MqttQoS.AT_LEAST_ONCE);
-							NotifyCenter.publishEvent(sysMessageEvent);
+							SystemMessage systemMessage = new SystemMessage();
+							systemMessage.setTopic(MODULES);
+							systemMessage.setPayload(e.getMessage());
+							systemMessage.setMqttQoS(MqttQoS.AT_LEAST_ONCE);
+							ActorSelection actorRef = actorSystem.actorSelection("/user/" + ((MqttConnectMessage) msg).payload().clientIdentifier());
+							actorRef.tell(systemMessage, ActorRef.noSender());
 							//此处对断网进行了处理
 							ctx.channel().close();
 						}

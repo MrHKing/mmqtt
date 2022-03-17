@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.monkey.mmq.metadata.system;
+package org.monkey.mmq.core.actor.metadata.system;
 
 import org.monkey.mmq.core.consistency.matedata.Record;
 

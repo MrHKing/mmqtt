@@ -11,7 +11,7 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-public class RuleEngineManagerTest {
+public class RuleEngineActorTest {
     @Test
     public void testSpelExpressionParser() {
         String phoneNo = "13812341234";

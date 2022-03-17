@@ -25,8 +25,8 @@ import io.netty.util.AttributeKey;
 import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.core.utils.LoggerUtils;
-import org.monkey.mmq.metadata.message.RetainMessageMateData;
-import org.monkey.mmq.metadata.subscribe.SubscribeMateData;
+import org.monkey.mmq.core.actor.metadata.message.RetainMessageMateData;
+import org.monkey.mmq.core.actor.metadata.subscribe.SubscribeMateData;
 import org.monkey.mmq.service.RetainMessageStoreService;
 import org.monkey.mmq.service.SubscribeStoreService;
 

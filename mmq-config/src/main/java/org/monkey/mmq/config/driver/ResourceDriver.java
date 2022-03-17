@@ -3,7 +3,6 @@ package org.monkey.mmq.config.driver;
 import org.monkey.mmq.config.matedata.ResourcesMateData;
 import org.monkey.mmq.core.exception.MmqException;
 
-import java.sql.SQLException;
 import java.util.Map;
 
 public interface ResourceDriver<T> {

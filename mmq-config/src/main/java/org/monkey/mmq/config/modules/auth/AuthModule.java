@@ -2,10 +2,9 @@ package org.monkey.mmq.config.modules.auth;
 
 import org.monkey.mmq.config.driver.DriverFactory;
 import org.monkey.mmq.config.matedata.ModelEnum;
-import org.monkey.mmq.config.matedata.ModelMateData;
+import org.monkey.mmq.config.modules.ModelMateData;
 import org.monkey.mmq.config.matedata.ResourceEnum;
 import org.monkey.mmq.config.modules.BaseModule;
-import org.monkey.mmq.config.modules.IModule;
 import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.core.utils.StringUtils;
 import org.springframework.stereotype.Component;

@@ -19,11 +19,11 @@ import cn.hutool.core.util.StrUtil;
 import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.cluster.ServerMemberManager;
 import org.monkey.mmq.core.exception.MmqException;
-import org.monkey.mmq.metadata.KeyBuilder;
+import org.monkey.mmq.config.KeyBuilder;
 import org.monkey.mmq.core.consistency.matedata.RecordListener;
-import org.monkey.mmq.metadata.UtilsAndCommons;
-import org.monkey.mmq.metadata.subscribe.SubscribeMateData;
-import org.monkey.mmq.metadata.system.SystemInfoMateData;
+import org.monkey.mmq.config.UtilsAndCommons;
+import org.monkey.mmq.core.actor.metadata.subscribe.SubscribeMateData;
+import org.monkey.mmq.core.actor.metadata.system.SystemInfoMateData;
 import org.monkey.mmq.core.consistency.persistent.ConsistencyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -34,7 +34,6 @@ import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 /**
  * 订阅一致性存储

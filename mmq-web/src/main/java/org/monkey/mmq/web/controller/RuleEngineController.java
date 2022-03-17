@@ -15,19 +15,14 @@
  */
 package org.monkey.mmq.web.controller;
 
-import org.monkey.mmq.config.matedata.ResourcesMateData;
 import org.monkey.mmq.config.matedata.RuleEngineMateData;
-import org.monkey.mmq.config.service.ResourcesService;
 import org.monkey.mmq.config.service.RuleEngineService;
 import org.monkey.mmq.core.consistency.model.ResponsePage;
 import org.monkey.mmq.core.consistency.model.RestResultUtils;
 import org.monkey.mmq.core.utils.StringUtils;
-import org.monkey.mmq.metadata.message.ClientMateData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;

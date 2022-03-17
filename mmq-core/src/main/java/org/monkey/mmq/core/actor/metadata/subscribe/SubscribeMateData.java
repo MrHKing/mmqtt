@@ -2,7 +2,7 @@
  * Copyright (c) 2020, Solley (hkk@yanboo.com.cn) All rights reserved.
  */
 
-package org.monkey.mmq.metadata.subscribe;
+package org.monkey.mmq.core.actor.metadata.subscribe;
 
 import org.monkey.mmq.core.consistency.matedata.Record;
 

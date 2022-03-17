@@ -15,8 +15,6 @@
  */
 package org.monkey.mmq.config.driver;
 
-import com.alibaba.druid.pool.DruidDataSource;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -28,8 +26,6 @@ import org.monkey.mmq.core.utils.JacksonUtils;
 import org.monkey.mmq.core.utils.StringUtils;
 import org.springframework.stereotype.Component;
 
-import java.sql.Connection;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
