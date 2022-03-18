@@ -94,6 +94,10 @@ server.port=8888
 #*************** mqtt broker Configurations ***************#
 mmq.broker.websocketPort=2883
 mmq.broker.port=3883
+mmq.broker.ssl.password=mmq
+mmq.broker.ssl.certPath=cert/mmq.pfx
+mmq.broker.ssl.port=17733
+mmq.broker.ssl.websocketPort=36633
 mmq.broker.default.user=admin
 mmq.broker.default.password=admin@mmq
 mmq.broker.default.anonymous=true
