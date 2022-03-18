@@ -8,9 +8,9 @@
 |   | /  | |  |||   |  ,', |  |,.   ; |:  |     Console: http://${mmq.local.ip}:${server.port}/dashboard/monitor
 '   | :  | :  |,|   | /  | |--' '   .  \  |     MQTT Port: ${mmq.broker.port}
 ;   . |  ; |--' |   : |  | ,     \   `.   |     MQTT WebsocketPort: ${mmq.broker.websocketPort}
-|   : |  | ,    |   : |  |/       `--'""| |     User Home: ${mmq.home}
-|   : '  |/     |   | |`-'          |   | | 
-;   | |`-'      |   ;/              |   | : 
+|   : |  | ,    |   : |  |/       `--'""| |     MQTT SSL Port: ${mmq.broker.ssl.port}
+|   : '  |/     |   | |`-'          |   | |     MQTT SSL WebsocketPort: ${mmq.broker.ssl.websocketPort}
+;   | |`-'      |   ;/              |   | :     User Home: ${mmq.home}
 |   ;/          '---'               `---'.| 
 '---'                                 `---` 
                                             

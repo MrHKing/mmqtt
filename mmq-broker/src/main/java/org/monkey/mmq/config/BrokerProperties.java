@@ -41,20 +41,16 @@ public class BrokerProperties {
 	private static final String MMQ_BROKER_WEBSOCKET_SSL_PROPERTY = "mmq.broker.ssl.websocketPort";
 	private static final String DEFAULT_MMQ_BROKER_SSL_WEBSOCKET = "2663";
 
+	private static final String MMQ_BROKER_SSL_PASSWORD = "mmq.broker.ssl.password";
+	private static final String DEFAULT_MMQ_BROKER_SSL_PASSWORD = "mmq";
+
+	private static final String MMQ_BROKER_SSL_CERT_PATH = "mmq.broker.ssl.certPath";
+	private static final String DEFAULT_MMQ_BROKER_SSL_CERT_PATH  = "cert/mmq.pfx";
+
 	/**
 	 * WebSocket Path值, 默认值 /mqtt
 	 */
 	private String websocketPath = "/mqtt";
-
-	/**
-	 * SSL密钥文件密码
-	 */
-	private String sslPassword = "mmq";
-
-	/**
-	 * SSL是否启用
-	 */
-	private boolean sslEnabled = false;
 
 	/**
 	 * 心跳时间(秒), 默认60秒, 该值可被客户端连接时相应配置覆盖
@@ -97,11 +93,11 @@ public class BrokerProperties {
 	}
 
 	public String getSslPassword() {
-		return sslPassword;
+		return EnvUtil.getProperty(MMQ_BROKER_SSL_PASSWORD, DEFAULT_MMQ_BROKER_SSL_PASSWORD);
 	}
 
-	public boolean getSslEnabled() {
-		return sslEnabled;
+	public String getSslCertPath() {
+		return EnvUtil.getProperty(MMQ_BROKER_SSL_CERT_PATH, DEFAULT_MMQ_BROKER_SSL_CERT_PATH);
 	}
 
 	public int getKeepAlive() {

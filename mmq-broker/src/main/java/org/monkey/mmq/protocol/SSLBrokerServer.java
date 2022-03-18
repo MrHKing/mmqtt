@@ -89,7 +89,7 @@ public class SSLBrokerServer {
 		bossGroup = brokerProperties.isUseEpoll() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
 		workerGroup = brokerProperties.isUseEpoll() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
 		KeyStore keyStore = KeyStore.getInstance("PKCS12");
-		InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("keystore/mmq.pfx");
+		InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(brokerProperties.getSslCertPath());
 		keyStore.load(inputStream, brokerProperties.getSslPassword().toCharArray());
 		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
 		kmf.init(keyStore, brokerProperties.getSslPassword().toCharArray());
@@ -101,7 +101,7 @@ public class SSLBrokerServer {
 
 	@PreDestroy
 	public void stop() {
-		LoggerUtils.printIfInfoEnabled(Loggers.BROKER_PROTOCOL,"Shutdown {} MQTT Broker ...", "[" +id + "]");
+		LoggerUtils.printIfInfoEnabled(Loggers.BROKER_PROTOCOL,"Shutdown {} MQTT SSL Broker ...", "[" +id + "]");
 		bossGroup.shutdownGracefully();
 		bossGroup = null;
 		workerGroup.shutdownGracefully();
@@ -110,7 +110,7 @@ public class SSLBrokerServer {
 		channel = null;
 		websocketChannel.closeFuture().syncUninterruptibly();
 		websocketChannel = null;
-		LoggerUtils.printIfInfoEnabled(Loggers.BROKER_PROTOCOL,"MQTT Broker {} shutdown finish.", "[" + id + "]");
+		LoggerUtils.printIfInfoEnabled(Loggers.BROKER_PROTOCOL,"MQTT SSL Broker {} shutdown finish.", "[" + id + "]");
 	}
 
 	private void mqttServer() throws Exception {
@@ -133,6 +133,9 @@ public class SSLBrokerServer {
 					sslEngine.setNeedClientAuth(false);        // 不需要验证客户端
 					sslEngine.setEnabledCipherSuites(new String[]{
 							"TLS_RSA_WITH_AES_256_CBC_SHA256",
+							"SSL_RSA_WITH_RC4_128_MD5",
+							"SSL_RSA_WITH_RC4_128_SHA",
+							"TLS_RSA_WITH_AES_128_CBC_SHA",
 							"TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
 							"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
 					});
@@ -171,6 +174,9 @@ public class SSLBrokerServer {
 					sslEngine.setNeedClientAuth(false);        // 不需要验证客户端
 					sslEngine.setEnabledCipherSuites(new String[]{
 							"TLS_RSA_WITH_AES_256_CBC_SHA256",
+							"SSL_RSA_WITH_RC4_128_MD5",
+							"SSL_RSA_WITH_RC4_128_SHA",
+							"TLS_RSA_WITH_AES_128_CBC_SHA",
 							"TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
 							"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
 					});
