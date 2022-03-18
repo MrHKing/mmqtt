@@ -117,6 +117,7 @@
         <taos.version>2.0.18</taos.version>
         <javatuples.version>1.2</javatuples.version>
         <akka-actor.version>2.6.0-M5</akka-actor.version>
+        <bouncycastle.version>1.46</bouncycastle.version>
     </properties>
     <!-- == -->
     <!-- =========================================================Build plugins================================================ -->
@@ -397,6 +398,12 @@
                 <groupId>${project.groupId}</groupId>
                 <artifactId>mmq-web</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk16</artifactId>
+                <version>${bouncycastle.version}</version>
             </dependency>
 
             <dependency>

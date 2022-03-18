@@ -1,6 +1,8 @@
 package org.monkey.mmq.config.driver;
 
 import com.alibaba.fastjson.JSON;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.PEMReader;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.monkey.mmq.config.matedata.ResourcesMateData;
@@ -8,6 +10,17 @@ import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.core.utils.StringUtils;
 import org.springframework.stereotype.Component;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManagerFactory;
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.KeyStore;
+import java.security.SecureRandom;
+import java.security.Security;
+import java.security.cert.X509Certificate;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -56,10 +69,19 @@ public class MQTTDriver implements ResourceDriver<MqttClient> {
             options.setConnectionTimeout(connectionTimeout);
             // 设置会话心跳时间 单位为秒 服务器会每隔1.5*20秒的时间向客户端发送个消息判断客户端是否在线，但这个方法并没有重连的机制
             options.setKeepAliveInterval(keepAliveInterval);
+            // 判断是否启用SSL
+            if (resource.get("sslEnable") != null) {
+                boolean sslEnable = Boolean.parseBoolean(resource.get("sslEnable").toString());
+                if (sslEnable) {
+                    options.setSocketFactory(getSocketFactorySingle(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("cert/mmq.cer")),""));
+                }
+            }
             // 连接服务器
             mqttClient.connect(options);
             mqttClientConcurrentHashMap.put(resourceId, mqttClient);
         } catch (MqttException e) {
+            return;
+        } catch (Exception exception) {
             return;
         }
     }
@@ -120,11 +142,18 @@ public class MQTTDriver implements ResourceDriver<MqttClient> {
             options.setConnectionTimeout(1);
             // 设置会话心跳时间 单位为秒 服务器会每隔1.5*20秒的时间向客户端发送个消息判断客户端是否在线，但这个方法并没有重连的机制
             options.setKeepAliveInterval(keepAliveInterval);
+            // 判断是否启用SSL
+            if (resourcesMateData.getResource().get("sslEnable") != null) {
+                boolean sslEnable = Boolean.parseBoolean(resourcesMateData.getResource().get("sslEnable").toString());
+                if (sslEnable) {
+                    options.setSocketFactory(getSocketFactorySingle(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("cert/mmq.cer")),""));
+                }
+            }
             // 连接服务器
             mqttClient.connect(options);
 
             return true;
-        } catch (MqttException e) {
+        } catch (Exception e) {
             return false;
         }
     }
@@ -144,5 +173,28 @@ public class MQTTDriver implements ResourceDriver<MqttClient> {
         } catch (Exception e) {
             throw new MmqException(e.hashCode(), e.getMessage());
         }
+    }
+
+    public static SSLSocketFactory getSocketFactorySingle(final InputStreamReader caCertStr, String protocol) throws Exception {
+        Security.addProvider(new BouncyCastleProvider());
+
+        // load CA certificate
+        PEMReader reader = new PEMReader(caCertStr);
+//        PEMReader reader = new PEMReader(new InputStreamReader(new ByteArrayInputStream(caCertStr.getBytes())));
+        X509Certificate caCert = (X509Certificate)reader.readObject();
+        reader.close();
+        // client key and certificates are sent to server so it can authenticate us
+        KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());//"JKS"
+        ks.load(null, null);
+        ks.setCertificateEntry("ca-certificate", caCert);
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());//"PKIX"
+        tmf.init(ks);
+        // finally, create SSL socket factory
+        if(StringUtils.isBlank(protocol)){
+            protocol= "TLSv1.1";
+        }
+        SSLContext context = SSLContext.getInstance(protocol);//"TLSv1.1"
+        context.init(null, tmf.getTrustManagers(), new SecureRandom());
+        return context.getSocketFactory();
     }
 }

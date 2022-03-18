@@ -204,14 +204,32 @@
                 v-decorator="[
                   'resource.server',
                   {
-                    rules: [{ required: type === 'MQTT_BROKER' ? true : false, message: '请输入MQTT服务' }]
+                    rules: [{ required: type === 'MQTT_BROKER' ? true : false, message: '请输入MQTT服务地址' }]
                   }
                 ]"
-                placeholder="请输入MQTT服务"
+                placeholder="[ssl://ip:port] OR [tcp://ip:port]"
               />
             </a-form-item>
           </a-col>
-          <a-col :span="12"> </a-col>
+          <a-col :span="12">
+            <a-form-item label="SSL启用">
+              <a-select
+                v-decorator="[
+                  'resource.sslEnable',
+                  {
+                    rules: [{ required: false, message: '请输入SSL启用' }]
+                  }
+                ]"
+              >
+                <a-select-option value="true">
+                  true
+                </a-select-option>
+                <a-select-option value="false">
+                  false
+                </a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
         </a-row>
         <a-row :gutter="16">
           <a-col :span="12">
@@ -301,6 +319,7 @@ export default {
       this.form.resetFields()
       this.visible = true
       if (record) {
+        console.log(record)
         this.curResourceID = record.resourceID
         this.setFieldsValueByType(record.type, record)
       }
@@ -350,12 +369,18 @@ export default {
               resource: {
                 server: record.resource.server,
                 password: record.resource.password,
-                username: record.resource.username
+                username: record.resource.username,
+                sslEnable: record.resource.sslEnable ? record.resource.sslEnable : 'false'
               }
             })
           })
           break
       }
+    },
+    beforeUpload(flie) {
+      console.log(flie)
+      this.form.setFieldsValue('resource.caCertStr', flie)
+      return false
     },
     typeChange(value) {
       this.type = value

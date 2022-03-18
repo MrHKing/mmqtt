@@ -54,5 +54,9 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>mmq-rule-engine</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk16</artifactId>
+        </dependency>
     </dependencies>
 </project>

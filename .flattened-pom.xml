@@ -113,6 +113,7 @@
     <log4j.version>2.13.3</log4j.version>
     <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
     <servlet-api.version>3.0</servlet-api.version>
+    <bouncycastle.version>1.46</bouncycastle.version>
     <spring-boot-dependencies.version>2.1.6.RELEASE</spring-boot-dependencies.version>
     <revision>1.1.1</revision>
   </properties>
@@ -164,6 +165,11 @@
         <groupId>${project.groupId}</groupId>
         <artifactId>mmq-web</artifactId>
         <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcprov-jdk16</artifactId>
+        <version>${bouncycastle.version}</version>
       </dependency>
       <dependency>
         <groupId>io.jsonwebtoken</groupId>
