@@ -17,6 +17,7 @@ package org.monkey.mmq.config.driver;
 
 import org.monkey.mmq.config.matedata.ResourceEnum;
 import org.monkey.mmq.core.utils.ApplicationUtils;
+import org.monkey.mmq.core.utils.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -42,9 +43,11 @@ public class DriverFactory {
         sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
         property.put("utc", sdf.format(date));
         property.put("timestamp", date.getTime());
-        property.put("username", username);
+        if (StringUtils.isNotEmpty(username)) {
+            property.put("username", username);
+        }
 
-        if (topic == null) return;
+        if (StringUtils.isEmpty(topic)) return;
         property.put("topic", topic);
 
         String[] topics = topic.split("/");

@@ -79,13 +79,13 @@ public class TDengineDriver implements ResourceDriver {
             DruidDataSource dataSource = new DruidDataSource(); // 创建Druid连接池
             dataSource.setDriverClassName(JDBC_DRIVER);
             dataSource.setUrl(url); // 设置数据库的连接地址
-            dataSource.setUsername(USERNAME);
-            dataSource.setPassword(PASSWORD);
+            dataSource.setUsername(resource.get(USERNAME).toString());
+            dataSource.setPassword(resource.get(PASSWORD).toString());
             // pool configurations
             dataSource.setInitialSize(8);
             dataSource.setMinIdle(1);
             dataSource.setMaxActive(20);
-
+            dataSource.setValidationQuery("select server_status()");
             dataSources.put(resourceId, dataSource);
         } catch (Exception throwables) {
             return;
@@ -103,7 +103,7 @@ public class TDengineDriver implements ResourceDriver {
     public Connection getDriver(String resourceId) throws Exception {
         if (dataSources == null) return null;
         if (dataSources.get(resourceId) == null) return null;
-        if (!dataSources.get(resourceId).isInited()) return null;
+        //if (!dataSources.get(resourceId).isInited()) return null;
         return dataSources.get(resourceId).getConnection();
     }
 

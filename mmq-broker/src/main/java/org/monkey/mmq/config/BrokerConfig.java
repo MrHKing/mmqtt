@@ -1,6 +1,7 @@
 package org.monkey.mmq.config;
 
 import akka.actor.ActorSystem;
+import akka.event.Logging;
 import com.alipay.remoting.rpc.RpcClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +17,9 @@ import org.springframework.context.annotation.Configuration;
 public class BrokerConfig {
     @Bean
     public ActorSystem actorSystem() {
-        return ActorSystem.create("mmq");
+        ActorSystem actorSystem = ActorSystem.create("mmq");
+        actorSystem.eventStream().setLogLevel(Logging.ErrorLevel());
+        return actorSystem;
     }
 
     @Bean
