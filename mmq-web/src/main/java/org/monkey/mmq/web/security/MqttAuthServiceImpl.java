@@ -20,7 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.monkey.mmq.auth.exception.AccessException;
 import org.monkey.mmq.auth.model.Permission;
 import org.monkey.mmq.auth.model.User;
-import org.monkey.mmq.auth.service.IAuthService;
+import org.monkey.mmq.auth.service.IMqttAuthService;
 import org.monkey.mmq.core.common.Constants;
 import org.monkey.mmq.web.util.RequestUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +39,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author solley
  */
 @Service("authService")
-public class AuthServiceImpl implements IAuthService {
+public class MqttAuthServiceImpl implements IMqttAuthService {
 
     private static final String TOKEN_PREFIX = "Bearer ";
 

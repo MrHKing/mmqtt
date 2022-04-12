@@ -99,7 +99,7 @@
 
         <httpasyncclient.version>4.1.3</httpasyncclient.version>
         <mysql-connector-java.version>8.0.21</mysql-connector-java.version>
-        <jraft-core.version>1.3.5</jraft-core.version>
+        <jraft-core.version>1.3.10.bugfix</jraft-core.version>
         <jjwt.version>0.11.2</jjwt.version>
         <jsqlparser.version>4.0</jsqlparser.version>
         <rpc-grpc-impl.version>1.3.5</rpc-grpc-impl.version>

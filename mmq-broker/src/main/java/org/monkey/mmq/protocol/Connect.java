@@ -23,7 +23,7 @@ import io.netty.handler.codec.mqtt.*;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.AttributeKey;
 import io.netty.util.CharsetUtil;
-import org.monkey.mmq.auth.service.IAuthService;
+import org.monkey.mmq.auth.service.IMqttAuthService;
 import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.core.utils.StringUtils;
@@ -51,9 +51,9 @@ public class Connect {
 
 	private DupPubRelMessageStoreService dupPubRelMessageStoreService;
 
-	private IAuthService authService;
+	private IMqttAuthService authService;
 
-	public Connect(SessionStoreService sessionStoreService, SubscribeStoreService subscribeStoreService, DupPublishMessageStoreService dupPublishMessageStoreService, DupPubRelMessageStoreService dupPubRelMessageStoreService, IAuthService authService) {
+	public Connect(SessionStoreService sessionStoreService, SubscribeStoreService subscribeStoreService, DupPublishMessageStoreService dupPublishMessageStoreService, DupPubRelMessageStoreService dupPubRelMessageStoreService, IMqttAuthService authService) {
 		this.sessionStoreService = sessionStoreService;
 		this.subscribeStoreService = subscribeStoreService;
 		this.dupPublishMessageStoreService = dupPublishMessageStoreService;

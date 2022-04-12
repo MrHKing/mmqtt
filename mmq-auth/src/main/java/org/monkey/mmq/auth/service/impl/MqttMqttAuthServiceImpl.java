@@ -20,7 +20,7 @@ import cn.hutool.core.util.StrUtil;
 import org.monkey.mmq.auth.exception.AccessException;
 import org.monkey.mmq.auth.model.Permission;
 import org.monkey.mmq.auth.model.User;
-import org.monkey.mmq.auth.service.IAuthService;
+import org.monkey.mmq.auth.service.IMqttAuthService;
 import org.monkey.mmq.config.matedata.ModelEnum;
 import org.monkey.mmq.config.modules.IModule;
 import org.monkey.mmq.config.modules.ModuleFactory;
@@ -36,7 +36,7 @@ import java.security.interfaces.RSAPrivateKey;
  * MQTT用户名和密码认证服务
  */
 @Service("mqttAuthService")
-public class MqttAuthServiceImpl implements IAuthService {
+public class MqttMqttAuthServiceImpl implements IMqttAuthService {
 
 	private RSAPrivateKey privateKey;
 

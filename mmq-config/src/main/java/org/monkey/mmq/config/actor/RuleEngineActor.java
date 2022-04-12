@@ -94,6 +94,8 @@ public final class RuleEngineActor extends AbstractActor {
     }
 
     protected void ruleProcess(RuleEngineMessage msg) {
+        if (!ruleEngineMateData.getEnable()) return;
+
         // 获得引擎的SQL，进行处理
         ReactorQL.builder()
                 .sql(ruleEngineMateData.getSql())

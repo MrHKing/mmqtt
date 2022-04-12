@@ -105,7 +105,7 @@ export default {
     SystemInfo,
     TomcatInfo
   },
-  data () {
+  data() {
     return {
       dateTime: moment(new Date()).format('YYYY-MM-DD'),
       node: '',
@@ -124,17 +124,14 @@ export default {
       }
     }
   },
-  created () {
-
-  },
-  mounted () {
+  created() {},
+  mounted() {
     const _this = this // 声明一个变量指向Vue实例this，保证作用域一致
     this.getTotalSystemInfo()
     this.timer = setInterval(() => {
       getSystemInfo().then(res => {
         _this.SystemInfoMateData = res.data
       })
-      _this.getTotalSystemInfo()
     }, 5000)
 
     getSystemInfo().then(res => {
@@ -146,7 +143,7 @@ export default {
     })
   },
   methods: {
-    nodeSelectChange (node) {
+    nodeSelectChange(node) {
       if (this.activeKey === '1') {
         this.$refs.systemInfo.loadTomcatInfo()
       } else if (this.activeKey === '2') {
@@ -157,7 +154,7 @@ export default {
         this.$refs.httpTrace.fetch()
       }
     },
-    getTotalSystemInfo () {
+    getTotalSystemInfo() {
       this.totalCPU = 1
       this.useCPU = 0
       this.totalJVMMem = 1
@@ -186,7 +183,7 @@ export default {
         })
       })
     },
-    convert (value, type) {
+    convert(value, type) {
       if (type === Number) {
         return Number(value * 100).toFixed(2)
       } else if (type === Date) {
@@ -194,7 +191,7 @@ export default {
       }
       return value
     },
-    convertMem (value, type) {
+    convertMem(value, type) {
       if (type === Number) {
         return Number(value / 1048576).toFixed(2)
       }

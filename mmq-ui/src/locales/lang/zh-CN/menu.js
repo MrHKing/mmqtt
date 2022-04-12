@@ -10,5 +10,7 @@ export default {
     'menu.ruleEngine.resources': '资源',
     'menu.ruleEngine.ruleEngine': '规则引擎',
     'menu.modules': '模块',
-    'menu.modules.modules': '模块'
+    'menu.modules.modules': '模块',
+    'menu.account.logout': '登出',
+    'menu.account.settings': '设置'
 }

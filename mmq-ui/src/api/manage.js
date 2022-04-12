@@ -2,16 +2,14 @@ import { axios } from '@/utils/request'
 
 const api = {
     user: '/api/user',
-    role: '/api/role',
-    service: '/api/service',
-    permission: '/api/permission',
-    permissionNoPager: '/api/permission/no-pager'
+    updatePassword: '/v1/auth/users/password',
+    service: '/api/service'
 }
 
 export default api
 
 // post
-export function postAction (url, parameter) {
+export function postAction(url, parameter) {
     return axios({
         url: url,
         method: 'post',
@@ -20,7 +18,7 @@ export function postAction (url, parameter) {
 }
 
 // post method= {post | put}
-export function httpAction (url, parameter, method) {
+export function httpAction(url, parameter, method) {
     return axios({
         url: url,
         method: method,
@@ -29,7 +27,7 @@ export function httpAction (url, parameter, method) {
 }
 
 // put
-export function putAction (url, parameter) {
+export function putAction(url, parameter) {
     return axios({
         url: url,
         method: 'put',
@@ -38,7 +36,7 @@ export function putAction (url, parameter) {
 }
 
 // get
-export function getAction (url, parameter) {
+export function getAction(url, parameter) {
     return axios({
         url: url,
         method: 'get',
@@ -47,7 +45,7 @@ export function getAction (url, parameter) {
 }
 
 // deleteAction
-export function deleteAction (url, parameter) {
+export function deleteAction(url, parameter) {
     return axios({
         url: url,
         method: 'delete',
@@ -55,7 +53,7 @@ export function deleteAction (url, parameter) {
     })
 }
 
-export function getUserList (parameter) {
+export function getUserList(parameter) {
     return axios({
         url: api.user,
         method: 'get',
@@ -63,15 +61,7 @@ export function getUserList (parameter) {
     })
 }
 
-export function getRoleList (parameter) {
-    return axios({
-        url: api.role,
-        method: 'get',
-        params: parameter
-    })
-}
-
-export function getServiceList (parameter) {
+export function getServiceList(parameter) {
     return axios({
         url: api.service,
         method: 'get',
@@ -79,10 +69,11 @@ export function getServiceList (parameter) {
     })
 }
 
-export function getPermissions (parameter) {
+// update password
+export function updatePassword(parameter) {
     return axios({
-        url: api.permissionNoPager,
-        method: 'get',
+        url: api.updatePassword,
+        method: 'put',
         params: parameter
     })
 }
@@ -93,7 +84,7 @@ export function getPermissions (parameter) {
  * @param parameter
  * @returns {*}
  */
-export function downFile (url, parameter) {
+export function downFile(url, parameter) {
     return axios({
         url: url,
         params: parameter,
@@ -102,7 +93,7 @@ export function downFile (url, parameter) {
     })
 }
 
-export function downZip (url, parameter) {
+export function downZip(url, parameter) {
     return axios({
         url: url,
         params: parameter,

@@ -4,7 +4,7 @@ import { Icon, Menu, Dropdown } from 'ant-design-vue'
 import { i18nRender } from '@/locales'
 import i18nMixin from '@/store/i18n-mixin'
 
-const locales = ['zh-CN', 'zh-TW', 'en-US', 'pt-BR']
+const locales = ['zh-CN', 'en-US']
 const languageLabels = {
   'zh-CN': '简体中文',
   'zh-TW': '繁体中文',
@@ -28,7 +28,7 @@ const SelectLang = {
   },
   name: 'SelectLang',
   mixins: [i18nMixin],
-  render () {
+  render() {
     const { prefixCls } = this
     const changeLang = ({ key }) => {
       this.setLang(key)

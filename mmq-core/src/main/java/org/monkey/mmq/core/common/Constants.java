@@ -25,6 +25,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class Constants {
 
+    public static final String MQTT_PERSISTENT_AUTH_GROUP = "mqtt_persistent_auth";
+
     public static final String MQTT_PERSISTENT_CONFIG_GROUP = "mqtt_persistent_config";
 
     public static final String MQTT_PERSISTENT_BROKER_GROUP = "mqtt_persistent_broker";

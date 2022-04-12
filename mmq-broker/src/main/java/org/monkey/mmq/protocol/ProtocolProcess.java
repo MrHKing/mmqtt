@@ -17,14 +17,12 @@
 package org.monkey.mmq.protocol;
 
 import akka.actor.ActorSystem;
-import org.monkey.mmq.auth.service.IAuthService;
-import org.monkey.mmq.core.cluster.Member;
+import org.monkey.mmq.auth.service.IMqttAuthService;
 import org.monkey.mmq.core.cluster.ServerMemberManager;
 import org.monkey.mmq.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
 import java.util.concurrent.ExecutorService;
@@ -47,7 +45,7 @@ public class ProtocolProcess {
 
 	@Qualifier("mqttAuthService")
 	@Autowired
-	private IAuthService authService;
+	private IMqttAuthService authService;
 
 	@Autowired
 	private RetainMessageStoreService messageStoreService;

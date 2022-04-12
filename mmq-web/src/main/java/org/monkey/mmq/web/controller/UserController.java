@@ -18,20 +18,16 @@ package org.monkey.mmq.web.controller;
 
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import netscape.javascript.JSObject;
-import org.monkey.mmq.auth.common.ActionTypes;
 import org.monkey.mmq.auth.common.AuthConfigs;
 import org.monkey.mmq.auth.common.AuthSystemTypes;
 import org.monkey.mmq.auth.exception.AccessException;
 import org.monkey.mmq.auth.model.User;
-import org.monkey.mmq.auth.service.IAuthService;
+import org.monkey.mmq.auth.service.IMqttAuthService;
 import org.monkey.mmq.core.common.Constants;
 import org.monkey.mmq.core.consistency.model.RestResult;
 import org.monkey.mmq.core.consistency.model.RestResultUtils;
 import org.monkey.mmq.core.utils.JacksonUtils;
-import org.monkey.mmq.core.utils.Objects;
 import org.monkey.mmq.core.utils.PasswordEncoderUtil;
-import org.monkey.mmq.web.config.NotWrap;
 import org.monkey.mmq.web.security.JwtTokenManager;
 import org.monkey.mmq.web.security.MmqAuthConfig;
 import org.monkey.mmq.web.security.MmqUser;
@@ -47,7 +43,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import javax.security.auth.message.config.AuthConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -76,38 +71,7 @@ public class UserController {
 
     @Qualifier("authService")
     @Autowired
-    private IAuthService authService;
-
-    /**
-     * Create a new user.
-     *
-     * @param username username
-     * @param password password
-     * @return ok if create succeed
-     * @throws IllegalArgumentException if user already exist
-     */
-    @PostMapping
-    public Object createUser(@RequestParam String username, @RequestParam String password) {
-
-        User user = userDetailsService.getUserFromDatabase(username);
-        if (user != null) {
-            throw new IllegalArgumentException("user '" + username + "' already exist!");
-        }
-        userDetailsService.createUser(username, PasswordEncoderUtil.encode(password));
-        return RestResultUtils.success("create user ok!");
-    }
-
-    /**
-     * Delete an existed user.
-     *
-     * @param username username of user
-     * @return ok if deleted succeed, keep silent if user not exist
-     */
-    @DeleteMapping
-    public Object deleteUser(@RequestParam String username) {
-        userDetailsService.deleteUser(username);
-        return RestResultUtils.success("delete user ok!");
-    }
+    private IMqttAuthService authService;
 
     /**
      * Update an user.
@@ -143,8 +107,8 @@ public class UserController {
 
         return JacksonUtils.toObj("{\n" +
                 "    \"id\": \"4291d7da9005377ec9aec4a71ea837f\",\n" +
-                "    \"name\": \"天野远子\",\n" +
-                "    \"username\": \"admin\",\n" +
+                "    \"name\": \"MMQ\",\n" +
+                "    \"username\": \"Admin\",\n" +
                 "    \"password\": \"\",\n" +
                 "    \"avatar\": \"/avatar2.jpg\",\n" +
                 "    \"status\": 1,\n" +
@@ -183,18 +147,6 @@ public class UserController {
                 "\t}]\n" +
                 "}\n" +
                 "  }");
-    }
-
-    /**
-     * Get paged users.
-     *
-     * @param pageNo   number index of page
-     * @param pageSize size of page
-     * @return A collection of users, empty set if no user is found
-     */
-    @GetMapping
-    public Object getUsers(@RequestParam int pageNo, @RequestParam int pageSize) {
-        return userDetailsService.getUsersFromDatabase(pageNo, pageSize);
     }
 
     /**
@@ -271,17 +223,5 @@ public class UserController {
         } catch (Exception e) {
             return RestResultUtils.failed(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Update userpassword failed");
         }
-    }
-
-
-    /**
-     * Fuzzy matching username.
-     *
-     * @param username username
-     * @return Matched username
-     */
-    @GetMapping("/search")
-    public List<String> searchUsersLikeUsername(@RequestParam String username) {
-        return userDetailsService.findUserLikeUsername(username);
     }
 }

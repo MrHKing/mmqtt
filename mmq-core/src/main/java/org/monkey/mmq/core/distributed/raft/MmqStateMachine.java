@@ -97,7 +97,6 @@ class MmqStateMachine extends StateMachineAdapter {
                         message = ProtoMessageUtil.parse(data.array());
                     }
 
-                    Loggers.RAFT.info("receive log : {}", message);
                     LoggerUtils.printIfDebugEnabled(Loggers.RAFT, "receive log : {}", message);
                     
                     if (message instanceof WriteRequest) {

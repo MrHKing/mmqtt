@@ -107,7 +107,7 @@
     <dependency>
       <groupId>com.alipay.sofa</groupId>
       <artifactId>jraft-core</artifactId>
-      <version>1.3.5</version>
+      <version>1.3.10.bugfix</version>
       <scope>compile</scope>
       <exclusions>
         <exclusion>

@@ -1,10 +1,10 @@
 export default {
     'user.login.userName': 'userName',
     'user.login.password': 'password',
-    'user.login.username.placeholder': 'Account: mmq',
-    'user.login.password.placeholder': 'password: aaaaaa',
+    'user.login.username.placeholder': 'Account',
+    'user.login.password.placeholder': 'password',
     'user.login.message-invalid-credentials':
-        'Invalid username or password（admin/ant.design）',
+        'Invalid username or password（mmq/aaaaaa）',
     'user.login.message-invalid-verification-code': 'Invalid verification code',
     'user.login.tab-login-credentials': 'Credentials',
     'user.login.tab-login-mobile': 'Mobile number',

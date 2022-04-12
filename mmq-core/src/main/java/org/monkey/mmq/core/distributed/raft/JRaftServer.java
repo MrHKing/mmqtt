@@ -24,6 +24,7 @@ import com.alipay.sofa.jraft.core.CliServiceImpl;
 import com.alipay.sofa.jraft.entity.PeerId;
 import com.alipay.sofa.jraft.entity.Task;
 import com.alipay.sofa.jraft.error.RaftError;
+import com.alipay.sofa.jraft.option.ApplyTaskMode;
 import com.alipay.sofa.jraft.option.CliOptions;
 import com.alipay.sofa.jraft.option.NodeOptions;
 import com.alipay.sofa.jraft.option.RaftOptions;
@@ -157,7 +158,7 @@ public class JRaftServer {
         nodeOptions.setSharedVoteTimer(true);
         nodeOptions.setSharedStepDownTimer(true);
         nodeOptions.setSharedSnapshotTimer(true);
-        
+        nodeOptions.setApplyTaskMode(ApplyTaskMode.Blocking);
         nodeOptions.setElectionTimeoutMs(electionTimeout);
         RaftOptions raftOptions = RaftOptionsBuilder.initRaftOptions(raftConfig);
         nodeOptions.setRaftOptions(raftOptions);

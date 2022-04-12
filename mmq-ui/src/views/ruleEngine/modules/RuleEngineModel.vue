@@ -18,9 +18,9 @@
               :options="options"
             ></codemirror>
           </a-form-item>
-          <a-form-item label="是否启用">
+          <!-- <a-form-item label="是否启用">
             <a-switch v-decorator="['enable', { valuePropName: 'checked' }]" />
-          </a-form-item>
+          </a-form-item> -->
           <a-form-item label="备注">
             <a-textarea
               v-decorator="[

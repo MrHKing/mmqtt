@@ -47,7 +47,7 @@
         </span>
         <span slot="action" slot-scope="text, record">
           <template>
-            <a @click="handleEnable(record)">{{ record.enable ? '启动' : '停止' }}</a>
+            <a @click="handleEnable(record)">{{ record.enable ? '停止' : '启用' }}</a>
             <a-divider type="vertical" />
             <a @click="handleSave(record)">编辑</a>
             <a-divider type="vertical" />
