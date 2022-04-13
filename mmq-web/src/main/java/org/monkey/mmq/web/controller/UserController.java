@@ -219,9 +219,9 @@ public class UserController {
                 userDetailsService.updateUserPassword(username, PasswordEncoderUtil.encode(newPassword));
                 return RestResultUtils.success("Update password success");
             }
-            return RestResultUtils.failed(HttpStatus.UNAUTHORIZED.value(), "Old password is invalid");
+            return RestResultUtils.failedWithMsg(HttpStatus.UNAUTHORIZED.value(), "Old password is invalid");
         } catch (Exception e) {
-            return RestResultUtils.failed(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Update userpassword failed");
+            return RestResultUtils.failedWithMsg(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Update userpassword failed");
         }
     }
 }

@@ -18,6 +18,7 @@ package org.monkey.mmq.auth.service;
 import org.monkey.mmq.auth.model.Page;
 import org.monkey.mmq.auth.model.User;
 import org.monkey.mmq.auth.persistent.KeyBuilder;
+import org.monkey.mmq.auth.persistent.UtilsAndCommons;
 import org.monkey.mmq.auth.utils.Loggers;
 import org.monkey.mmq.core.consistency.matedata.RecordListener;
 import org.monkey.mmq.core.consistency.persistent.ConsistencyService;
@@ -47,7 +48,7 @@ public class UserPersistentService implements RecordListener<User> {
         User user = new User();
         user.setUsername("mmq");
         user.setPassword("$2a$10$VxvrQ0Omo9ilSFjFwJKE5.7AVg0ug6.dMS.TVQBxbnuNkzuDDQdCS");
-        userConcurrentHashMap.put(user.getUsername(), user);
+        userConcurrentHashMap.put(UtilsAndCommons.AUTH_STORE + user.getUsername(), user);
     }
 
     /**
@@ -63,14 +64,14 @@ public class UserPersistentService implements RecordListener<User> {
     }
 
     public User findUserByUsername(String username) {
-        return userConcurrentHashMap.get(username);
+        return userConcurrentHashMap.get(UtilsAndCommons.AUTH_STORE + username);
     }
 
     public void updateUserPassword(String username, String password) {
-        User user = userConcurrentHashMap.get(username);
+        User user = userConcurrentHashMap.get(UtilsAndCommons.AUTH_STORE + username);
         user.setPassword(password);
         try {
-            consistencyService.put(username, user);
+            consistencyService.put(UtilsAndCommons.AUTH_STORE + username, user);
         } catch (MmqException e) {
             Loggers.AUTH.error(e.getErrMsg());
         }
