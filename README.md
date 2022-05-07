@@ -7,7 +7,19 @@
 
 *MMQ broker* 完整支持MQTT V3.1 和 V3.1.1。
 
-## 安装
+## 特征
+   - 分布式MQTT服务
+   - 万级连接数并发（3台 华为云1核2G  1M带宽）
+   - MQTT V3.1 和 V3.1.1
+   - 支持桥接（MYSQL、POSTGRESQL、SQLSERVER、KAFKA、TDENGINE、MQTT BROKER、Influxdb*）
+   - 规则引擎 通过SQL进行规则转发
+   - 管理API 对MMQ BROKER管理接口。
+   - 认证鉴权 登录认证管理
+   - 集群管理 在线配置和管理集群*
+      
+      *为正在开发中的功能
+
+### 安装
 
 *MMQ broker* 是跨平台的，支持 Linux、Unix、macOS 以及 Windows。这意味着 *MMQ broker* 可以部署在 x86_64 架构的服务器上。由于使用raft一致性算法，集群部署三个节点以上。
 
