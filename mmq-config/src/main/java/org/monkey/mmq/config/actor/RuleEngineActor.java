@@ -40,10 +40,15 @@ public final class RuleEngineActor extends AbstractActor {
     ActorSystem actorSystem;
 
     RuleEngineMateData ruleEngineMateData;
+    
+    final ReactorQL reactorQL;
 
     public RuleEngineActor(RuleEngineMateData ruleEngineMateData, ActorSystem actorSystem) {
         this.actorSystem = actorSystem;
         this.ruleEngineMateData = ruleEngineMateData;
+        reactorQL = ReactorQL.builder()
+                .sql(ruleEngineMateData.getSql())
+                .build();
     }
 
     private boolean isTopic(String topic, String topicFilter) {
@@ -95,12 +100,8 @@ public final class RuleEngineActor extends AbstractActor {
 
     protected void ruleProcess(RuleEngineMessage msg) {
         if (!ruleEngineMateData.getEnable()) return;
-
-        // 获得引擎的SQL，进行处理
-        ReactorQL.builder()
-                .sql(ruleEngineMateData.getSql())
-                .build()
-                .start(name -> isTopic(msg.getMessage().getTopic(), name) ?
+        
+        reactorQL.start(name -> isTopic(msg.getMessage().getTopic(), name) ?
                         Flux.just((new ObjectMapper().convertValue(JacksonUtils.toObj(new String(msg.getMessage().getMessageBytes().toByteArray())),Map.class))) : Flux.just())
                 .doOnNext(map -> {
                     // 如果不为空则触发响应
