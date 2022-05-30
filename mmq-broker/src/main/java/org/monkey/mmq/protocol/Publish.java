@@ -55,8 +55,6 @@ public class Publish {
 
 	private DupPublishMessageStoreService dupPublishMessageStoreService;
 
-	private GlobalMetricsStoreService globalMetricsStoreService;
-
 	private ActorSystem actorSystem;
 
 	private final Member local;
@@ -65,14 +63,13 @@ public class Publish {
 				   RetainMessageStoreService retainMessageStoreService,
 				   DupPublishMessageStoreService dupPublishMessageStoreService,
 				   Member local,
-				   ActorSystem actorSystem, GlobalMetricsStoreService globalMetricsStoreService) {
+				   ActorSystem actorSystem) {
 		this.sessionStoreService = sessionStoreService;
 		this.subscribeStoreService = subscribeStoreService;
 		this.retainMessageStoreService = retainMessageStoreService;
 		this.dupPublishMessageStoreService = dupPublishMessageStoreService;
 		this.local = local;
 		this.actorSystem = actorSystem;
-		this.globalMetricsStoreService = globalMetricsStoreService;
 	}
 
 	public void processPublish(Channel channel, MqttPublishMessage msg) throws MmqException {
@@ -92,7 +89,13 @@ public class Publish {
 		if (sessionStore == null) return;
 
 		// byte flow metrics
-		globalMetricsStoreService.put(clientId, messageBytes.length, PublishInOutType.IN);
+		PublishMessage publishMessage = new PublishMessage();
+		publishMessage.setLocal(true);
+		publishMessage.setPublishInOutType(PublishInOutType.IN);
+		publishMessage.setBytes(messageBytes.length);
+		publishMessage.setClientId(clientId);
+		ActorSelection actorPublishSelection = actorSystem.actorSelection("/user/" + clientId);
+		actorPublishSelection.tell(publishMessage, ActorRef.noSender());
 
 		RuleEngineMessage ruleEngineMessage = new RuleEngineMessage();
 		ruleEngineMessage.setUsername(sessionStore.getUser());
@@ -120,12 +123,6 @@ public class Publish {
 		List<SubscribeMateData> subscribeStores = subscribeStoreService.search(topic);
 
 		subscribeStores.forEach(subscribeStore -> {
-				// byte flow metrics
-				try {
-					globalMetricsStoreService.put(clientId, messageBytes.length, PublishInOutType.OUT);
-				} catch (MmqException e) {
-					Loggers.BROKER_PROTOCOL.info("publish byte flow metrics error!");
-				}
 				// 订阅者收到MQTT消息的QoS级别, 最终取决于发布消息的QoS和主题订阅的QoS
 				MqttQoS respQoS = mqttQoS.value() > subscribeStore.getMqttQoS() ? MqttQoS.valueOf(subscribeStore.getMqttQoS()) : mqttQoS;
 				SessionMateData sessionStore = sessionStoreService.get(subscribeStore.getClientId());
@@ -159,10 +156,22 @@ public class Publish {
 						dupPublishMessageStoreService.put(subscribeStore.getClientId(), dupPublishMessageStore);
 						sessionStore.getChannel().writeAndFlush(publishMessage);
 					}
+
+					PublishMessage publishMessage = new PublishMessage();
+					publishMessage.setPublishInOutType(PublishInOutType.OUT);
+					publishMessage.setLocal(true);
+					publishMessage.setClientId(clientId);
+					publishMessage.setBytes(messageBytes.length);
+					ActorSelection actorSelection = actorSystem.actorSelection("/user/" + clientId);
+					actorSelection.tell(publishMessage, ActorRef.noSender());
 				} else {
 					PublishMessage publishMessage = new PublishMessage();
 					publishMessage.setNodeIp(subscribeStore.getNodeIp());
 					publishMessage.setNodePort(subscribeStore.getNodePort());
+					publishMessage.setPublishInOutType(PublishInOutType.OUT);
+					publishMessage.setClientId(clientId);
+					publishMessage.setLocal(false);
+					publishMessage.setBytes(messageBytes.length);
 					publishMessage.setInternalMessage(InternalMessage.newBuilder()
 							.setTopic(topic)
 							.setMqttQoS(respQoS.value())

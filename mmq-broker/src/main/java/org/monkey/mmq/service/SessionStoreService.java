@@ -62,6 +62,9 @@ public class SessionStoreService implements RecordListener<ClientMateData> {
     @Autowired
     GlobalMQTTMessageCounter globalMQTTMessageCounter;
 
+    @Autowired
+    GlobalMetricsStoreService globalMetricsStoreService;
+
     ActorSystem actorSystem;
 
     RpcClient rpcClient;
@@ -95,7 +98,8 @@ public class SessionStoreService implements RecordListener<ClientMateData> {
                 subscribeStoreService,
                 this,
                 dupPublishMessageStoreService,
-                rpcClient
+                rpcClient,
+                globalMetricsStoreService
         )), "driver");
     }
 
@@ -131,7 +135,8 @@ public class SessionStoreService implements RecordListener<ClientMateData> {
                 subscribeStoreService,
                 this,
                 dupPublishMessageStoreService,
-                rpcClient
+                rpcClient,
+                globalMetricsStoreService
         )), clientId);
         clientActors.put(clientId, clientActor);
         clientActor.tell(clientPutMessage, ActorRef.noSender());

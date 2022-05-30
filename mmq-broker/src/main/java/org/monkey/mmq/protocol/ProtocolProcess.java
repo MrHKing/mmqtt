@@ -177,7 +177,7 @@ public class ProtocolProcess {
 	public Publish publish() {
 		if (publish == null) {
 			publish = new Publish(sessionStoreService, subscribeStoreService, messageStoreService,
-					dupPublishMessageStoreService, memberManager.getSelf(), actorSystem, globalMetricsStoreService);
+					dupPublishMessageStoreService, memberManager.getSelf(), actorSystem);
 		}
 		return publish;
 	}

@@ -16,9 +16,11 @@ import org.monkey.mmq.core.cluster.ServerMemberManager;
 import org.monkey.mmq.core.consistency.persistent.ConsistencyService;
 import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.config.UtilsAndCommons;
+import org.monkey.mmq.metrics.GlobalMQTTMessageCounter;
 import org.monkey.mmq.notifier.processor.PublishRequestProcessor;
 import org.monkey.mmq.notifier.processor.RejectClientProcessor;
 import org.monkey.mmq.service.DupPublishMessageStoreService;
+import org.monkey.mmq.service.GlobalMetricsStoreService;
 import org.monkey.mmq.service.SessionStoreService;
 import org.monkey.mmq.service.SubscribeStoreService;
 
@@ -37,7 +39,9 @@ public class ClientActor extends AbstractActor {
                        ServerMemberManager memberManager,
                        SubscribeStoreService subscribeStoreService,
                        SessionStoreService sessionStoreService,
-                       DupPublishMessageStoreService dupPublishMessageStoreService,RpcClient rpcClient) {
+                       DupPublishMessageStoreService dupPublishMessageStoreService,
+                       RpcClient rpcClient,
+                       GlobalMetricsStoreService globalMetricsStoreService) {
         this.consistencyService = consistencyService;
         this.subscribeStoreService = subscribeStoreService;
         this.sessionStoreService = sessionStoreService;
@@ -45,9 +49,12 @@ public class ClientActor extends AbstractActor {
 
         this.memberManager = memberManager;
         this.rpcClient = rpcClient;
+        this.globalMetricsStoreService = globalMetricsStoreService;
     }
 
     private final SubscribeStoreService subscribeStoreService;
+
+    private final GlobalMetricsStoreService globalMetricsStoreService;
 
     private final SessionStoreService sessionStoreService;
     private final DupPublishMessageStoreService dupPublishMessageStoreService;
@@ -101,12 +108,18 @@ public class ClientActor extends AbstractActor {
 
     protected void publishMsg(PublishMessage publishMessage) {
         try {
-            rpcClient.oneway(publishMessage.getNodeIp() + ":" + (publishMessage.getNodePort() + 10),
-                    publishMessage.getInternalMessage());
+            if (!publishMessage.isLocal()) {
+                rpcClient.oneway(publishMessage.getNodeIp() + ":" + (publishMessage.getNodePort() + 10),
+                        publishMessage.getInternalMessage());
+            }
+            this.globalMetricsStoreService.put(publishMessage.getClientId(), publishMessage.getBytes(), publishMessage.getPublishInOutType());
+
         } catch (RemotingException e) {
             Loggers.BROKER_SERVER.error("client publish message remoting failed.", e);
         } catch (InterruptedException e) {
             Loggers.BROKER_SERVER.error("client publish message interrupted failed.", e);
+        } catch (MmqException e) {
+            Loggers.BROKER_SERVER.error("client publish message mmq exception failed.", e);
         }
     }
 

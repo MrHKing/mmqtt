@@ -17,6 +17,7 @@ package org.monkey.mmq.core.actor.message;
 
 import org.monkey.mmq.core.actor.ActorMsg;
 import org.monkey.mmq.core.actor.MsgType;
+import org.monkey.mmq.core.actor.metadata.message.PublishInOutType;
 import org.monkey.mmq.core.entity.InternalMessage;
 
 /**
@@ -31,6 +32,46 @@ public class PublishMessage implements ActorMsg {
     private String nodeIp;
 
     private int nodePort;
+
+    private boolean isLocal;
+
+    private int bytes;
+
+    private PublishInOutType publishInOutType;
+
+    private String clientId;
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
+    public int getBytes() {
+        return bytes;
+    }
+
+    public void setBytes(int bytes) {
+        this.bytes = bytes;
+    }
+
+    public PublishInOutType getPublishInOutType() {
+        return publishInOutType;
+    }
+
+    public void setPublishInOutType(PublishInOutType publishInOutType) {
+        this.publishInOutType = publishInOutType;
+    }
+
+    public boolean isLocal() {
+        return isLocal;
+    }
+
+    public void setLocal(boolean local) {
+        isLocal = local;
+    }
 
     public String getNodeIp() {
         return nodeIp;
