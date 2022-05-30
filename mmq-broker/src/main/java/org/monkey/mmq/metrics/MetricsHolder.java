@@ -3,7 +3,6 @@ package org.monkey.mmq.metrics;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
-import com.sun.istack.internal.NotNull;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.atomic.LongAdder;
@@ -20,16 +19,16 @@ import static org.monkey.mmq.metrics.MMQMetrics.*;
 @Component
 public class MetricsHolder {
 
-    private final @NotNull MetricRegistry metricRegistry;
-    private final @NotNull Counter incomingMessageCounter;
-    private final @NotNull Counter outgoingMessageCounter;
+    private final MetricRegistry metricRegistry;
+    private final Counter incomingMessageCounter;
+    private final Counter outgoingMessageCounter;
 
-    private final @NotNull Counter incomingConnectCounter;
+    private final Counter incomingConnectCounter;
 
-    private final @NotNull Counter incomingPublishCounter;
-    private final @NotNull Counter outgoingPublishCounter;
+    private final Counter incomingPublishCounter;
+    private final Counter outgoingPublishCounter;
 
-    private final @NotNull Counter subscriptionCounter;
+    private final Counter subscriptionCounter;
 
     public MetricsHolder() {
         this.metricRegistry = new MetricRegistry();
@@ -46,31 +45,31 @@ public class MetricsHolder {
 
     }
 
-    public @NotNull MetricRegistry getMetricRegistry() {
+    public MetricRegistry getMetricRegistry() {
         return metricRegistry;
     }
 
-    public @NotNull Counter getIncomingMessageCounter() {
+    public Counter getIncomingMessageCounter() {
         return incomingMessageCounter;
     }
 
-    public @NotNull Counter getOutgoingMessageCounter() {
+    public Counter getOutgoingMessageCounter() {
         return outgoingMessageCounter;
     }
 
-    public @NotNull Counter getIncomingConnectCounter() {
+    public Counter getIncomingConnectCounter() {
         return incomingConnectCounter;
     }
 
-    public @NotNull Counter getIncomingPublishCounter() {
+    public Counter getIncomingPublishCounter() {
         return incomingPublishCounter;
     }
 
-    public @NotNull Counter getOutgoingPublishCounter() {
+    public Counter getOutgoingPublishCounter() {
         return outgoingPublishCounter;
     }
 
-    public @NotNull Counter getSubscriptionCounter() {
+    public Counter getSubscriptionCounter() {
         return subscriptionCounter;
     }
 }

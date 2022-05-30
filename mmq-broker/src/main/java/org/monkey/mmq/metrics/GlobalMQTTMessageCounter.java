@@ -1,7 +1,6 @@
 package org.monkey.mmq.metrics;
 
 import com.codahale.metrics.Gauge;
-import com.sun.istack.internal.NotNull;
 import io.netty.handler.codec.mqtt.MqttMessage;
 import io.netty.handler.codec.mqtt.MqttMessageType;
 import org.springframework.stereotype.Component;
@@ -21,11 +20,11 @@ import static org.monkey.mmq.metrics.MMQMetrics.BYTES_WRITE_TOTAL;
  **/
 @Component
 public class GlobalMQTTMessageCounter {
-    private final @NotNull MetricsHolder metricsHolder;
-    private final @NotNull LongAdder bytesReadTotal;
-    private final @NotNull LongAdder bytesWrittenTotal;
+    private final MetricsHolder metricsHolder;
+    private final LongAdder bytesReadTotal;
+    private final LongAdder bytesWrittenTotal;
 
-    public GlobalMQTTMessageCounter(final @NotNull MetricsHolder metricsHolder) {
+    public GlobalMQTTMessageCounter(final MetricsHolder metricsHolder) {
         this.metricsHolder = metricsHolder;
         this.bytesReadTotal = new LongAdder();
         this.bytesWrittenTotal = new LongAdder();
@@ -35,7 +34,7 @@ public class GlobalMQTTMessageCounter {
         metricsHolder.getMetricRegistry().register(BYTES_WRITE_TOTAL.name(), (Gauge<Long>) bytesWrittenTotal::longValue);
     }
 
-    public void countInbound(final @NotNull MqttMessageType mqttMessageType) {
+    public void countInbound(final MqttMessageType mqttMessageType) {
         metricsHolder.getIncomingMessageCounter().inc();
         if (CONNECT.equals(mqttMessageType)) {
             metricsHolder.getIncomingConnectCounter().inc();
@@ -51,7 +50,7 @@ public class GlobalMQTTMessageCounter {
         bytesReadTotal.add(bytes);
     }
 
-    public void countOutbound(final @NotNull MqttMessageType mqttMessageType) {
+    public void countOutbound(final MqttMessageType mqttMessageType) {
         metricsHolder.getOutgoingMessageCounter().inc();
         if (CONNECT.equals(mqttMessageType)) {
             metricsHolder.getIncomingConnectCounter().dec();
