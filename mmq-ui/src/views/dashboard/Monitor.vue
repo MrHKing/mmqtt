@@ -5,8 +5,8 @@
         <a-col :span="6">
           <a-card>
             <a-statistic
-              title="总CPU使用情况"
-              :value="Number(useCPU / totalCPU).toFixed(2) + '%'"
+              title="总接收字节(byte)"
+              :value="SystemInfoMateData.bytesReadTotal"
               class="demo-class"
               :value-style="{ color: '#3f8600', fontSize: '32px' }"
             >
@@ -19,8 +19,8 @@
         <a-col :span="6">
           <a-card>
             <a-statistic
-              title="总内存使用情况"
-              :value="Number(useMem).toFixed(2) + 'M'"
+              title="总发送字节(byte)"
+              :value="SystemInfoMateData.bytesWrittenTotal"
               class="demo-class"
               :value-style="{ color: '#3f8600', fontSize: '28px' }"
             >
@@ -91,7 +91,6 @@
 <script>
 import moment from 'moment'
 import { getSystemInfo, getNodes } from '@/api/system'
-import { getAction } from '@/api/manage'
 import HttpTrace from './module/HttpTrace'
 import JvmInfo from './module/JvmInfo'
 import SystemInfo from './module/SystemInfo'
@@ -117,17 +116,15 @@ export default {
       activeKey: '1',
       SystemInfoMateData: {
         clientCount: 0,
-        systemRunTime: 0,
-        version: '',
-        systemName: '',
-        subscribeCount: 0
+        subscribeCount: 0,
+        bytesReadTotal: 0,
+        bytesWrittenTotal: 0
       }
     }
   },
   created() {},
   mounted() {
     const _this = this // 声明一个变量指向Vue实例this，保证作用域一致
-    this.getTotalSystemInfo()
     this.timer = setInterval(() => {
       getSystemInfo().then(res => {
         _this.SystemInfoMateData = res.data
@@ -153,35 +150,6 @@ export default {
       } else {
         this.$refs.httpTrace.fetch()
       }
-    },
-    getTotalSystemInfo() {
-      this.totalCPU = 1
-      this.useCPU = 0
-      this.totalJVMMem = 1
-      this.useMem = 0
-      this.nodeList.forEach(node => {
-        const url = this.nodeUrl ? 'http://' + this.nodeUrl : ''
-        getAction(url + '/actuator/metrics/system.cpu.count').then(value => {
-          const val = value.measurements[0].value
-          this.totalCPU += val
-          getAction(url + '/actuator/metrics/process.cpu.usage').then(value => {
-            let usage = value.measurements[0].value
-            usage = this.convert(usage, Number)
-            this.useCPU += val * usage
-          })
-        })
-        getAction(url + '/actuator/metrics/jvm.memory.max').then(value => {
-          let val = value.measurements[0].value
-          val = this.convertMem(val, Number)
-          this.totalJVMMem += val
-        })
-        getAction(url + '/actuator/metrics/jvm.memory.used').then(value => {
-          let used = value.measurements[0].value
-          used = this.convertMem(used, Number)
-          this.useMem = Number(this.useMem) + Number(used)
-          console.log(this.useMem + ':' + used)
-        })
-      })
     },
     convert(value, type) {
       if (type === Number) {

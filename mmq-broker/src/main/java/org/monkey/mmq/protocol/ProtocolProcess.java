@@ -19,6 +19,7 @@ package org.monkey.mmq.protocol;
 import akka.actor.ActorSystem;
 import org.monkey.mmq.auth.service.IMqttAuthService;
 import org.monkey.mmq.core.cluster.ServerMemberManager;
+import org.monkey.mmq.metrics.GlobalMQTTMessageCounter;
 import org.monkey.mmq.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -55,6 +56,9 @@ public class ProtocolProcess {
 
 	@Autowired
 	private DupPubRelMessageStoreService dupPubRelMessageStoreService;
+
+	@Autowired
+	private GlobalMetricsStoreService globalMetricsStoreService;
 
 	@Autowired
 	private ActorSystem actorSystem;
@@ -172,7 +176,8 @@ public class ProtocolProcess {
 
 	public Publish publish() {
 		if (publish == null) {
-			publish = new Publish(sessionStoreService, subscribeStoreService, messageStoreService, dupPublishMessageStoreService, memberManager.getSelf(), actorSystem);
+			publish = new Publish(sessionStoreService, subscribeStoreService, messageStoreService,
+					dupPublishMessageStoreService, memberManager.getSelf(), actorSystem, globalMetricsStoreService);
 		}
 		return publish;
 	}

@@ -24,6 +24,7 @@ package org.monkey.mmq.service;
 import akka.actor.*;
 import com.alipay.remoting.rpc.RpcClient;
 import io.netty.handler.codec.mqtt.MqttConnectMessage;
+import io.netty.handler.codec.mqtt.MqttMessageType;
 import org.monkey.mmq.core.actor.message.ClientRemoveMessage;
 import org.monkey.mmq.core.actor.message.RejectMessage;
 import org.monkey.mmq.config.Loggers;
@@ -39,6 +40,7 @@ import org.monkey.mmq.core.actor.metadata.message.SessionMateData;
 import org.monkey.mmq.core.actor.metadata.system.SystemInfoMateData;
 import org.monkey.mmq.core.actor.message.ClientPutMessage;
 import org.monkey.mmq.core.consistency.persistent.ConsistencyService;
+import org.monkey.mmq.metrics.GlobalMQTTMessageCounter;
 import org.monkey.mmq.notifier.ClientActor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -57,12 +59,12 @@ public class SessionStoreService implements RecordListener<ClientMateData> {
     @Resource(name = "mqttPersistentConsistencyServiceDelegate")
     private ConsistencyService consistencyService;
 
+    @Autowired
+    GlobalMQTTMessageCounter globalMQTTMessageCounter;
+
     ActorSystem actorSystem;
 
     RpcClient rpcClient;
-
-    @Autowired
-    private SystemInfoStoreService systemInfoStoreService;
 
     private final ServerMemberManager memberManager;
 
@@ -200,40 +202,19 @@ public class SessionStoreService implements RecordListener<ClientMateData> {
 
     @Override
     public void onChange(String key, ClientMateData value) throws Exception {
-
-        // 节点IP为空则删除
-//        if (StringUtils.isEmpty(value.getNodeIp())) {
-//            this.delete(value.getClientId());
-//        }
-//
-        // 判断是否是连接本节点的客户端
-//        if (this.memberManager.getSelf().getIp().equals(value.getNodeIp())) {
-//            SessionMateData sessionMateData = storage.get(value.getClientId());
-//            if (sessionMateData != null) {
-//                clientStory.put(key, value);
-//            } else {
-//                this.delete(value.getClientId());
-//            }
-//        } else {
-//            clientStory.put(key, value);
-//        }
         clientStory.put(key, value);
-        SystemInfoMateData systemInfoMateData = systemInfoStoreService.getSystemInfo();
-        systemInfoMateData.setClientCount(clientStory.size());
-        systemInfoStoreService.put(systemInfoMateData);
+        globalMQTTMessageCounter.countInbound(MqttMessageType.CONNECT);
     }
 
     @Override
     public void onDelete(String key) throws Exception {
 
         ClientMateData clientMateData = clientStory.get(key);
-        SystemInfoMateData systemInfoMateData = systemInfoStoreService.getSystemInfo();
         if (clientActors.get(clientMateData.getClientId()) != null) {
             actorSystem.stop(clientActors.get(clientMateData.getClientId()));
             clientActors.remove(clientMateData.getClientId());
         }
         clientStory.remove(key);
-        systemInfoMateData.setClientCount(clientStory.size());
-        systemInfoStoreService.put(systemInfoMateData);
+        globalMQTTMessageCounter.countOutbound(MqttMessageType.CONNECT);
     }
 }

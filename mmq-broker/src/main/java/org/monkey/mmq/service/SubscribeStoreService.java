@@ -16,6 +16,7 @@
 package org.monkey.mmq.service;
 
 import cn.hutool.core.util.StrUtil;
+import io.netty.handler.codec.mqtt.MqttMessageType;
 import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.cluster.ServerMemberManager;
 import org.monkey.mmq.core.exception.MmqException;
@@ -25,6 +26,7 @@ import org.monkey.mmq.config.UtilsAndCommons;
 import org.monkey.mmq.core.actor.metadata.subscribe.SubscribeMateData;
 import org.monkey.mmq.core.actor.metadata.system.SystemInfoMateData;
 import org.monkey.mmq.core.consistency.persistent.ConsistencyService;
+import org.monkey.mmq.metrics.GlobalMQTTMessageCounter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -47,7 +49,7 @@ public class SubscribeStoreService implements RecordListener<SubscribeMateData> 
     private ConsistencyService consistencyService;
 
     @Autowired
-    private SystemInfoStoreService systemInfoStoreService;
+    GlobalMQTTMessageCounter globalMQTTMessageCounter;
 
     private Map<String, ConcurrentHashMap<String, SubscribeMateData>> subscribes = new ConcurrentHashMap<>();
 
@@ -184,6 +186,7 @@ public class SubscribeStoreService implements RecordListener<SubscribeMateData> 
             }
             clientConcurrentHashMap.put(key, value);
             subWildcard.put(value.getTopicFilter(), clientConcurrentHashMap);
+            globalMQTTMessageCounter.countInbound(MqttMessageType.SUBSCRIBE);
         } else  {
             ConcurrentHashMap<String, SubscribeMateData> clientConcurrentHashMap = subscribes.get(value.getTopicFilter());
             if (clientConcurrentHashMap == null) {
@@ -191,34 +194,18 @@ public class SubscribeStoreService implements RecordListener<SubscribeMateData> 
             }
             clientConcurrentHashMap.put(key, value);
             subscribes.put(value.getTopicFilter(), clientConcurrentHashMap);
+            globalMQTTMessageCounter.countInbound(MqttMessageType.SUBSCRIBE);
         }
-
-        AtomicInteger subCount = new AtomicInteger();
-        subscribes.forEach((subKey, client) -> {
-            subCount.addAndGet(client.size());
-        });
-        subWildcard.forEach((subKey, client) -> {
-            subCount.addAndGet(client.size());
-        });
-        SystemInfoMateData systemInfoMateData = systemInfoStoreService.getSystemInfo();
-        systemInfoMateData.setSubscribeCount(subCount.get());
-        systemInfoStoreService.put(systemInfoMateData);
     }
 
     @Override
     public void onDelete(String key) throws Exception {
-        AtomicInteger subCount = new AtomicInteger();
         subscribes.forEach((subKey, client) -> {
             client.remove(key);
-            subCount.addAndGet(client.size());
         });
         subWildcard.forEach((subKey, client) -> {
             client.remove(key);
-            subCount.addAndGet(client.size());
         });
-
-        SystemInfoMateData systemInfoMateData = systemInfoStoreService.getSystemInfo();
-        systemInfoMateData.setSubscribeCount(subCount.get());
-        systemInfoStoreService.put(systemInfoMateData);
+        globalMQTTMessageCounter.countOutbound(MqttMessageType.SUBSCRIBE);
     }
 }

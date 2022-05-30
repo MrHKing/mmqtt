@@ -15,14 +15,17 @@
  */
 package org.monkey.mmq.web.controller;
 
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.Gauge;
+import io.micrometer.core.lang.Nullable;
 import io.netty.util.internal.StringUtil;
 import org.monkey.mmq.core.cluster.ServerMemberManager;
 import org.monkey.mmq.core.actor.metadata.message.ClientMateData;
 import org.monkey.mmq.core.actor.metadata.subscribe.SubscribeMateData;
 import org.monkey.mmq.core.actor.metadata.system.SystemInfoMateData;
+import org.monkey.mmq.metrics.MetricsHolder;
 import org.monkey.mmq.service.SessionStoreService;
 import org.monkey.mmq.service.SubscribeStoreService;
-import org.monkey.mmq.service.SystemInfoStoreService;
 import org.monkey.mmq.core.consistency.model.ResponsePage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -35,6 +38,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.monkey.mmq.metrics.MMQMetrics.*;
+
 /**
  *
  * @author solley
@@ -42,9 +47,6 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping({"/v1/system"})
 public class SystemInfoController {
-
-    @Autowired
-    SystemInfoStoreService systemInfoStoreService;
 
     @Autowired
     SessionStoreService sessionStoreService;
@@ -56,6 +58,9 @@ public class SystemInfoController {
     @Qualifier("serverMemberManager")
     ServerMemberManager memberManager;
 
+    @Autowired
+    MetricsHolder metricsHolder;
+
     /**
      * Get system info.
      *
@@ -63,9 +68,16 @@ public class SystemInfoController {
      */
     @GetMapping("/info")
     public Object getSystemInfo() {
-        SystemInfoMateData systemInfoMateData = systemInfoStoreService.getSystemInfo();
-        long contextTime = System.currentTimeMillis() - systemInfoMateData.getSystemRunTime();
-        systemInfoMateData.setSystemRunTime(contextTime);
+        SystemInfoMateData systemInfoMateData = new SystemInfoMateData();
+        systemInfoMateData.setClientCount(getCountValue(INCOMING_CONNECT_COUNT.name()));
+        systemInfoMateData.setSubscribeCount(getCountValue(SUBSCRIPTIONS_CURRENT.name()));
+
+        final Number bytesReadTotal = getGaugeValue(BYTES_READ_TOTAL.name());
+        final Number bytesWrittenTotal = getGaugeValue(BYTES_WRITE_TOTAL.name());
+
+        systemInfoMateData.setBytesReadTotal(bytesReadTotal.longValue());
+        systemInfoMateData.setBytesWrittenTotal(bytesWrittenTotal.longValue());
+
         return systemInfoMateData;
     }
 
@@ -146,5 +158,39 @@ public class SystemInfoController {
     @GetMapping("/nodes")
     public Object getNodes() {
         return memberManager.getServerList().values();
+    }
+
+    private @Nullable long getCountValue(final String metricName) {
+        try {
+            final SortedMap<String, Counter> counters = metricsHolder.getMetricRegistry().getCounters((name, metric) -> metricName.equals(name));
+            if (counters.isEmpty()) {
+                return 0;
+            }
+
+            //we expect a single result here
+            final Counter counter = counters.values().iterator().next();
+
+            final long value = counter.getCount();
+            return value;
+        } catch (final Exception e) {
+            return 0;
+        }
+    }
+
+    private @Nullable <T> T getGaugeValue(final String metricName) {
+        try {
+            final SortedMap<String, Gauge> gauges = metricsHolder.getMetricRegistry().getGauges((name, metric) -> metricName.equals(name));
+            if (gauges.isEmpty()) {
+                return null;
+            }
+
+            //we expect a single result here
+            final Gauge gauge = gauges.values().iterator().next();
+
+            final T value = (T) gauge.getValue();
+            return value;
+        } catch (final Exception e) {
+            return null;
+        }
     }
 }

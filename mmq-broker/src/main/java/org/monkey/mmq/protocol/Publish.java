@@ -25,6 +25,7 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.*;
 import io.netty.util.AttributeKey;
 import org.monkey.mmq.config.Loggers;
+import org.monkey.mmq.core.actor.metadata.message.PublishInOutType;
 import org.monkey.mmq.core.cluster.Member;
 import org.monkey.mmq.core.entity.InternalMessage;
 import org.monkey.mmq.core.exception.MmqException;
@@ -35,6 +36,7 @@ import org.monkey.mmq.core.actor.metadata.message.SessionMateData;
 import org.monkey.mmq.core.actor.metadata.subscribe.SubscribeMateData;
 import org.monkey.mmq.core.actor.message.PublishMessage;
 import org.monkey.mmq.config.matedata.RuleEngineMessage;
+import org.monkey.mmq.metrics.GlobalMQTTMessageCounter;
 import org.monkey.mmq.service.*;
 
 import java.util.List;
@@ -53,6 +55,8 @@ public class Publish {
 
 	private DupPublishMessageStoreService dupPublishMessageStoreService;
 
+	private GlobalMetricsStoreService globalMetricsStoreService;
+
 	private ActorSystem actorSystem;
 
 	private final Member local;
@@ -61,13 +65,14 @@ public class Publish {
 				   RetainMessageStoreService retainMessageStoreService,
 				   DupPublishMessageStoreService dupPublishMessageStoreService,
 				   Member local,
-				   ActorSystem actorSystem) {
+				   ActorSystem actorSystem, GlobalMetricsStoreService globalMetricsStoreService) {
 		this.sessionStoreService = sessionStoreService;
 		this.subscribeStoreService = subscribeStoreService;
 		this.retainMessageStoreService = retainMessageStoreService;
 		this.dupPublishMessageStoreService = dupPublishMessageStoreService;
 		this.local = local;
 		this.actorSystem = actorSystem;
+		this.globalMetricsStoreService = globalMetricsStoreService;
 	}
 
 	public void processPublish(Channel channel, MqttPublishMessage msg) throws MmqException {
@@ -85,6 +90,9 @@ public class Publish {
 		// 规则引擎
 		SessionMateData sessionStore = sessionStoreService.get(clientId);
 		if (sessionStore == null) return;
+
+		// byte flow metrics
+		globalMetricsStoreService.put(clientId, messageBytes.length, PublishInOutType.IN);
 
 		RuleEngineMessage ruleEngineMessage = new RuleEngineMessage();
 		ruleEngineMessage.setUsername(sessionStore.getUser());
@@ -112,6 +120,12 @@ public class Publish {
 		List<SubscribeMateData> subscribeStores = subscribeStoreService.search(topic);
 
 		subscribeStores.forEach(subscribeStore -> {
+				// byte flow metrics
+				try {
+					globalMetricsStoreService.put(clientId, messageBytes.length, PublishInOutType.OUT);
+				} catch (MmqException e) {
+					Loggers.BROKER_PROTOCOL.info("publish byte flow metrics error!");
+				}
 				// 订阅者收到MQTT消息的QoS级别, 最终取决于发布消息的QoS和主题订阅的QoS
 				MqttQoS respQoS = mqttQoS.value() > subscribeStore.getMqttQoS() ? MqttQoS.valueOf(subscribeStore.getMqttQoS()) : mqttQoS;
 				SessionMateData sessionStore = sessionStoreService.get(subscribeStore.getClientId());

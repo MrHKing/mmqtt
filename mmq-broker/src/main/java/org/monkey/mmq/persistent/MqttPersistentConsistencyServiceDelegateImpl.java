@@ -108,16 +108,10 @@ public class MqttPersistentConsistencyServiceDelegateImpl implements PersistentC
     protected Class<? extends Record> getClassOfRecordFromKey(String key) {
         if (KeyBuilder.matchSessionStoreKey(key)) {
             return ClientMateData.class;
-        } else if (KeyBuilder.matchSystemRunTimeKey(key)) {
-            return SystemInfoMateData.class;
         } else if (KeyBuilder.matchSubscribeKey(key)) {
             return SubscribeMateData.class;
         } else if (KeyBuilder.matchPublishKey(key)) {
-            return DupPublishMessageMateData.class;
-        } else if (KeyBuilder.matchPubRelKey(key)) {
-            return DupPubRelMessageMateData.class;
-        } else if (KeyBuilder.matchRetainKey(key)) {
-            return RetainMessageMateData.class;
+            return PublishMateData.class;
         }
         return Record.class;
     }

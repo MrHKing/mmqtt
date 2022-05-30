@@ -26,7 +26,7 @@ import java.io.Serializable;
  */
 public class SystemInfoMateData implements Record, Serializable {
 
-    private Integer clientCount;
+    private long clientCount;
 
     private long systemRunTime;
 
@@ -34,22 +34,33 @@ public class SystemInfoMateData implements Record, Serializable {
 
     private String systemName;
 
-    private Integer subscribeCount;
+    private long subscribeCount;
 
-    public SystemInfoMateData(String version, String systemName, long systemRunTime) {
-        this.version = version;
-        this.systemName = systemName;
-        this.systemRunTime = systemRunTime;
-        this.clientCount = 0;
-        this.subscribeCount = 0;
+    private long bytesReadTotal;
+
+    private long bytesWrittenTotal;
+
+    public long getBytesReadTotal() {
+        return bytesReadTotal;
     }
 
+    public void setBytesReadTotal(long bytesReadTotal) {
+        this.bytesReadTotal = bytesReadTotal;
+    }
 
-    public Integer getClientCount() {
+    public long getBytesWrittenTotal() {
+        return bytesWrittenTotal;
+    }
+
+    public void setBytesWrittenTotal(long bytesWrittenTotal) {
+        this.bytesWrittenTotal = bytesWrittenTotal;
+    }
+
+    public long getClientCount() {
         return clientCount;
     }
 
-    public void setClientCount(Integer clientCount) {
+    public void setClientCount(long clientCount) {
         this.clientCount = clientCount;
     }
 
@@ -77,11 +88,11 @@ public class SystemInfoMateData implements Record, Serializable {
         this.systemName = systemName;
     }
 
-    public Integer getSubscribeCount() {
+    public long getSubscribeCount() {
         return subscribeCount;
     }
 
-    public void setSubscribeCount(Integer subscribeCount) {
+    public void setSubscribeCount(long subscribeCount) {
         this.subscribeCount = subscribeCount;
     }
 
