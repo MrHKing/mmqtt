@@ -76,6 +76,8 @@ export default {
           return ' ip:' + resource.ip + ' port:' + resource.port + ' 数据库名称:' + resource.databaseName
         case 'KAFKA':
           return ' Kafka服务:' + resource.server
+        case 'RABBITMQ':
+          return ' RabbitMQip:' + resource.ip + ' port:' + resource.port
         case 'MQTT_BROKER':
           return ' MQTT BROKER服务:' + resource.server
         default:

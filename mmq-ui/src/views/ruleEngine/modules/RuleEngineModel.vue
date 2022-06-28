@@ -107,6 +107,7 @@
               <a-select-option value="TDENGINE"> Tdengine </a-select-option>
               <a-select-option value="KAFKA"> Kafka </a-select-option>
               <a-select-option value="MQTT_BROKER"> MQTT Broker </a-select-option>
+              <a-select-option value="RABBITMQ"> RabbitMQ </a-select-option>
             </a-select>
           </a-form-item>
         </a-row>
@@ -128,7 +129,7 @@
           </a-form-item>
         </a-row>
         <a-row :gutter="16">
-          <div v-if="curType != 'KAFKA' && curType != 'MQTT_BROKER'">
+          <div v-if="curType != 'KAFKA' && curType != 'MQTT_BROKER' && curType !='RABBITMQ'">
             <a-form-item label="SQL">
               <codemirror
                 v-decorator="['resource.sql', { rules: [{ required: true, message: '请输入SQL' }] }]"
@@ -144,12 +145,28 @@
               />
             </a-form-item>
           </div>
-          <div v-if="curType === 'MQTT_BROKER'">
-            <a-form-item label="Payload">
+          <div v-if="curType === 'RABBITMQ'">
+            <a-form-item label="Exchange">
               <a-input
-                v-decorator="['resource.payload', { rules: [{ required: false, message: '请输入Payload' }] }]"
-                placeholder="请输入Payload"
+                v-decorator="['resource.exchange', { rules: [{ required: false, message: '请输入exchange' }] }]"
+                placeholder="请输入exchange"
               />
+            </a-form-item>
+          </div>
+          <div v-if="curType === 'RABBITMQ'">
+            <a-form-item label="Queue">
+              <a-input
+                v-decorator="['resource.queue', { rules: [{ required: false, message: '请输入queue' }] }]"
+                placeholder="请输入queue"
+              />
+            </a-form-item>
+          </div>
+          <div v-if="curType === 'MQTT_BROKER' || curType === 'RABBITMQ'">
+            <a-form-item label="Payload">
+              <codemirror
+                v-decorator="['resource.payload', { rules: [{ required: true, message: '请输入payload' }] }]"
+                :options="options"
+              ></codemirror>
             </a-form-item>
           </div>
         </a-row>
@@ -281,6 +298,8 @@ export default {
           return ' ip:' + resource.ip + ' port:' + resource.port + ' 数据库名称:' + resource.databaseName
         case 'KAFKA':
           return ' Kafka服务:' + resource.server + ' topic:' + resource.topic
+           case 'RABBITMQ':
+          return ' RabbitMQ服务:' + resource.ip + ' queue:' + resource.queue + ' exchange' + resource.exchange
         default:
           return ''
       }
@@ -340,6 +359,23 @@ export default {
             })
           })
           break
+        case 'RABBITMQ':
+          this.$nextTick(() => {
+            this.resourcesform.setFieldsValue({
+              resourceID: record.resourceID,
+              type: type,
+              description: record.description,
+              resource: {
+                ip: record.resource.ip,
+                password: record.resource.password,
+                username: record.resource.username,
+                queue: record.resource.queue,
+                exchange: record.resource.exchange,
+                payload: record.resource.payload
+              }
+            })
+          })
+          break
       }
     },
     handleResourceOk() {
@@ -356,6 +392,9 @@ export default {
               const resource = resources[0]
               resource.resource.sql = formData.resource.sql
               resource.resource.topic = formData.resource.topic
+              resource.resource.queue = formData.resource.queue
+              resource.resource.exchange = formData.resource.exchange
+              resource.resource.payload = formData.resource.payload
               resource.resourceIndex = that.resourceIndex
               that.resourceIndex++
               console.log(that.resourcesAddFlag)

@@ -19,6 +19,7 @@ package org.monkey.mmq.protocol;
 
 import akka.actor.ActorSystem;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerSocketChannel;
@@ -123,12 +124,13 @@ public class BrokerServer {
 					channelPipeline.addLast("broker", new BrokerHandler(protocolProcess, actorSystem));
 				}
 			})
-			.option(ChannelOption.SO_BACKLOG,512)
-//			.childOption(ChannelOption.TCP_NODELAY, false)
-//			.childOption(ChannelOption.SO_SNDBUF, 65536)
-//			.option(ChannelOption.SO_RCVBUF, 65536)
-//			.option(ChannelOption.SO_REUSEADDR, true)
-			.childOption(ChannelOption.SO_KEEPALIVE, brokerProperties.isSoKeepAlive());
+			.option(ChannelOption.SO_BACKLOG, 128)
+			.option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+			.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+			.childOption(ChannelOption.SO_KEEPALIVE, true)
+			.childOption(ChannelOption.TCP_NODELAY, true)
+			.childOption(ChannelOption.SO_REUSEADDR, true)
+			.childOption(ChannelOption.SO_KEEPALIVE, true);
 		channel = sb.bind(brokerProperties.getPort()).sync().channel();
 	}
 
@@ -157,12 +159,13 @@ public class BrokerServer {
 					channelPipeline.addLast("broker", new BrokerHandler(protocolProcess, actorSystem));
 				}
 			})
-			.option(ChannelOption.SO_BACKLOG, 512)
-//			.childOption(ChannelOption.TCP_NODELAY, false)
-//			.childOption(ChannelOption.SO_SNDBUF, Integer.MAX_VALUE)
-//			.option(ChannelOption.SO_RCVBUF, Integer.MAX_VALUE)
-//			.option(ChannelOption.SO_REUSEADDR, true)
-			.childOption(ChannelOption.SO_KEEPALIVE, brokerProperties.isSoKeepAlive());
+			.option(ChannelOption.SO_BACKLOG, 128)
+				.option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+				.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+				.childOption(ChannelOption.SO_KEEPALIVE, true)
+				.childOption(ChannelOption.TCP_NODELAY, true)
+				.childOption(ChannelOption.SO_REUSEADDR, true)
+				.childOption(ChannelOption.SO_KEEPALIVE, true);
 		websocketChannel = sb.bind(brokerProperties.getWebsocketPort()).sync().channel();
 	}
 

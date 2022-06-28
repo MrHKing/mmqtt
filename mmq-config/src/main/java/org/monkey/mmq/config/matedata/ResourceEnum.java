@@ -7,7 +7,8 @@ public enum ResourceEnum {
     POSTGRESQL(org.monkey.mmq.config.driver.PostgresqlDriver.class),
     MQTT_BROKER(org.monkey.mmq.config.driver.MQTTDriver.class),
     TDENGINE(org.monkey.mmq.config.driver.TDengineDriver.class),
-    INFLUXDB(org.monkey.mmq.config.driver.InfluxDBDriver.class);
+    INFLUXDB(org.monkey.mmq.config.driver.InfluxDBDriver.class),
+    RABBITMQ(org.monkey.mmq.config.driver.RabbitMQDriver.class),;
 
     private Class name;
 

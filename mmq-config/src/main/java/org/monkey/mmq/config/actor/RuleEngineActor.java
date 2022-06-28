@@ -99,15 +99,15 @@ public final class RuleEngineActor extends AbstractActor {
     }
 
     protected void ruleProcess(RuleEngineMessage msg) {
-        if (!ruleEngineMateData.getEnable()) return;
+        if (!this.ruleEngineMateData.getEnable()) return;
         
         reactorQL.start(name -> isTopic(msg.getMessage().getTopic(), name) ?
                         Flux.just((new ObjectMapper().convertValue(JacksonUtils.toObj(new String(msg.getMessage().getMessageBytes().toByteArray())),Map.class))) : Flux.just())
                 .doOnNext(map -> {
                     // 如果不为空则触发响应
-                    if (map != null && ruleEngineMateData.getResourcesMateDatas().size() != 0) {
+                    if (map != null && this.ruleEngineMateData.getResourcesMateDatas().size() != 0) {
                         // 根据规则获得规则的响应
-                        ruleEngineMateData.getResourcesMateDatas().forEach(resource -> {
+                        this.ruleEngineMateData.getResourcesMateDatas().forEach(resource -> {
                             DriverMessage driverMessage = new DriverMessage();
                             driverMessage.setProperty(map);
                             driverMessage.setResourcesMateData(resource);

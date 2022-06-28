@@ -95,6 +95,7 @@
     <commons-dbcp.version>1.4</commons-dbcp.version>
     <commons-io.version>2.7</commons-io.version>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <rabbitmq.version>5.15.0</rabbitmq.version>
     <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
     <sqljdbc4.version>4.0</sqljdbc4.version>
     <maven-assembly-plugin.version>3.0.0</maven-assembly-plugin.version>
@@ -318,6 +319,11 @@
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <version>${guava.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.rabbitmq</groupId>
+        <artifactId>amqp-client</artifactId>
+        <version>${rabbitmq.version}</version>
       </dependency>
       <dependency>
         <groupId>io.grpc</groupId>

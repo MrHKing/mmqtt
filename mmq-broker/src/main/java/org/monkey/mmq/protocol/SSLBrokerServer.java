@@ -18,7 +18,9 @@ package org.monkey.mmq.protocol;
 
 
 import akka.actor.ActorSystem;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerSocketChannel;
@@ -51,6 +53,7 @@ import javax.net.ssl.SSLEngine;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.util.UUID;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * Netty启动Broker
@@ -86,8 +89,8 @@ public class SSLBrokerServer {
 	@PostConstruct
 	public void start() throws Exception {
 		LoggerUtils.printIfInfoEnabled(Loggers.BROKER_PROTOCOL,"Initializing {} MQTT Broker ...", "[" + id + "]");
-		bossGroup = brokerProperties.isUseEpoll() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
-		workerGroup = brokerProperties.isUseEpoll() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
+		bossGroup = brokerProperties.isUseEpoll() ? new EpollEventLoopGroup() : new NioEventLoopGroup(1, createThreadFactory("mmq-eventloop-parent-%d"));
+		workerGroup = brokerProperties.isUseEpoll() ? new EpollEventLoopGroup() : new NioEventLoopGroup(0, createThreadFactory("mmq-eventloop-child-%d"));
 		KeyStore keyStore = KeyStore.getInstance("PKCS12");
 		InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(brokerProperties.getSslCertPath());
 		keyStore.load(inputStream, brokerProperties.getSslPassword().toCharArray());
@@ -146,12 +149,13 @@ public class SSLBrokerServer {
 					channelPipeline.addLast("broker", new BrokerHandler(protocolProcess, actorSystem));
 				}
 			})
-			.option(ChannelOption.SO_BACKLOG,512)
-//			.childOption(ChannelOption.TCP_NODELAY, false)
-//			.childOption(ChannelOption.SO_SNDBUF, 65536)
-//			.option(ChannelOption.SO_RCVBUF, 65536)
-//			.option(ChannelOption.SO_REUSEADDR, true)
-			.childOption(ChannelOption.SO_KEEPALIVE, brokerProperties.isSoKeepAlive());
+				.option(ChannelOption.SO_BACKLOG, 128)
+				.option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+				.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+				.childOption(ChannelOption.SO_KEEPALIVE, true)
+				.childOption(ChannelOption.TCP_NODELAY, true)
+				.childOption(ChannelOption.SO_REUSEADDR, true)
+				.childOption(ChannelOption.SO_KEEPALIVE, true);
 		channel = sb.bind(brokerProperties.getSSLPort()).sync().channel();
 	}
 
@@ -195,13 +199,25 @@ public class SSLBrokerServer {
 					channelPipeline.addLast("broker", new BrokerHandler(protocolProcess, actorSystem));
 				}
 			})
-			.option(ChannelOption.SO_BACKLOG, 512)
-//			.childOption(ChannelOption.TCP_NODELAY, false)
-//			.childOption(ChannelOption.SO_SNDBUF, 65536)
-//			.option(ChannelOption.SO_RCVBUF, 65536)
-//			.option(ChannelOption.SO_REUSEADDR, true)
-			.childOption(ChannelOption.SO_KEEPALIVE, brokerProperties.isSoKeepAlive());
+			.option(ChannelOption.SO_BACKLOG, 128)
+			.option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+			.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+			.childOption(ChannelOption.SO_KEEPALIVE, true)
+			.childOption(ChannelOption.TCP_NODELAY, true)
+			.childOption(ChannelOption.SO_REUSEADDR, true)
+			.childOption(ChannelOption.SO_KEEPALIVE, true);
 		websocketChannel = sb.bind(brokerProperties.getSSLWebsocketPort()).sync().channel();
 	}
 
+	/**
+	 * Creates a Thread Factory that names Threads with the given format
+	 *
+	 * @param nameFormat the format
+	 * @return a ThreadFactory that names Threads with the given format
+	 */
+	private ThreadFactory createThreadFactory(final String nameFormat) {
+		return new ThreadFactoryBuilder().
+				setNameFormat(nameFormat).
+				build();
+	}
 }

@@ -67,6 +67,12 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
+      <groupId>com.rabbitmq</groupId>
+      <artifactId>amqp-client</artifactId>
+      <version>5.15.0</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
       <groupId>io.projectreactor</groupId>
       <artifactId>reactor-tools</artifactId>
       <version>3.3.8.RELEASE</version>
