@@ -18,6 +18,7 @@ package org.monkey.mmq.config.driver;
 
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.alibaba.fastjson.JSON;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -145,12 +146,15 @@ public class RabbitMQDriver implements ResourceDriver<Channel> {
             channel = (Channel) this.getDriver(resourcesMateData.getResourceID());
             if (channel != null && resourcesMateData.getResource().get(EXCHANGE) != null
                 && resourcesMateData.getResource().get(QUEUE) != null
-                &&  resourcesMateData.getResource().get(PAYLOAD) != null) {
-                DriverFactory.setProperty(property, topic, username);
-                String template = resourcesMateData.getResource().get(PAYLOAD).toString();
-                ExpressionParser parser = new SpelExpressionParser();
-                TemplateParserContext parserContext = new TemplateParserContext();
-                String content = parser.parseExpression(template, parserContext).getValue(property, String.class);
+                && resourcesMateData.getResource().get(PAYLOAD) != null) {
+                String content = JSON.toJSONString(property);
+                if (!resourcesMateData.getResource().get(PAYLOAD).equals(PAYLOAD)) {
+                    DriverFactory.setProperty(property, topic, username);
+                    String template = resourcesMateData.getResource().get(PAYLOAD).toString();
+                    ExpressionParser parser = new SpelExpressionParser();
+                    TemplateParserContext parserContext = new TemplateParserContext();
+                    content = parser.parseExpression(template, parserContext).getValue(property, String.class);
+                }
                 channel.basicPublish(resourcesMateData.getResource().get(EXCHANGE).toString(),
                         resourcesMateData.getResource().get(QUEUE).toString(), null, content.getBytes());
             }
