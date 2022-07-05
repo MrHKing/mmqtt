@@ -29,6 +29,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import static org.monkey.mmq.config.config.Constants.*;
 
 /**
  * @author solley
@@ -39,16 +40,6 @@ public class MysqlDriver implements ResourceDriver<Connection> {
     private ConcurrentHashMap<String, DruidDataSource> dataSources = new ConcurrentHashMap<>();
 
     static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
-
-    static final String IP = "ip";
-
-    static final String DATABASE_NAME = "databaseName";
-
-    static final String USERNAME = "username";
-
-    static final String PASSWORD = "password";
-
-    static final String PORT = "port";
 
     @Override
     public void addDriver(String resourceId, Map<String, Object> resource) {

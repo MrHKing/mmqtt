@@ -24,6 +24,7 @@ import java.security.cert.X509Certificate;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import static org.monkey.mmq.config.config.Constants.*;
 
 /**
  * @ClassNameMQTTDriver
@@ -164,6 +165,7 @@ public class MQTTDriver implements ResourceDriver<MqttClient> {
         try {
             MqttClient mqttClient = this.getDriver(resourcesMateData.getResourceID());
             if (mqttClient.isConnected()) {
+                if (resourcesMateData.getResource().get(PAYLOAD) != null)
                 mqttClient.publish(topic,
                         JSON.toJSONString(property).getBytes(),
                         qos, false);

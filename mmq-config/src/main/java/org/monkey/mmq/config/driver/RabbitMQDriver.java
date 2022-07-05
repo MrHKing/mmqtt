@@ -36,6 +36,7 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeoutException;
+import static org.monkey.mmq.config.config.Constants.*;
 
 /**
  * @ClassName:RabbitMQDriver
@@ -48,21 +49,7 @@ import java.util.concurrent.TimeoutException;
 public class RabbitMQDriver implements ResourceDriver<Channel> {
 
     private ConcurrentHashMap<String, Connection> dataSources = new ConcurrentHashMap<>();
-    static final String IP = "ip";
 
-    static final String VIRTUALHOST = "virtualHost";
-
-    static final String USERNAME = "username";
-
-    static final String PASSWORD = "password";
-
-    static final String PORT = "port";
-
-    static final String QUEUE = "queue";
-
-    static final String EXCHANGE = "exchange";
-
-    static final String PAYLOAD = "payload";
 
     @Override
     public void addDriver(String resourceId, Map<String, Object> resource) {

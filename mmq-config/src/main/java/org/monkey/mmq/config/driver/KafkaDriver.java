@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
+import static org.monkey.mmq.config.config.Constants.*;
 
 /**
  * @author solley
@@ -37,8 +38,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class KafkaDriver implements ResourceDriver<Producer<String, String>> {
     private ConcurrentHashMap<String, Producer<String, String>> producers = new ConcurrentHashMap<>();
-
-    static final String SERVER = "server";
 
     @Override
     public void addDriver(String resourceId, Map resource) {

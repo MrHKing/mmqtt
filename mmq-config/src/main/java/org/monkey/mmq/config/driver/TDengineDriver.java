@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static org.monkey.mmq.config.config.Constants.*;
+
 /**
  * @author solley
  */
@@ -41,16 +43,6 @@ public class TDengineDriver implements ResourceDriver {
     private ConcurrentHashMap<String, DruidDataSource> dataSources = new ConcurrentHashMap<>();
 
     static final String JDBC_DRIVER = "com.taosdata.jdbc.rs.RestfulDriver";
-
-    static final String IP = "ip";
-
-    static final String DATABASE_NAME = "databaseName";
-
-    static final String USERNAME = "username";
-
-    static final String PASSWORD = "password";
-
-    static final String PORT = "port";
 
     @Override
     public void addDriver(String resourceId, Map resource) {

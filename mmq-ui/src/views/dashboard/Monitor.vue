@@ -5,8 +5,8 @@
         <a-col :span="6">
           <a-card>
             <a-statistic
-              title="总接收字节(byte)"
-              :value="SystemInfoMateData.bytesReadTotal"
+              title="总接收字节(MB)"
+              :value="(SystemInfoMateData.bytesReadTotal / 1024 / 1024).toFixed(2)"
               class="demo-class"
               :value-style="{ color: '#3f8600', fontSize: '32px' }"
             >
@@ -19,8 +19,8 @@
         <a-col :span="6">
           <a-card>
             <a-statistic
-              title="总发送字节(byte)"
-              :value="SystemInfoMateData.bytesWrittenTotal"
+              title="总发送字节(MB)"
+              :value="(SystemInfoMateData.bytesWrittenTotal / 1024 / 1024).toFixed(2)"
               class="demo-class"
               :value-style="{ color: '#3f8600', fontSize: '28px' }"
             >
