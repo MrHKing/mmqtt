@@ -18,9 +18,9 @@
               :options="options"
             ></codemirror>
           </a-form-item>
-          <!-- <a-form-item label="是否启用">
-            <a-switch v-decorator="['enable', { valuePropName: 'checked' }]" />
-          </a-form-item> -->
+          <a-form-item label="是否启用">
+            <a-switch v-model="enable" />
+          </a-form-item>
           <a-form-item label="备注">
             <a-textarea
               v-decorator="[
@@ -198,6 +198,7 @@ export default {
   data() {
     return {
       visible: false,
+      enable: true,
       resourceType: '',
       confirmLoading: false,
       confirmResourceLoading: false,
@@ -260,8 +261,8 @@ export default {
       getAction(this.url.listResourcesByRuleId, { ruleId: this.id }).then(res => {
         if (res.data) {
           this.ruleEngine = res.data
+          this.enable = this.ruleEngine.enable
         }
-
         console.log(this.ruleEngine)
         this.$nextTick(() => {
           this.ruleEngine.resourcesMateDatas.forEach(x => {
@@ -317,8 +318,6 @@ export default {
       if (!this.resourcesAddFlag) {
         this.resourceEditIndex = record.resourceIndex
       }
-
-      console.log(record)
       this.curType = record.type
       this.visible = true
       this.resourcesform.resetFields()
@@ -371,6 +370,21 @@ export default {
                 username: record.resource.username,
                 queue: record.resource.queue,
                 exchange: record.resource.exchange,
+                payload: record.resource.payload
+              }
+            })
+          })
+          break
+        case 'MQTT_BROKER':
+          this.$nextTick(() => {
+            this.resourcesform.setFieldsValue({
+              resourceID: record.resourceID,
+              type: type,
+              description: record.description,
+              resource: {
+                ip: record.resource.ip,
+                password: record.resource.password,
+                username: record.resource.username,
                 payload: record.resource.payload
               }
             })
@@ -429,6 +443,7 @@ export default {
           this.ruleEngine.resourcesMateDatas.splice(0, 1)
           formData.resourcesMateDatas = this.ruleEngine.resourcesMateDatas
           formData.ruleId = this.id
+          formData.enable = this.enable
           const obj = postAction(this.url.save, formData)
           obj
             .then(res => {

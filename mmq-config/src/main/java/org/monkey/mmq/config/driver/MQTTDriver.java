@@ -8,6 +8,9 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.monkey.mmq.config.matedata.ResourcesMateData;
 import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.core.utils.StringUtils;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.common.TemplateParserContext;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.stereotype.Component;
 
 import javax.net.ssl.SSLContext;
@@ -104,7 +107,9 @@ public class MQTTDriver implements ResourceDriver<MqttClient> {
     public MqttClient getDriver(String resourceId) throws Exception {
         if (mqttClientConcurrentHashMap == null) return null;
         if (mqttClientConcurrentHashMap.get(resourceId) == null) return null;
-        if (!mqttClientConcurrentHashMap.get(resourceId).isConnected()) return null;
+        if (!mqttClientConcurrentHashMap.get(resourceId).isConnected()) {
+            mqttClientConcurrentHashMap.get(resourceId).reconnect();
+        }
         return mqttClientConcurrentHashMap.get(resourceId);
     }
 
@@ -165,9 +170,17 @@ public class MQTTDriver implements ResourceDriver<MqttClient> {
         try {
             MqttClient mqttClient = this.getDriver(resourcesMateData.getResourceID());
             if (mqttClient.isConnected()) {
-                if (resourcesMateData.getResource().get(PAYLOAD) != null)
+                String content = JSON.toJSONString(property);
+                if (resourcesMateData.getResource().get(PAYLOAD) != null
+                        && resourcesMateData.getResource().get(PAYLOAD) != "") {
+                    DriverFactory.setProperty(property, topic, username);
+                    String template = resourcesMateData.getResource().get(PAYLOAD).toString();
+                    ExpressionParser parser = new SpelExpressionParser();
+                    TemplateParserContext parserContext = new TemplateParserContext();
+                    content = parser.parseExpression(template, parserContext).getValue(property, String.class);
+                }
                 mqttClient.publish(topic,
-                        JSON.toJSONString(property).getBytes(),
+                        content.getBytes(),
                         qos, false);
             } else {
                 mqttClient.reconnect();

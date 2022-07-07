@@ -75,6 +75,10 @@ const columns = [
     dataIndex: 'ruleId'
   },
   {
+    title: '规则名称',
+    dataIndex: 'name'
+  },
+  {
     title: '说明',
     dataIndex: 'description',
     sorter: true
