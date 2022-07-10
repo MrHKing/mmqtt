@@ -17,6 +17,12 @@ public class Constants {
 
     public static final String PASSWORD = "password";
 
+    public static final String INFLUXDB_BUCKET = "bucket";
+
+    public static final String INFLUXDB_ORG = "org";
+
+    public static final String TOKEN = "token";
+
     public static final String PORT = "port";
 
     public static final String QUEUE = "queue";

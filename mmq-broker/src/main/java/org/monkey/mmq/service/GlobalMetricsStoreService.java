@@ -33,6 +33,8 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 import static org.monkey.mmq.core.actor.metadata.message.PublishInOutType.IN;
 
 /**
@@ -41,55 +43,16 @@ import static org.monkey.mmq.core.actor.metadata.message.PublishInOutType.IN;
  * @author solley
  */
 @Service
-public class GlobalMetricsStoreService  implements RecordListener<PublishMateData> {
-
-    @Resource(name = "mqttPersistentConsistencyServiceDelegate")
-    private ConsistencyService consistencyService;
+public class GlobalMetricsStoreService {
 
     @Autowired
     GlobalMQTTMessageCounter globalMQTTMessageCounter;
 
-    /**
-     * Init
-     */
-    @PostConstruct
-    public void init() {
-        try {
-            consistencyService.listen(KeyBuilder.getPublishStoreKey(), this);
-        } catch (MmqException e) {
-            Loggers.BROKER_SERVER.error("listen global metrics service failed.", e);
-        }
-    }
-
     public void put(String clientId, int bytes, PublishInOutType publishInOutType) throws MmqException {
-        PublishMateData publishMateData = new PublishMateData();
-        publishMateData.setBytes(bytes);
-        publishMateData.setOutInType(publishInOutType.name());
-        consistencyService.put(UtilsAndCommons.PUBLISH_STORE + clientId, publishMateData);
-    }
-
-    @Override
-    public boolean interests(String key) {
-        return KeyBuilder.matchPublishKey(key);
-    }
-
-    @Override
-    public boolean matchUnlistenKey(String key) {
-        return KeyBuilder.matchPublishKey(key);
-    }
-
-    @Override
-    public void onChange(String key, PublishMateData value) throws Exception {
-        if (IN.name().equals(value.getOutInType())) {
-            globalMQTTMessageCounter.countInboundTraffic(value.getBytes());
+        if (IN.name().equals(publishInOutType.name())) {
+            globalMQTTMessageCounter.countInboundTraffic(bytes);
         } else {
-            globalMQTTMessageCounter.countOutboundTraffic(value.getBytes());
+            globalMQTTMessageCounter.countOutboundTraffic(bytes);
         }
-
-    }
-
-    @Override
-    public void onDelete(String key) throws Exception {
-
     }
 }

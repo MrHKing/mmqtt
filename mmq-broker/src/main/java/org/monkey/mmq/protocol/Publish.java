@@ -89,13 +89,13 @@ public class Publish {
 		if (sessionStore == null) return;
 
 		// byte flow metrics
-//		PublishMessage publishMessage = new PublishMessage();
-//		publishMessage.setLocal(true);
-//		publishMessage.setPublishInOutType(PublishInOutType.IN);
-//		publishMessage.setBytes(messageBytes.length);
-//		publishMessage.setClientId(clientId);
-//		ActorSelection actorPublishSelection = actorSystem.actorSelection("/user/" + clientId);
-//		actorPublishSelection.tell(publishMessage, ActorRef.noSender());
+		PublishMessage publishMessage = new PublishMessage();
+		publishMessage.setLocal(true);
+		publishMessage.setPublishInOutType(PublishInOutType.IN);
+		publishMessage.setBytes(messageBytes.length);
+		publishMessage.setClientId(clientId);
+		ActorSelection actorPublishSelection = actorSystem.actorSelection("/user/" + clientId);
+		actorPublishSelection.tell(publishMessage, ActorRef.noSender());
 
 		RuleEngineMessage ruleEngineMessage = new RuleEngineMessage();
 		ruleEngineMessage.setUsername(sessionStore.getUser());
@@ -157,13 +157,13 @@ public class Publish {
 						sessionStore.getChannel().writeAndFlush(publishMessage);
 					}
 
-//					PublishMessage publishMessage = new PublishMessage();
-//					publishMessage.setPublishInOutType(PublishInOutType.OUT);
-//					publishMessage.setLocal(true);
-//					publishMessage.setClientId(clientId);
-//					publishMessage.setBytes(messageBytes.length);
-//					ActorSelection actorSelection = actorSystem.actorSelection("/user/" + clientId);
-//					actorSelection.tell(publishMessage, ActorRef.noSender());
+					PublishMessage publishMessage = new PublishMessage();
+					publishMessage.setPublishInOutType(PublishInOutType.OUT);
+					publishMessage.setLocal(true);
+					publishMessage.setClientId(clientId);
+					publishMessage.setBytes(messageBytes.length);
+					ActorSelection actorSelection = actorSystem.actorSelection("/user/" + clientId);
+					actorSelection.tell(publishMessage, ActorRef.noSender());
 				} else {
 					PublishMessage publishMessage = new PublishMessage();
 					publishMessage.setNodeIp(subscribeStore.getNodeIp());

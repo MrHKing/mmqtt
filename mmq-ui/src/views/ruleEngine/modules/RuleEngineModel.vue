@@ -108,6 +108,7 @@
               <a-select-option value="KAFKA"> Kafka </a-select-option>
               <a-select-option value="MQTT_BROKER"> MQTT Broker </a-select-option>
               <a-select-option value="RABBITMQ"> RabbitMQ </a-select-option>
+              <a-select-option value="INFLUXDB"> InfluxDB V2.0 </a-select-option>
             </a-select>
           </a-form-item>
         </a-row>
@@ -129,12 +130,20 @@
           </a-form-item>
         </a-row>
         <a-row :gutter="16">
-          <div v-if="curType != 'KAFKA' && curType != 'MQTT_BROKER' && curType !='RABBITMQ'">
-            <a-form-item label="SQL">
-              <codemirror
-                v-decorator="['resource.sql', { rules: [{ required: true, message: '请输入SQL' }] }]"
-                :options="options"
-              ></codemirror>
+          <div v-if="curType === 'INFLUXDB'">
+            <a-form-item label="Organization">
+              <a-input
+                v-decorator="['resource.org', { rules: [{ required: true, message: '请输入Organization' }] }]"
+                placeholder="请输入Organization"
+              />
+            </a-form-item>
+          </div>
+          <div v-if="curType === 'INFLUXDB'">
+            <a-form-item label="bucket">
+              <a-input
+                v-decorator="['resource.bucket', { rules: [{ required: true, message: '请输入bucket' }] }]"
+                placeholder="请输入bucket"
+              />
             </a-form-item>
           </div>
           <div v-if="curType === 'KAFKA'">
@@ -159,6 +168,14 @@
                 v-decorator="['resource.queue', { rules: [{ required: false, message: '请输入queue' }] }]"
                 placeholder="请输入queue"
               />
+            </a-form-item>
+          </div>
+          <div v-if="curType != 'KAFKA' && curType != 'MQTT_BROKER' && curType !='RABBITMQ'">
+            <a-form-item label="SQL">
+              <codemirror
+                v-decorator="['resource.sql', { rules: [{ required: true, message: '请输入SQL' }] }]"
+                :options="options"
+              ></codemirror>
             </a-form-item>
           </div>
           <div v-if="curType === 'MQTT_BROKER' || curType === 'RABBITMQ'">
@@ -297,9 +314,11 @@ export default {
           return ' ip:' + resource.ip + ' port:' + resource.port + ' 数据库名称:' + resource.databaseName
         case 'TDENGINE':
           return ' ip:' + resource.ip + ' port:' + resource.port + ' 数据库名称:' + resource.databaseName
+        case 'INFLUXDB':
+          return ' ip:' + resource.ip + ' port:' + resource.port + ' organization:' + resource.org + ' bucket:' + resource.bucket
         case 'KAFKA':
           return ' Kafka服务:' + resource.server + ' topic:' + resource.topic
-           case 'RABBITMQ':
+        case 'RABBITMQ':
           return ' RabbitMQ服务:' + resource.ip + ' queue:' + resource.queue + ' exchange' + resource.exchange
         default:
           return ''
@@ -375,6 +394,23 @@ export default {
             })
           })
           break
+        case 'INFLUXDB':
+          this.$nextTick(() => {
+            this.resourcesform.setFieldsValue({
+              resourceID: record.resourceID,
+              type: type,
+              description: record.description,
+              resource: {
+                ip: record.resource.ip,
+                port: record.resource.port,
+                sql: record.resource.sql,
+                token: record.resource.token,
+                org: record.resource.org,
+                bucket: record.resource.bucket
+              }
+            })
+          })
+          break
         case 'MQTT_BROKER':
           this.$nextTick(() => {
             this.resourcesform.setFieldsValue({
@@ -408,6 +444,8 @@ export default {
               resource.resource.topic = formData.resource.topic
               resource.resource.queue = formData.resource.queue
               resource.resource.exchange = formData.resource.exchange
+              resource.resource.org = formData.resource.org
+              resource.resource.bucket = formData.resource.bucket
               resource.resource.payload = formData.resource.payload
               resource.resourceIndex = that.resourceIndex
               that.resourceIndex++

@@ -28,6 +28,7 @@
               <a-select-option value="KAFKA"> Kafka </a-select-option>
               <a-select-option value="MQTT_BROKER"> MQTT Broker </a-select-option>
               <a-select-option value="RABBITMQ"> RabbitMQ </a-select-option>
+              <a-select-option value="INFLUXDB"> InfluxDB V2.0 </a-select-option>
             </a-select>
           </a-form-item>
         </a-col>
@@ -330,6 +331,49 @@
           </a-col>
         </a-row>
       </div>
+      <div v-show="type === 'INFLUXDB'">
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item label="INFLUXDB IP">
+              <a-input
+                v-decorator="[
+                  'resource.ip',
+                  {
+                    rules: [{ required: type === 'INFLUXDB' ? true : false, message: '请输入INFLUXDB IP' }]
+                  }
+                ]"
+                placeholder="请输入INFLUXDB IP"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12"><a-form-item label="服务端口">
+            <a-input-number
+              v-decorator="[
+                'resource.port',
+                {
+                  rules: [{ required: type === 'INFLUXDB' ? true : false, message: '请输入服务端口' }]
+                }
+              ]"
+              placeholder="请输入服务端口"
+            />
+          </a-form-item> </a-col>
+        </a-row>
+        <a-row :gutter="16">
+          <a-col :span="24">
+            <a-form-item label="TOKEN">
+              <a-input
+                v-decorator="[
+                  'resource.token',
+                  {
+                    rules: [{ required: type === 'INFLUXDB' ? true : false, message: '请输入TOKEN' }]
+                  }
+                ]"
+                placeholder="请输入TOKEN"
+              />
+            </a-form-item>
+          </a-col>
+        </a-row>
+      </div>
       <a-row :gutter="16">
         <a-col :span="24">
           <a-form-item label="备注">
@@ -443,6 +487,20 @@ export default {
                 username: record.resource.username,
                 port: record.resource.port,
                 virtualHost: record.resource.virtualHost
+              }
+            })
+          })
+          break
+        case 'INFLUXDB':
+          this.$nextTick(() => {
+            this.form.setFieldsValue({
+              resourceID: record.resourceID,
+              type: type,
+              description: record.description,
+              resource: {
+                ip: record.resource.ip,
+                port: record.resource.port,
+                token: record.resource.token
               }
             })
           })
