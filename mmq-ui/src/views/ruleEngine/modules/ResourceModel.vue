@@ -28,7 +28,8 @@
               <a-select-option value="KAFKA"> Kafka </a-select-option>
               <a-select-option value="MQTT_BROKER"> MQTT Broker </a-select-option>
               <a-select-option value="RABBITMQ"> RabbitMQ </a-select-option>
-              <a-select-option value="INFLUXDB"> InfluxDB V2.0 </a-select-option>
+              <a-select-option value="INFLUXDB"> InfluxDB V2.X </a-select-option>
+              <a-select-option value="INFLUX1XDB"> InfluxDB V1.X </a-select-option>
             </a-select>
           </a-form-item>
         </a-col>
@@ -38,7 +39,7 @@
           </a-form-item>
         </a-col>
       </a-row>
-      <div v-show="type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' || type === 'TDENGINE'">
+      <div v-show="type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' || type === 'TDENGINE' || type === 'INFLUX1XDB'">
         <a-row :gutter="16">
           <a-col :span="12">
             <a-form-item label="IP">
@@ -49,7 +50,7 @@
                     rules: [
                       {
                         required:
-                          type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' || type === 'TDENGINE'
+                          type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' || type === 'TDENGINE' || type === 'INFLUX1XDB'
                             ? true
                             : false,
                         message: '请输入IP'
@@ -70,7 +71,7 @@
                     rules: [
                       {
                         required:
-                          type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' || type === 'TDENGINE'
+                          type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' || type === 'TDENGINE' || type === 'INFLUX1XDB'
                             ? true
                             : false,
                         message: '请输入端口'
@@ -93,7 +94,7 @@
                     rules: [
                       {
                         required:
-                          type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' || type === 'TDENGINE'
+                          type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' || type === 'TDENGINE' || type === 'INFLUX1XDB'
                             ? true
                             : false,
                         message: '请输入账户'
@@ -114,7 +115,7 @@
                     rules: [
                       {
                         required:
-                          type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' || type === 'TDENGINE'
+                          type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' || type === 'TDENGINE' || type === 'INFLUX1XDB'
                             ? true
                             : false,
                         message: '请输入密码'
@@ -137,7 +138,7 @@
                     rules: [
                       {
                         required:
-                          type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' || type === 'TDENGINE'
+                          type === 'MYSQL' || type === 'POSTGRESQL' || type === 'SQLSERVER' || type === 'TDENGINE' || type === 'INFLUX1XDB'
                             ? true
                             : false,
                         message: '请输入要连接的数据库'
@@ -374,6 +375,23 @@
           </a-col>
         </a-row>
       </div>
+      <div v-show="type === 'INFLUX1XDB'">
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item label="retentionPolicy">
+              <a-input
+                v-decorator="[
+                  'resource.retentionPolicy',
+                  {
+                    rules: [{ required: type === 'INFLUX1XDB' ? true : false, message: '请输入retentionPolicy' }]
+                  }
+                ]"
+                placeholder="请输入retentionPolicy"
+              />
+            </a-form-item>
+          </a-col>
+        </a-row>
+      </div>
       <a-row :gutter="16">
         <a-col :span="24">
           <a-form-item label="备注">
@@ -501,6 +519,23 @@ export default {
                 ip: record.resource.ip,
                 port: record.resource.port,
                 token: record.resource.token
+              }
+            })
+          })
+          break
+        case 'INFLUX1XDB':
+          this.$nextTick(() => {
+            this.form.setFieldsValue({
+              resourceID: record.resourceID,
+              type: type,
+              description: record.description,
+              resource: {
+                ip: record.resource.ip,
+                port: record.resource.port,
+                password: record.resource.password,
+                username: record.resource.username,
+                databaseName: record.resource.databaseName,
+                retentionPolicy: record.resource.retentionPolicy
               }
             })
           })

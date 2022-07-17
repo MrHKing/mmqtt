@@ -31,8 +31,12 @@ public class Constants {
 
     public static final String PAYLOAD = "payload";
 
+    public static final String SQL = "sql";
+
     public static final String SERVER = "server";
 
     public static final String DATABASE_NAME = "databaseName";
+
+    public static final String RETENTIOM_POLICY = "retentionPolicy";
 
 }

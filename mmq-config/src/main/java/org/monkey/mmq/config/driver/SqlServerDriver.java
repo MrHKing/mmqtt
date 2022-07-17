@@ -114,7 +114,7 @@ public class SqlServerDriver implements ResourceDriver<Connection>{
             connection = (Connection) this.getDriver(resourcesMateData.getResourceID());
             if (connection != null) {
                 DriverFactory.setProperty(property, topic, username);
-                String sql = resourcesMateData.getResource().get("sql").toString();
+                String sql = resourcesMateData.getResource().get(SQL).toString();
                 ExpressionParser parser = new SpelExpressionParser();
                 TemplateParserContext parserContext = new TemplateParserContext();
                 String content = parser.parseExpression(sql, parserContext).getValue(property, String.class);

@@ -108,7 +108,8 @@
               <a-select-option value="KAFKA"> Kafka </a-select-option>
               <a-select-option value="MQTT_BROKER"> MQTT Broker </a-select-option>
               <a-select-option value="RABBITMQ"> RabbitMQ </a-select-option>
-              <a-select-option value="INFLUXDB"> InfluxDB V2.0 </a-select-option>
+              <a-select-option value="INFLUXDB"> InfluxDB V2.X </a-select-option>
+              <a-select-option value="INFLUX1XDB"> InfluxDB V1.X </a-select-option>
             </a-select>
           </a-form-item>
         </a-row>
@@ -314,6 +315,8 @@ export default {
           return ' ip:' + resource.ip + ' port:' + resource.port + ' 数据库名称:' + resource.databaseName
         case 'TDENGINE':
           return ' ip:' + resource.ip + ' port:' + resource.port + ' 数据库名称:' + resource.databaseName
+        case 'INFLUX1XDB':
+          return ' ip:' + resource.ip + ' port:' + resource.port + ' 数据库名称:' + resource.databaseName
         case 'INFLUXDB':
           return ' ip:' + resource.ip + ' port:' + resource.port + ' organization:' + resource.org + ' bucket:' + resource.bucket
         case 'KAFKA':
@@ -346,6 +349,7 @@ export default {
         case 'POSTGRESQL':
         case 'SQLSERVER':
         case 'TDENGINE':
+        case 'INFLUX1XDB':
           this.$nextTick(() => {
             this.resourcesform.setFieldsValue({
               resourceID: record.resourceID,
