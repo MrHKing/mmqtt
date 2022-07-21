@@ -66,11 +66,23 @@ public class ClientActor extends AbstractActor {
     private final ServerMemberManager memberManager;
 
     @Override
+    public void preStart() {
+    }
+
+    @Override
+    public void postStop() {
+        Loggers.BROKER_SERVER.error("client actor stop");
+    }
+
+    @Override
     public Receive createReceive() {
         return receiveBuilder().match(ActorMsg.class, msg -> {
             switch (msg.getMsgType()) {
                 case CLIENT_PUT:
                     clientPut((ClientPutMessage) msg);
+                    break;
+                case STOP:
+                    getContext().stop(getSelf());
                     break;
                 case CLIENT_REMOVE:
                     clientRemove((ClientRemoveMessage) msg);

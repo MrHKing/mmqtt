@@ -58,4 +58,10 @@ public enum MsgType {
      * See {@link SystemMessage}
      */
     SYSTEM_INFO,
+
+    /**
+     * STOP events for message
+     * See {@link StopMessage}
+     */
+    STOP
 }

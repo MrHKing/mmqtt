@@ -23,6 +23,7 @@ import org.monkey.mmq.core.cluster.ServerMemberManager;
 import org.monkey.mmq.core.actor.metadata.message.ClientMateData;
 import org.monkey.mmq.core.actor.metadata.subscribe.SubscribeMateData;
 import org.monkey.mmq.core.actor.metadata.system.SystemInfoMateData;
+import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.metrics.MetricsHolder;
 import org.monkey.mmq.service.SessionStoreService;
 import org.monkey.mmq.service.SubscribeStoreService;
@@ -146,7 +147,7 @@ public class SystemInfoController {
     }
 
     @GetMapping("/rejectClient")
-    public void rejectClient(@RequestParam String clinetId) {
+    public void rejectClient(@RequestParam String clinetId) throws MmqException {
         sessionStoreService.rejectClient(clinetId);
     }
 

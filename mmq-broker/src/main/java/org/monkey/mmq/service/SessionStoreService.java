@@ -25,6 +25,7 @@ import akka.actor.*;
 import com.alipay.remoting.rpc.RpcClient;
 import io.netty.handler.codec.mqtt.MqttConnectMessage;
 import io.netty.handler.codec.mqtt.MqttMessageType;
+import org.monkey.mmq.core.actor.StopMessage;
 import org.monkey.mmq.core.actor.message.ClientRemoveMessage;
 import org.monkey.mmq.core.actor.message.RejectMessage;
 import org.monkey.mmq.config.Loggers;
@@ -157,10 +158,11 @@ public class SessionStoreService implements RecordListener<ClientMateData> {
         }
     }
 
-    public void rejectClient(String clientId) {
+    public void rejectClient(String clientId) throws MmqException {
         SessionMateData sessionMateData = this.get(clientId);
         if (sessionMateData != null) {
             sessionMateData.getChannel().close();
+            this.delete(clientId);
         } else {
             ClientMateData clientMateData = clientStory.get(UtilsAndCommons.SESSION_STORE + clientId);
             if (clientMateData == null) {
@@ -213,10 +215,10 @@ public class SessionStoreService implements RecordListener<ClientMateData> {
 
     @Override
     public void onDelete(String key) throws Exception {
-
         ClientMateData clientMateData = clientStory.get(key);
         if (clientActors.get(clientMateData.getClientId()) != null) {
-            actorSystem.stop(clientActors.get(clientMateData.getClientId()));
+            ActorSelection actorRef = actorSystem.actorSelection("/user/" + clientMateData.getClientId());
+            actorRef.tell(new StopMessage(), ActorRef.noSender());
             clientActors.remove(clientMateData.getClientId());
         }
         clientStory.remove(key);

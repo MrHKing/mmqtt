@@ -22,6 +22,7 @@ import org.monkey.mmq.config.matedata.KeyBuilder;
 import org.monkey.mmq.config.matedata.RuleEngineMateData;
 import org.monkey.mmq.config.matedata.UpdateRuleEngineMessage;
 import org.monkey.mmq.config.matedata.UtilsAndCommons;
+import org.monkey.mmq.core.actor.StopMessage;
 import org.monkey.mmq.core.consistency.matedata.RecordListener;
 import org.monkey.mmq.core.consistency.persistent.ConsistencyService;
 import org.monkey.mmq.core.exception.MmqException;
@@ -114,7 +115,8 @@ public class RuleEngineService implements RecordListener<RuleEngineMateData> {
     public void onDelete(String key) throws Exception {
         RuleEngineMateData ruleEngineMateData = ruleEngineMateDataMap.get(key);
         if (actorRefMap.get(ruleEngineMateData.getRuleId()) != null) {
-            actorSystem.stop(actorRefMap.get(ruleEngineMateData.getRuleId()));
+            ActorSelection actorRef = actorSystem.actorSelection("/user/" + ruleEngineMateData.getRuleId());
+            actorRef.tell(new StopMessage(), ActorRef.noSender());
             actorRefMap.remove(ruleEngineMateData.getRuleId());
         }
         ruleEngineMateDataMap.remove(key);

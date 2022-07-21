@@ -15,6 +15,8 @@
  */
 package org.monkey.mmq.config.service;
 
+import akka.actor.ActorRef;
+import akka.actor.ActorSelection;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import org.monkey.mmq.config.actor.DriverActor;
@@ -24,6 +26,7 @@ import org.monkey.mmq.config.matedata.DriverMessage;
 import org.monkey.mmq.config.matedata.KeyBuilder;
 import org.monkey.mmq.config.matedata.UtilsAndCommons;
 import org.monkey.mmq.config.matedata.ResourcesMateData;
+import org.monkey.mmq.core.actor.StopMessage;
 import org.monkey.mmq.core.consistency.matedata.RecordListener;
 import org.monkey.mmq.core.consistency.persistent.ConsistencyService;
 import org.monkey.mmq.core.exception.MmqException;
@@ -115,6 +118,8 @@ public class ResourcesService implements RecordListener<ResourcesMateData> {
         ResourcesMateData resourcesMateData = resourcesMateDataMap.get(key);
         if (resourcesMateData == null) return;
         DriverFactory.getResourceDriverByEnum(resourcesMateData.getType()).deleteDriver(resourcesMateData.getResourceID());
+        ActorSelection actorRef = actorSystem.actorSelection("/user/" + resourcesMateData.getResourceID());
+        actorRef.tell(new StopMessage(), ActorRef.noSender());
         resourcesMateDataMap.remove(key);
     }
 }

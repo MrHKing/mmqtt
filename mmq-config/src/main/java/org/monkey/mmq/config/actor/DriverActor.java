@@ -5,11 +5,13 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSelection;
 import akka.actor.ActorSystem;
 import io.netty.handler.codec.mqtt.MqttQoS;
+import org.monkey.mmq.config.config.Loggers;
 import org.monkey.mmq.core.actor.message.SystemMessage;
 import org.monkey.mmq.config.driver.DriverFactory;
 import org.monkey.mmq.config.matedata.DriverMessage;
 import org.monkey.mmq.core.exception.MmqException;
 
+import static org.monkey.mmq.core.actor.MsgType.STOP;
 import static org.monkey.mmq.core.common.Constants.RULE_ENGINE;
 
 /**
@@ -28,24 +30,46 @@ public class DriverActor extends AbstractActor {
     }
 
     @Override
-    public Receive createReceive() {
-        return receiveBuilder().match(DriverMessage.class, msg -> {
-            try {
-                DriverFactory.getResourceDriverByEnum(msg.getResourcesMateData().getType()).handle(msg.getProperty(),
-                        msg.getResourcesMateData(),
-                        msg.getRuleEngineMessage().getMessage().getTopic(),
-                        msg.getRuleEngineMessage().getMessage().getMqttQoS(),
-                        msg.getRuleEngineMessage().getMessage().getAddress(),
-                        msg.getRuleEngineMessage().getUsername());
-            } catch (MmqException e) {
-                SystemMessage systemMessage = new SystemMessage();
-                systemMessage.setTopic(RULE_ENGINE);
-                systemMessage.setPayload(e.getMessage());
-                systemMessage.setMqttQoS(MqttQoS.AT_LEAST_ONCE);
-                ActorSelection actorRef = actorSystem.actorSelection("/user/driver");
-                actorRef.tell(systemMessage, ActorRef.noSender());
-            }
+    public void preStart() {
+        Loggers.CONFIG_SERVER.error("driver actor start");
+    }
 
-        }).build();
+    @Override
+    public void postStop() {
+        Loggers.CONFIG_SERVER.error("driver actor stop");
+    }
+
+    @Override
+    public Receive createReceive() {
+    return receiveBuilder()
+        .match(
+            DriverMessage.class,
+            msg -> {
+              switch (msg.getMsgType()) {
+                case STOP:
+                  getContext().stop(getSelf());
+                  break;
+                case DRIVER_BRIDGE:
+                  try {
+                    DriverFactory.getResourceDriverByEnum(msg.getResourcesMateData().getType())
+                        .handle(
+                            msg.getProperty(),
+                            msg.getResourcesMateData(),
+                            msg.getRuleEngineMessage().getMessage().getTopic(),
+                            msg.getRuleEngineMessage().getMessage().getMqttQoS(),
+                            msg.getRuleEngineMessage().getMessage().getAddress(),
+                            msg.getRuleEngineMessage().getUsername());
+                  } catch (MmqException e) {
+                    SystemMessage systemMessage = new SystemMessage();
+                    systemMessage.setTopic(RULE_ENGINE);
+                    systemMessage.setPayload(e.getMessage());
+                    systemMessage.setMqttQoS(MqttQoS.AT_LEAST_ONCE);
+                    ActorSelection actorRef = actorSystem.actorSelection("/user/driver");
+                    actorRef.tell(systemMessage, ActorRef.noSender());
+                  }
+                  break;
+              }
+            })
+        .build();
     }
 }

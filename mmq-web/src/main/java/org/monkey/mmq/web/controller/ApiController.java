@@ -5,6 +5,7 @@ import org.monkey.mmq.core.consistency.model.ResponsePage;
 import org.monkey.mmq.core.consistency.model.RestResultUtils;
 import org.monkey.mmq.core.actor.metadata.message.ClientMateData;
 import org.monkey.mmq.core.actor.metadata.subscribe.SubscribeMateData;
+import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.service.SessionStoreService;
 import org.monkey.mmq.service.SubscribeStoreService;
 import org.monkey.mmq.web.config.BasicApi;
@@ -77,7 +78,7 @@ public class ApiController {
      */
     @BasicApi
     @GetMapping("/rejectClient")
-    public Object rejectClient(@RequestParam String clientId, HttpServletRequest request) {
+    public Object rejectClient(@RequestParam String clientId, HttpServletRequest request) throws MmqException {
         sessionStoreService.rejectClient(clientId);
         return RestResultUtils.success();
     }

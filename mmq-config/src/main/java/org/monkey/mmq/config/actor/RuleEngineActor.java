@@ -21,6 +21,7 @@ import akka.actor.ActorSelection;
 import akka.actor.ActorSystem;
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.monkey.mmq.config.config.Loggers;
 import org.monkey.mmq.config.matedata.DriverMessage;
 import org.monkey.mmq.config.matedata.RuleEngineMessage;
 import org.monkey.mmq.config.matedata.RuleEngineMateData;
@@ -42,6 +43,15 @@ public final class RuleEngineActor extends AbstractActor {
     RuleEngineMateData ruleEngineMateData;
     
     final ReactorQL reactorQL;
+
+    @Override
+    public void preStart() {
+    }
+
+    @Override
+    public void postStop() {
+        Loggers.CONFIG_SERVER.error(ruleEngineMateData.getName() + ":rule actor stop");
+    }
 
     public RuleEngineActor(RuleEngineMateData ruleEngineMateData, ActorSystem actorSystem) {
         this.actorSystem = actorSystem;
@@ -81,8 +91,10 @@ public final class RuleEngineActor extends AbstractActor {
     @Override
     public Receive createReceive() {
         return receiveBuilder().match(ActorMsg.class, msg -> {
-
             switch (msg.getMsgType()) {
+                case STOP:
+                    getContext().stop(getSelf());
+                    break;
                 case RULE_ENGINE:
                     ruleProcess((RuleEngineMessage) msg);
                     break;
