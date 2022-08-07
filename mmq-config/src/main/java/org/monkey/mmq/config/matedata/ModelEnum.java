@@ -9,7 +9,8 @@ package org.monkey.mmq.config.matedata;
  **/
 public enum ModelEnum {
     AUTH(org.monkey.mmq.config.modules.auth.AuthModule.class),
-    API(org.monkey.mmq.config.modules.api.ApiModule.class);
+    API(org.monkey.mmq.config.modules.api.ApiModule.class),
+    ACL(org.monkey.mmq.config.modules.acl.AclModule.class);
 
     private Class name;
 

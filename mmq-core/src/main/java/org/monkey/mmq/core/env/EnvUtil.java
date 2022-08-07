@@ -76,6 +76,8 @@ public class EnvUtil {
     private static final String DEFAULT_RESOURCE_PATH = "/application.properties";
     
     private static final String DEFAULT_ADDITIONAL_PATH = "conf";
+
+    private static final String DEFAULT_PLUGS_PATH = "plugs";
     
     private static final String DEFAULT_ADDITIONAL_FILE = "cluster.conf";
     
@@ -86,6 +88,8 @@ public class EnvUtil {
     private static final String MMQ_TEMP_DIR_2 = "tmp";
 
     private static String confPath = "";
+
+    private static String plugsPath = "";
 
     private static String mmqHomePath = null;
     
@@ -265,7 +269,15 @@ public class EnvUtil {
                 - (double) OPERATING_SYSTEM_MX_BEAN.getFreePhysicalMemorySize() / (double) OPERATING_SYSTEM_MX_BEAN
                 .getTotalPhysicalMemorySize());
     }
-    
+
+    public static String getPlugsPath() {
+        if (StringUtils.isNotBlank(EnvUtil.plugsPath)) {
+            return EnvUtil.plugsPath;
+        }
+        EnvUtil.plugsPath = Paths.get(getMmqHome(), DEFAULT_PLUGS_PATH).toString();
+        return plugsPath;
+    }
+
     public static String getConfPath() {
         if (StringUtils.isNotBlank(EnvUtil.confPath)) {
             return EnvUtil.confPath;

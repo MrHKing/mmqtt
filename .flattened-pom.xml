@@ -19,7 +19,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.monkey.mmq</groupId>
   <artifactId>mmq</artifactId>
-  <version>1.1.2</version>
+  <version>1.1.3</version>
   <packaging>pom</packaging>
   <name>Monkey mmq ${project.version}</name>
   <description>Top mmq project pom.xml file</description>
@@ -38,12 +38,12 @@
     <module>mmq-core</module>
     <module>mmq-broker</module>
     <module>mmq-auth</module>
-    <module>mmq-device</module>
     <module>mmq-rule-engine</module>
     <module>mmq-config</module>
     <module>mmq-api</module>
     <module>distribution</module>
     <module>mmq-web</module>
+    <module>mmq-plugs</module>
   </modules>
   <properties>
     <jackson-core.version>2.12.2</jackson-core.version>
@@ -68,6 +68,7 @@
     <maven-javadoc-plugin.version>2.10.4</maven-javadoc-plugin.version>
     <findbugs-maven-plugin.version>3.0.4</findbugs-maven-plugin.version>
     <jjwt.version>0.11.2</jjwt.version>
+    <influxdbClient.version>2.23</influxdbClient.version>
     <javatuples.version>1.2</javatuples.version>
     <influxdb.version>3.1.0</influxdb.version>
     <jraft-core.version>1.3.10.bugfix</jraft-core.version>
@@ -115,7 +116,7 @@
     <maven-enforcer-plugin.version>1.4.1</maven-enforcer-plugin.version>
     <commons-lang3.version>3.4</commons-lang3.version>
     <reflections.version>0.9.11</reflections.version>
-    <revision>1.1.2</revision>
+    <revision>1.1.3</revision>
     <jackson.annotations.version>2.12.2</jackson.annotations.version>
     <sonar.jacoco.itReportPath>${project.basedir}/../test/target/jacoco-it.exec</sonar.jacoco.itReportPath>
     <jacoco-maven-plugin.version>0.7.8</jacoco-maven-plugin.version>
@@ -156,17 +157,17 @@
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>mmq-device</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
         <artifactId>distribution</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>mmq-web</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>mmq-plugs</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -226,6 +227,11 @@
         <groupId>com.influxdb</groupId>
         <artifactId>influxdb-client-java</artifactId>
         <version>${influxdb.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.influxdb</groupId>
+        <artifactId>influxdb-java</artifactId>
+        <version>${influxdbClient.version}</version>
       </dependency>
       <dependency>
         <groupId>org.jetbrains.kotlin</groupId>

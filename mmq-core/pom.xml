@@ -181,6 +181,15 @@
 <!--            <groupId>org.rocksdb</groupId>-->
 <!--            <artifactId>rocksdbjni</artifactId>-->
 <!--        </dependency>-->
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>mmq-plugs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

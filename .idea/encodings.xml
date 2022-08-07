@@ -7,6 +7,8 @@
     <file url="file://$PROJECT_DIR$/mmq-config/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mmq-core/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mmq-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mmq-plugs/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mmq-plugs/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mmq-rule-engine/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mmq-web/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mmq-web/src/main/resources" charset="UTF-8" />

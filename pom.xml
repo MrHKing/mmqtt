@@ -322,12 +322,12 @@
         <module>mmq-core</module>
         <module>mmq-broker</module>
         <module>mmq-auth</module>
-        <module>mmq-device</module>
         <module>mmq-rule-engine</module>
         <module>mmq-config</module>
         <module>mmq-api</module>
         <module>distribution</module>
         <module>mmq-web</module>
+        <module>mmq-plugs</module>
     </modules>
     <!-- 所有的子项目默认依赖 -->
     <dependencies>
@@ -390,17 +390,17 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>mmq-device</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
                 <artifactId>distribution</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>mmq-web</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>mmq-plugs</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

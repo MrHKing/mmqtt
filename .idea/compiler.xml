@@ -6,7 +6,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="mmq-device" />
+        <module name="mmq-plugs" />
         <module name="mmq-auth" />
         <module name="mmq-core" />
         <module name="mmq-config" />
@@ -19,6 +19,7 @@
     <bytecodeTargetLevel>
       <module name="mmq-bridge" target="1.8" />
       <module name="mmq-consistency" target="8" />
+      <module name="mmq-device" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

@@ -27,6 +27,7 @@ import org.monkey.mmq.core.file.FileChangeEvent;
 import org.monkey.mmq.core.file.FileWatcher;
 import org.monkey.mmq.core.file.WatchFileCenter;
 import org.monkey.mmq.core.notify.NotifyCenter;
+import org.monkey.mmq.core.plugs.PlugsFactory;
 import org.monkey.mmq.core.utils.ApplicationUtils;
 import org.monkey.mmq.core.utils.DiskUtils;
 import org.monkey.mmq.core.utils.InetUtils;
@@ -68,17 +69,9 @@ public class StartingApplicationListener implements MmqApplicationListener {
     
     private static final String DEFAULT_FUNCTION_MODE = "All";
     
-    private static final String DEFAULT_DATABASE = "mysql";
-    
-    private static final String DATASOURCE_PLATFORM_PROPERTY = "spring.datasource.platform";
-    
-    private static final String DEFAULT_DATASOURCE_PLATFORM = "";
-    
-    private static final String DATASOURCE_MODE_EXTERNAL = "external";
-    
-    private static final String DATASOURCE_MODE_EMBEDDED = "embedded";
-    
     private static final Map<String, Object> SOURCES = new ConcurrentHashMap<>();
+
+    private static ConfigurableApplicationContext context;
     
     private ScheduledExecutorService scheduledExecutorService;
     
@@ -102,6 +95,8 @@ public class StartingApplicationListener implements MmqApplicationListener {
     
     @Override
     public void contextPrepared(ConfigurableApplicationContext context) {
+        this.context = context;
+        readJar(EnvUtil.getPlugsPath());
         logClusterConf();
         
         logStarting();
@@ -109,7 +104,7 @@ public class StartingApplicationListener implements MmqApplicationListener {
     
     @Override
     public void contextLoaded(ConfigurableApplicationContext context) {
-    
+
     }
     
     @Override
@@ -178,9 +173,44 @@ public class StartingApplicationListener implements MmqApplicationListener {
                 return StringUtils.contains(context, "application.properties");
             }
         });
-        
+
+    WatchFileCenter.registerWatcher(
+        EnvUtil.getPlugsPath(),
+        new FileWatcher() {
+          @Override
+          public void onChange(FileChangeEvent event) {
+            try {
+              PlugsFactory.createPlug(event.getPaths() + "/" + event.getContext(), context);
+            } catch (Exception ignore) {
+              LOGGER.warn("Failed to monitor file ", ignore);
+            }
+          }
+
+          @Override
+          public boolean interest(String context) {
+            return StringUtils.contains(context, ".jar");
+          }
+        });
     }
-    
+
+    private void readJar(String paths)  {
+        try {
+            File file = new File(paths);
+            if (!file.exists()) {
+                throw new IllegalArgumentException("Must be a file directory : " + paths);
+            }
+            File fa[] = file.listFiles();
+            for (int i = 0; i < fa.length; i++) {
+                File fs = fa[i];
+                if (!fs.isDirectory() && fs.getName().endsWith(".jar")) {
+                    PlugsFactory.createPlug(fs.getPath(), context);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.warn("Failed load file ", e);
+        }
+    }
+
     private void initSystemProperty() {
         if (EnvUtil.getStandaloneMode()) {
             System.setProperty(MODE_PROPERTY_KEY_STAND_MODE, MMQ_MODE_STAND_ALONE);
@@ -212,7 +242,7 @@ public class StartingApplicationListener implements MmqApplicationListener {
     }
     
     private void makeWorkDir() {
-        String[] dirNames = new String[] {"logs", "conf", "data"};
+        String[] dirNames = new String[] {"logs", "conf", "data", "plugs"};
         for (String dirName : dirNames) {
             LOGGER.info("Mmq Log files: {}", Paths.get(EnvUtil.getMmqHome(), dirName).toString());
             try {

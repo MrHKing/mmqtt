@@ -20,6 +20,7 @@
     </a-list>
     <AuthModuleModel ref="AuthModuleModel" @ok="loadData"></AuthModuleModel>
     <ApiModuleModel ref="ApiModuleModel" @ok="loadData"></ApiModuleModel>
+    <AclModuleModel ref="AclModuleModel" @ok="loadData"></AclModuleModel>
   </a-card>
 </template>
 
@@ -27,11 +28,13 @@
 import { getAction, putAction } from '@/api/manage'
 import AuthModuleModel from './modules/AuthModuleModel'
 import ApiModuleModel from './modules/ApiModuleModel'
+import AclModuleModel from './modules/AclModuleModel'
 export default {
   name: 'Subscribes',
   components: {
     AuthModuleModel,
-    ApiModuleModel
+    ApiModuleModel,
+    AclModuleModel
   },
   data() {
     return {
@@ -75,6 +78,9 @@ export default {
           break
         case 'API-MODULE':
           this.$refs.ApiModuleModel.update(record)
+          break
+        case 'ACL-MODULE':
+          this.$refs.AclModuleModel.update(record)
           break
       }
     }
