@@ -118,8 +118,8 @@ public class ResourcesService implements RecordListener<ResourcesMateData> {
         ResourcesMateData resourcesMateData = resourcesMateDataMap.get(key);
         if (resourcesMateData == null) return;
         DriverFactory.getResourceDriverByEnum(resourcesMateData.getType()).deleteDriver(resourcesMateData.getResourceID());
+        resourcesMateDataMap.remove(key);
         ActorSelection actorRef = actorSystem.actorSelection("/user/" + resourcesMateData.getResourceID());
         actorRef.tell(new StopMessage(), ActorRef.noSender());
-        resourcesMateDataMap.remove(key);
     }
 }

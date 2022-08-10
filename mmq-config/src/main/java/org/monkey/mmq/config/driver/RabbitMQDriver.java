@@ -30,6 +30,7 @@ import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.stereotype.Component;
+import org.stringtemplate.v4.ST;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -138,9 +139,9 @@ public class RabbitMQDriver implements ResourceDriver<Channel> {
                 if (!resourcesMateData.getResource().get(PAYLOAD).equals(PAYLOAD)) {
                     DriverFactory.setProperty(property, topic, username);
                     String template = resourcesMateData.getResource().get(PAYLOAD).toString();
-                    ExpressionParser parser = new SpelExpressionParser();
-                    TemplateParserContext parserContext = new TemplateParserContext();
-                    content = parser.parseExpression(template, parserContext).getValue(property, String.class);
+                    ST st = new ST(template);
+                    st.add("json", property);
+                    content = st.render();
                 }
                 channel.basicPublish(resourcesMateData.getResource().get(EXCHANGE).toString(),
                         resourcesMateData.getResource().get(QUEUE).toString(), null, content.getBytes());

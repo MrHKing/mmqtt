@@ -66,7 +66,7 @@
             </template>
             <template v-else>
               <a-card :title="item.title">
-                <div slot="title">{{ item.resourceID }}</div>
+                <div slot="title">{{ item.resourceName }}</div>
                 <a slot="actions" @click="handleResourceSave(item)">编辑</a>
                 <a-popconfirm slot="actions" title="Sure to delete?" @confirm="() => handleDelete(item)">
                   <a href="javascript:;">删除</a>
@@ -124,8 +124,8 @@
               ]"
               placeholder="请选择资源id"
             >
-              <a-select-option v-for="(resource, index) in selectResources" :key="index">
-                {{ resource.resourceID }}
+              <a-select-option v-for="(resource, index) in selectResources" :key="index" :value="resource.resourceID">
+                {{ resource.resourceName }}
               </a-select-option>
             </a-select>
           </a-form-item>
@@ -344,6 +344,7 @@ export default {
       this.visible = true
       this.resourcesform.resetFields()
       const type = record.type
+      this.selectResources = this.curResources.filter(x => type === x.type)
       switch (type) {
         case 'MYSQL':
         case 'POSTGRESQL':
@@ -441,7 +442,7 @@ export default {
           const formData = Object.assign({}, values)
           console.log(formData)
           if (formData) {
-            const resources = that.curResources.filter(x => formData.type === x.type)
+            const resources = that.curResources.filter(x => formData.resourceID === x.resourceID)
             if (resources) {
               const resource = resources[0]
               resource.resource.sql = formData.resource.sql

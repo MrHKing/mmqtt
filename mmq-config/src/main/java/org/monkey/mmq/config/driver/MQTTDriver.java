@@ -12,6 +12,7 @@ import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.stereotype.Component;
+import org.stringtemplate.v4.ST;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
@@ -175,9 +176,9 @@ public class MQTTDriver implements ResourceDriver<MqttClient> {
                         && resourcesMateData.getResource().get(PAYLOAD) != "") {
                     DriverFactory.setProperty(property, topic, username);
                     String template = resourcesMateData.getResource().get(PAYLOAD).toString();
-                    ExpressionParser parser = new SpelExpressionParser();
-                    TemplateParserContext parserContext = new TemplateParserContext();
-                    content = parser.parseExpression(template, parserContext).getValue(property, String.class);
+                    ST st = new ST(template);
+                    st.add("json", property);
+                    content = st.render();
                 }
                 mqttClient.publish(topic,
                         content.getBytes(),

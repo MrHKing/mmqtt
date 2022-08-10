@@ -31,6 +31,8 @@ public class ResourcesMateData<T> implements Record, Serializable {
 
     private String resourceID;
 
+    private String resourceName;
+
     private String description;
 
     private ResourceEnum type;
@@ -67,5 +69,13 @@ public class ResourcesMateData<T> implements Record, Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getResourceName() {
+        return resourceName;
+    }
+
+    public void setResourceName(String resourceName) {
+        this.resourceName = resourceName;
     }
 }

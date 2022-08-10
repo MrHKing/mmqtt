@@ -9,6 +9,24 @@
   >
     <a-form :form="form" layout="vertical" hide-required-mark>
       <a-row :gutter="16">
+        <a-form-item label="资源名称">
+          <a-input
+            v-decorator="[
+              'resourceName',
+              {
+                rules: [
+                  {
+                    required: true,
+                    message: '请输入资源名称'
+                  }
+                ]
+              }
+            ]"
+            placeholder="请输入资源名称"
+          />
+        </a-form-item>
+      </a-row>
+      <a-row :gutter="16">
         <a-col :span="12">
           <a-form-item label="资源类型">
             <a-select
@@ -467,6 +485,7 @@ export default {
           this.$nextTick(() => {
             this.form.setFieldsValue({
               resourceID: record.resourceID,
+              resourceName: record.resourceName,
               type: type,
               description: record.description,
               resource: {
@@ -483,6 +502,7 @@ export default {
           this.$nextTick(() => {
             this.form.setFieldsValue({
               resourceID: record.resourceID,
+              resourceName: record.resourceName,
               type: type,
               description: record.description,
               resource: {
@@ -497,6 +517,7 @@ export default {
           this.$nextTick(() => {
             this.form.setFieldsValue({
               resourceID: record.resourceID,
+              resourceName: record.resourceName,
               type: type,
               description: record.description,
               resource: {
@@ -513,6 +534,7 @@ export default {
           this.$nextTick(() => {
             this.form.setFieldsValue({
               resourceID: record.resourceID,
+              resourceName: record.resourceName,
               type: type,
               description: record.description,
               resource: {
@@ -527,6 +549,7 @@ export default {
           this.$nextTick(() => {
             this.form.setFieldsValue({
               resourceID: record.resourceID,
+              resourceName: record.resourceName,
               type: type,
               description: record.description,
               resource: {
@@ -544,6 +567,7 @@ export default {
           this.$nextTick(() => {
             this.form.setFieldsValue({
               resourceID: record.resourceID,
+              resourceName: record.resourceName,
               type: type,
               description: record.description,
               resource: {

@@ -12,7 +12,7 @@
         </template>
         <template v-else>
           <a-card :title="item.title">
-            <div slot="title">{{ item.resourceID }}</div>
+            <div slot="title">{{ item.resourceName }}</div>
             <a slot="actions" @click="handleSave(item)">编辑</a>
             <a-popconfirm slot="actions" title="Sure to delete?" @confirm="() => handleDelete(item)">
               <a href="javascript:;">删除</a>

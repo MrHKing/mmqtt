@@ -115,10 +115,14 @@ public class RuleEngineService implements RecordListener<RuleEngineMateData> {
     public void onDelete(String key) throws Exception {
         RuleEngineMateData ruleEngineMateData = ruleEngineMateDataMap.get(key);
         if (actorRefMap.get(ruleEngineMateData.getRuleId()) != null) {
-            ActorSelection actorRef = actorSystem.actorSelection("/user/" + ruleEngineMateData.getRuleId());
-            actorRef.tell(new StopMessage(), ActorRef.noSender());
+            ruleEngineMateDataMap.remove(key);
+            try {
+                ActorSelection actorRef = actorSystem.actorSelection("/user/" + ruleEngineMateData.getRuleId());
+                actorRef.tell(new StopMessage(), ActorRef.noSender());
+            } catch (Exception e) {
+                Loggers.CONFIG_SERVER.error("delete ruleEngine failed.", e);
+            }
             actorRefMap.remove(ruleEngineMateData.getRuleId());
         }
-        ruleEngineMateDataMap.remove(key);
     }
 }

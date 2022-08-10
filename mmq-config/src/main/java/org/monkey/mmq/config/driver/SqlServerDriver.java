@@ -23,6 +23,7 @@ import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.stereotype.Component;
+import org.stringtemplate.v4.ST;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -77,7 +78,9 @@ public class SqlServerDriver implements ResourceDriver<Connection>{
     @Override
     public void deleteDriver(String resourceId) {
         DruidDataSource druidDataSource = dataSources.get(resourceId);
-        druidDataSource.close();
+        if (druidDataSource != null) {
+            druidDataSource.close();
+        }
         dataSources.remove(resourceId);
     }
 
@@ -115,10 +118,13 @@ public class SqlServerDriver implements ResourceDriver<Connection>{
             if (connection != null) {
                 DriverFactory.setProperty(property, topic, username);
                 String sql = resourcesMateData.getResource().get(SQL).toString();
-                ExpressionParser parser = new SpelExpressionParser();
-                TemplateParserContext parserContext = new TemplateParserContext();
-                String content = parser.parseExpression(sql, parserContext).getValue(property, String.class);
-                connection.createStatement().execute(content);
+                ST content = new ST(sql);
+                content.add("json", property);
+                String[] sqlRet = content.render().split(";");
+                if (sqlRet.length == 0) connection.close();
+                for (String temp : sqlRet) {
+                    connection.createStatement().execute(temp);
+                }
                 connection.close();
             }
         } catch (Exception e) {

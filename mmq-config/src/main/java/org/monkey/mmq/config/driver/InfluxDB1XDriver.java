@@ -32,7 +32,9 @@ import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.stereotype.Component;
+import org.stringtemplate.v4.ST;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -127,20 +129,21 @@ public class InfluxDB1XDriver implements ResourceDriver<InfluxDB> {
             if (client != null && resourcesMateData.getResource().get(SQL) != null) {
                 DriverFactory.setProperty(property, topic, username);
                 String payload = resourcesMateData.getResource().get(SQL).toString();
-                ExpressionParser parser = new SpelExpressionParser();
-                TemplateParserContext parserContext = new TemplateParserContext();
-                String content = parser.parseExpression(payload, parserContext).getValue(property, String.class);
-                Map map = JSON.parseObject(content);
-                // Write points to InfluxDB.
-                Point.Builder builder = Point.measurement(map.get("measurement").toString())
-                        .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
-                for (Object tag : ((Map)map.get("tags")).entrySet()) {
-                    builder.tag(((Map.Entry)tag).getKey().toString(), ((Map.Entry)tag).getValue().toString());
+                ST content = new ST(payload);
+                content.add("json", property);
+                List<Map> maps = JSON.parseArray(content.render(), Map.class);
+                for (Map map : maps) {
+                    // Write points to InfluxDB.
+                    Point.Builder builder = Point.measurement(map.get("measurement").toString())
+                            .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+                    for (Object tag : ((Map)map.get("tags")).entrySet()) {
+                        builder.tag(((Map.Entry)tag).getKey().toString(), ((Map.Entry)tag).getValue().toString());
+                    }
+                    for (Object tag : ((Map)map.get("fields")).entrySet()) {
+                        builder.addField(((Map.Entry)tag).getKey().toString(), ((Map.Entry)tag).getValue().toString());
+                    }
+                    client.write(builder.build());
                 }
-                for (Object tag : ((Map)map.get("fields")).entrySet()) {
-                    builder.addField(((Map.Entry)tag).getKey().toString(), ((Map.Entry)tag).getValue().toString());
-                }
-                client.write(builder.build());
             }
         } catch (Exception e) {
             throw new MmqException(e.hashCode(), e.getMessage());

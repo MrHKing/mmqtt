@@ -26,6 +26,7 @@ import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.stereotype.Component;
+import org.stringtemplate.v4.ST;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -104,10 +105,9 @@ public class InfluxDBDriver implements ResourceDriver<InfluxDBClient> {
                 DriverFactory.setProperty(property, topic, username);
 
                 String sql = resourcesMateData.getResource().get("sql").toString();
-                ExpressionParser parser = new SpelExpressionParser();
-                TemplateParserContext parserContext = new TemplateParserContext();
-                String content = parser.parseExpression(sql, parserContext).getValue(property, String.class);
-
+                ST st = new ST(sql);
+                st.add("json", property);
+                String content = st.render();
                 WriteApiBlocking writeApi = client.getWriteApiBlocking();
                 writeApi.writeRecord(resourcesMateData.getResource().get(INFLUXDB_BUCKET).toString(),
                         resourcesMateData.getResource().get(INFLUXDB_ORG).toString(), WritePrecision.NS, content);
