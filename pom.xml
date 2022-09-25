@@ -350,6 +350,17 @@
             <id>clojars</id>
             <url>http://clojars.org/repo/</url>
         </repository>
+        <repository>
+            <id>alimaven</id>
+            <name>aliyun maven</name>
+            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
     </repositories>
     <!-- 管理依赖版本号,子项目不会默认依赖 -->
     <dependencyManagement>

@@ -6,7 +6,7 @@
           <a-card>
             <a-statistic
               title="总接收字节(MB)"
-              :value="(SystemInfoMateData.bytesReadTotal / 1024 / 1024).toFixed(2)"
+              :value="convertSize(SystemInfoMateData.bytesReadTotal)"
               class="demo-class"
               :value-style="{ color: '#3f8600', fontSize: '32px' }"
             >
@@ -20,7 +20,7 @@
           <a-card>
             <a-statistic
               title="总发送字节(MB)"
-              :value="(SystemInfoMateData.bytesWrittenTotal / 1024 / 1024).toFixed(2)"
+              :value="convertSize(SystemInfoMateData.bytesWrittenTotal)"
               class="demo-class"
               :value-style="{ color: '#3f8600', fontSize: '28px' }"
             >
@@ -149,6 +149,17 @@ export default {
         this.$refs.jvmInfo.loadTomcatInfo()
       } else {
         this.$refs.httpTrace.fetch()
+      }
+    },
+    convertSize(value) {
+      if (value > 1073741824) {
+        // 大于1G
+        return (value / 1073741824).toFixed(1) + 'GB'
+      } else if (value > 1048576) {
+        // 大于1M
+        return (value / 1048576).toFixed(1) + 'MB'
+      } else {
+        return (value / 1024).toFixed(1) + 'KB'
       }
     },
     convert(value, type) {

@@ -71,7 +71,7 @@ export default {
         'system.cpu.count': { color: 'green', text: 'CPU 数量', unit: '核' },
         'system.cpu.usage': { color: 'green', text: '系统 CPU 使用率', unit: '%' },
         'process.start.time': { color: 'purple', text: '应用启动时间点', unit: '' },
-        'process.uptime': { color: 'purple', text: '应用已运行时间', unit: '秒' },
+        'process.uptime': { color: 'purple', text: '应用已运行时间', unit: '' },
         'process.cpu.usage': { color: 'purple', text: '当前应用 CPU 使用率', unit: '%' }
       },
       // 当一条记录中需要取出多条数据的时候需要配置该字段
@@ -113,6 +113,9 @@ export default {
             if (param === 'process.start.time') {
               val = this.convert(val, Date)
             }
+            if (param === 'process.uptime') {
+              val = this.convertTime(val)
+            }
             info.push({ id: param + id, param, text: 'false value', value: val })
           })
         })
@@ -124,7 +127,15 @@ export default {
         this.tableLoading = false
       })
     },
-
+    convertTime (value) {
+      if (value > 86400) {
+        return (value / 86400).toFixed(0) + ' 天' + ((value % 86400).toFixed(0) / 3600).toFixed(0) + ' 小时 ' + (((value % 86400).toFixed(0) % 3600).toFixed(0) / 60).toFixed(0) + ' 分钟 ' + (((value % 86400).toFixed(0) % 3600).toFixed(0) % 60).toFixed(0) + ' 秒'
+      } else if (value > 3600) {
+        return (value / 3600).toFixed(0) + ' 小时 ' + ((value % 3600).toFixed(0) / 60).toFixed(0) + ' 分钟 ' + ((value % 3600).toFixed(0) % 60).toFixed(0) + ' 秒'
+      } else if (value > 60) {
+        return (value / 60).toFixed(0) + ' 分钟 ' + (value % 60).toFixed(0) + ' 秒'
+      }
+    },
     convert (value, type) {
       if (type === Number) {
         return Number(value * 100).toFixed(2)
