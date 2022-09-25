@@ -3,6 +3,7 @@ package org.monkey.mmq.web.controller;
 import org.monkey.mmq.config.modules.acl.AclModule;
 import org.monkey.mmq.config.modules.acl.AclParam;
 import org.monkey.mmq.core.consistency.model.ResponsePage;
+import org.monkey.mmq.core.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,15 +28,14 @@ public class AclController {
     public ResponsePage<AclParam> listAllAclParams(@RequestParam int pageNo,
                                                    @RequestParam int pageSize,
                                                    @RequestParam(required = false, defaultValue = "") String clientId,
-                                                   @RequestParam(required = false, defaultValue = "") String username,
-                                                   @RequestParam(required = false, defaultValue = "") String ip) {
+                                                   @RequestParam(required = false, defaultValue = "") String topic) {
         List<AclParam> aclParams = aclModule.listAllAclParams();
         return new ResponsePage<>(pageSize, pageNo,
                 aclParams.size() / pageSize,
                 aclParams.size(),
-                aclParams.stream().filter(x -> x.getClientId().contains(clientId))
-                        .filter(x -> x.getUsername().contains(username))
-                        .filter(x -> x.getIpaddr().contains(ip))
+                aclParams.stream()
+                        .filter(x -> StringUtils.isEmpty(clientId) ? true : clientId.contains(x.getClientId())
+                                || StringUtils.isEmpty(topic) ? true : topic.contains(x.getTopic()))
                         .skip(pageNo - 1).limit(pageSize).collect(Collectors.toList()));
     }
 

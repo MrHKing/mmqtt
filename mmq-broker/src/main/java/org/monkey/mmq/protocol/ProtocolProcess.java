@@ -18,6 +18,7 @@ package org.monkey.mmq.protocol;
 
 import akka.actor.ActorSystem;
 import org.monkey.mmq.auth.service.IMqttAuthService;
+import org.monkey.mmq.config.modules.acl.AclModule;
 import org.monkey.mmq.core.cluster.ServerMemberManager;
 import org.monkey.mmq.metrics.GlobalMQTTMessageCounter;
 import org.monkey.mmq.service.*;
@@ -62,6 +63,9 @@ public class ProtocolProcess {
 
 	@Autowired
 	private ActorSystem actorSystem;
+
+	@Autowired
+	private AclModule aclModule;
 
 	public final ServerMemberManager memberManager;
 
@@ -162,7 +166,7 @@ public class ProtocolProcess {
 
 	public Subscribe subscribe() {
 		if (subscribe == null) {
-			subscribe = new Subscribe(subscribeStoreService, messageStoreService);
+			subscribe = new Subscribe(subscribeStoreService, messageStoreService, aclModule);
 		}
 		return subscribe;
 	}
@@ -177,7 +181,7 @@ public class ProtocolProcess {
 	public Publish publish() {
 		if (publish == null) {
 			publish = new Publish(sessionStoreService, subscribeStoreService, messageStoreService,
-					dupPublishMessageStoreService, memberManager.getSelf(), actorSystem);
+					dupPublishMessageStoreService, memberManager.getSelf(), actorSystem, aclModule);
 		}
 		return publish;
 	}

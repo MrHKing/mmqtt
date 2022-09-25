@@ -12,17 +12,17 @@
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
               <a-form-item label="客户端ID">
-                <a-input v-model="queryParam.ruleId" placeholder="" />
+                <a-input v-model="queryParam.clientId" placeholder="" />
               </a-form-item>
             </a-col>
-            <a-col :md="8" :sm="24">
+            <!-- <a-col :md="8" :sm="24">
               <a-form-item label="账户名">
                 <a-input v-model="queryParam.ruleId" placeholder="" />
               </a-form-item>
-            </a-col>
+            </a-col> -->
             <a-col :md="8" :sm="24">
               <a-form-item label="TOPIC">
-                <a-input v-model="queryParam.ruleId" placeholder="" />
+                <a-input v-model="queryParam.topic" placeholder="" />
               </a-form-item>
             </a-col>
             <template v-if="advanced"> </template>
@@ -43,8 +43,14 @@
         </a-form>
       </div>
 
-      <div class="table-operator"><a-button type="primary" @click="handleSave(null)">添加</a-button></div>
-      <a-table :columns="columns" :data-source="dataSource">
+      <div class="table-operator"><a-button type="primary" @click="handleSave({})">添加</a-button></div>
+      <s-table
+        ref="table"
+        size="default"
+        rowKey="key"
+        :columns="columns"
+        :data="loadData"
+        :alert="true">
         <span slot="serial" slot-scope="text, record, index">
           {{ index + 1 }}
         </span>
@@ -54,8 +60,6 @@
         </span>
         <span slot="action" slot-scope="text, record">
           <template>
-            <a @click="handleEnable(record)">{{ record.enable ? '停止' : '启用' }}</a>
-            <a-divider type="vertical" />
             <a @click="handleSave(record)">编辑</a>
             <a-divider type="vertical" />
             <a-popconfirm v-if="list.length" title="Sure to delete?" @confirm="() => handleDelete(record)">
@@ -63,7 +67,7 @@
             </a-popconfirm>
           </template>
         </span>
-      </a-table>
+      </s-table>
     </a-card>
      <a-modal :visible="formVisible" title="Basic Modal" @cancel="handleCancel" @ok="handleOk">
       <a-form :form="form" layout="vertical" hide-required-mark>
@@ -81,7 +85,7 @@
             <a-select-option value=1> 允许 </a-select-option>
           </a-select>
         </a-form-item>
-        <a-form-item label="IP地址">
+        <!-- <a-form-item label="IP地址">
           <a-input
             v-decorator="['ipaddr', { rules: [{ required: true, message: '请输入ip地址' }] }]"
             placeholder="请输入ip地址"
@@ -89,10 +93,10 @@
         </a-form-item>
         <a-form-item label="用户名">
           <a-input
-            v-decorator="['username', { rules: [{ required: true, message: '请输入用户名' }] }]"
+            v-decorator="['username', { rules: [{ required: false, message: '请输入用户名' }] }]"
             placeholder="请输入用户名"
           />
-        </a-form-item>
+        </a-form-item> -->
         <a-form-item label="客户端ID">
           <a-input
             v-decorator="['clientId', { rules: [{ required: true, message: '请输入客户端ID' }] }]"
@@ -101,11 +105,11 @@
         </a-form-item>
         <a-form-item label="topic">
           <a-input
-            v-decorator="['topic', { rules: [{ required: true, message: '请输入topic' }] }]"
+            v-decorator="['topic', { rules: [{ required: false, message: '请输入topic' }] }]"
             placeholder="请输入topic"
           />
         </a-form-item>
-        <a-form-item label="权限">
+        <!-- <a-form-item label="权限">
           <a-select
             v-decorator="[
               'access',
@@ -119,7 +123,7 @@
             <a-select-option value=2> 发布 </a-select-option>
             <a-select-option value=3> 订阅与发布 </a-select-option>
           </a-select>
-        </a-form-item>
+        </a-form-item> -->
       </a-form>
       <template #footer>
         <a-button key="back" @click="handleCancel">取消</a-button>
@@ -131,7 +135,7 @@
 
 <script>
 import { STable, Ellipsis } from '@/components'
-import { getAction, postAction, putAction } from '@/api/manage'
+import { getAction, postAction, putAction, deleteAction } from '@/api/manage'
 const columns = [
   {
     title: '#',
@@ -141,22 +145,22 @@ const columns = [
     title: '是否允许',
     dataIndex: 'allow'
   },
-  {
-    title: 'ip地址',
-    dataIndex: 'ipaddr'
-  },
-  {
-    title: '用户名',
-    dataIndex: 'username'
-  },
+  // {
+  //   title: 'ip地址',
+  //   dataIndex: 'ipaddr'
+  // },
+  // {
+  //   title: '用户名',
+  //   dataIndex: 'username'
+  // },
   {
     title: '客户端ID',
     dataIndex: 'clientId'
   },
-  {
-    title: '权限',
-    dataIndex: 'access'
-  },
+  // {
+  //   title: '权限',
+  //   dataIndex: 'access'
+  // },
   {
     title: 'topic',
     dataIndex: 'topic'
@@ -183,6 +187,7 @@ export default {
       confirmLoading: false,
       visible: false,
       formVisible: false,
+      current: null,
       dataSource: [],
       list: [],
       form: this.$form.createForm(this),
@@ -230,12 +235,15 @@ export default {
     resetSearchForm() {
       this.queryParam = {}
     },
-    handleEnable(record) {
-    },
     handleDelete(record) {
+      deleteAction('/v1/api/acl', { id: record.id }).then(res => {
+        this.$message.success(res.message)
+        this.$refs.table.refresh()
+      })
     },
     handleSave(record) {
       this.formVisible = true
+      this.current = record
       this.form.resetFields()
       if (record != null) {
         this.$nextTick(() => {
@@ -260,7 +268,8 @@ export default {
         if (!err) {
           const formData = Object.assign({}, values)
           let obj
-          if (values.id) {
+          if (this.current.id) {
+            formData.id = this.current.id
             obj = putAction('/v1/api/acl', formData)
           } else {
             obj = postAction('/v1/api/acl', formData)
@@ -270,7 +279,8 @@ export default {
               if (res.code === 200) {
                 that.$message.success(res.message)
                 that.$emit('ok')
-                this.loadData()
+                // this.loadData()
+                this.$refs.table.refresh()
               } else {
                 that.$message.warning(res.message)
               }

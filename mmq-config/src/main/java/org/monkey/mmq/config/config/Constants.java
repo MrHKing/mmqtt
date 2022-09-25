@@ -39,4 +39,13 @@ public class Constants {
 
     public static final String RETENTIOM_POLICY = "retentionPolicy";
 
+    public static final Integer DENY = 0;
+
+    public static final Integer ALLOW = 1;
+
+    public static final Integer SUBSCRIBE = 1;
+
+    public static final Integer PUBLISH = 2;
+
+    public static final Integer SUBSCRIBE_AND_PUBLISH = 3;
 }

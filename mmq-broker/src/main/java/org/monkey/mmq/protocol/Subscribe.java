@@ -23,6 +23,7 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.*;
 import io.netty.util.AttributeKey;
 import org.monkey.mmq.config.Loggers;
+import org.monkey.mmq.config.modules.acl.AclModule;
 import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.core.utils.LoggerUtils;
 import org.monkey.mmq.core.actor.metadata.message.RetainMessageMateData;
@@ -32,6 +33,8 @@ import org.monkey.mmq.service.SubscribeStoreService;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.monkey.mmq.config.config.Constants.SUBSCRIBE;
 
 /**
  * SUBSCRIBE连接处理
@@ -43,19 +46,30 @@ public class Subscribe {
 
 	private RetainMessageStoreService retainMessageStoreService;
 
-	public Subscribe(SubscribeStoreService subscribeStoreService,  RetainMessageStoreService retainMessageStoreService) {
+	private AclModule aclModule;
+
+	public Subscribe(SubscribeStoreService subscribeStoreService,
+					 RetainMessageStoreService retainMessageStoreService,
+					 AclModule aclModule) {
 		this.subscribeStoreService = subscribeStoreService;
 		this.retainMessageStoreService = retainMessageStoreService;
+		this.aclModule = aclModule;
 	}
 
 	public void processSubscribe(Channel channel, MqttSubscribeMessage msg) {
 		List<MqttTopicSubscription> topicSubscriptions = msg.payload().topicSubscriptions();
 		if (this.validTopicFilter(topicSubscriptions)) {
 			String clientId = (String) channel.attr(AttributeKey.valueOf("clientId")).get();
+
 			List<Integer> mqttQoSList = new ArrayList<Integer>();
-			topicSubscriptions.forEach(topicSubscription -> {
+			for (MqttTopicSubscription topicSubscription: topicSubscriptions) {
 				String topicFilter = topicSubscription.topicName();
 				MqttQoS mqttQoS = topicSubscription.qualityOfService();
+				// acl
+				if (!aclModule.clientIdAccess(clientId, topicFilter)) {
+					channel.close();
+					return;
+				}
 				SubscribeMateData subscribeStore = new SubscribeMateData(clientId, topicFilter, mqttQoS.value());
 				try {
 					subscribeStoreService.put(topicFilter, subscribeStore);
@@ -64,7 +78,7 @@ public class Subscribe {
 				}
 				mqttQoSList.add(mqttQoS.value());
 				LoggerUtils.printIfDebugEnabled(Loggers.BROKER_PROTOCOL,"SUBSCRIBE - clientId: {}, topFilter: {}, QoS: {}", clientId, topicFilter, mqttQoS.value());
-			});
+			};
 			MqttSubAckMessage subAckMessage = (MqttSubAckMessage) MqttMessageFactory.newMessage(
 				new MqttFixedHeader(MqttMessageType.SUBACK, false, MqttQoS.AT_MOST_ONCE, false, 0),
 				MqttMessageIdVariableHeader.from(msg.variableHeader().messageId()),

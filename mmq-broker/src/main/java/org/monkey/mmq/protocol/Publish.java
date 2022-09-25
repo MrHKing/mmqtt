@@ -25,6 +25,7 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.*;
 import io.netty.util.AttributeKey;
 import org.monkey.mmq.config.Loggers;
+import org.monkey.mmq.config.modules.acl.AclModule;
 import org.monkey.mmq.core.actor.metadata.message.PublishInOutType;
 import org.monkey.mmq.core.cluster.Member;
 import org.monkey.mmq.core.entity.InternalMessage;
@@ -57,19 +58,23 @@ public class Publish {
 
 	private ActorSystem actorSystem;
 
+	private AclModule aclModule;
+
 	private final Member local;
 
 	public Publish(SessionStoreService sessionStoreService, SubscribeStoreService subscribeStoreService,
 				   RetainMessageStoreService retainMessageStoreService,
 				   DupPublishMessageStoreService dupPublishMessageStoreService,
 				   Member local,
-				   ActorSystem actorSystem) {
+				   ActorSystem actorSystem,
+				   AclModule aclModule) {
 		this.sessionStoreService = sessionStoreService;
 		this.subscribeStoreService = subscribeStoreService;
 		this.retainMessageStoreService = retainMessageStoreService;
 		this.dupPublishMessageStoreService = dupPublishMessageStoreService;
 		this.local = local;
 		this.actorSystem = actorSystem;
+		this.aclModule = aclModule;
 	}
 
 	public void processPublish(Channel channel, MqttPublishMessage msg) throws MmqException {
