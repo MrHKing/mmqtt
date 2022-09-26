@@ -4,17 +4,20 @@
 
 # MMQ broker
 *MMQ broker* 是一款完全开源，高度可伸缩，高可用的分布式 MQTT 消息服务器，适用于 IoT、M2M 和移动应用程序。
-
 *MMQ broker* 完整支持MQTT V3.1 和 V3.1.1。
+*开源免费 同时支持分布式架构和数据持久化、规则引擎、ACL的MQTT broker。
+*在1.1.4版本新增插件功能，可以实现更多定制化功能。
 
 ## 特征
    - 分布式MQTT服务
    - 万级连接数并发（3台 华为云1核2G  1M带宽）
    - MQTT V3.1 和 V3.1.1
-   - 支持桥接（MYSQL、POSTGRESQL、SQLSERVER、KAFKA、TDENGINE、MQTT BROKER、Influxdb*）
+   - 支持桥接（MYSQL、POSTGRESQL、SQLSERVER、KAFKA、TDENGINE、MQTT BROKER、Influxdb）
    - 规则引擎 通过SQL进行规则转发
    - 管理API 对MMQ BROKER管理接口。
    - 认证鉴权 登录认证管理
+   - 发布订阅 ACL
+   - 插件模块
    - 集群管理 在线配置和管理集群*
       
       *为正在开发中的功能
