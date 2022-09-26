@@ -3,10 +3,10 @@
 简体中文 | [English](./README-en.md)
 
 # MMQ broker
-*MMQ broker* 是一款完全开源，高度可伸缩，高可用的分布式 MQTT 消息服务器，适用于 IoT、M2M 和移动应用程序。
-*MMQ broker* 完整支持MQTT V3.1 和 V3.1.1。
-*开源免费 同时支持分布式架构和数据持久化、规则引擎、ACL的MQTT broker。
-*在1.1.4版本新增插件功能，可以实现更多定制化功能。
+* MMQ broker* 是一款完全开源，高度可伸缩，高可用的分布式 MQTT 消息服务器，适用于 IoT、M2M 和移动应用程序。
+* MMQ broker* 完整支持MQTT V3.1 和 V3.1.1。
+* 开源免费 同时支持分布式架构和数据持久化、规则引擎、ACL的MQTT broker。
+* 在1.1.4版本新增插件功能，可以实现更多定制化功能。
 
 ## 特征
    - 分布式MQTT服务
