@@ -59,7 +59,7 @@ import java.util.concurrent.ThreadFactory;
  * Netty启动Broker
  * @author Solley
  */
-@Component
+//@Component
 public class SSLBrokerServer {
 
 	/**

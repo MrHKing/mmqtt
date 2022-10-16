@@ -32,6 +32,7 @@ import org.monkey.mmq.core.entity.Response;
 import org.monkey.mmq.core.entity.WriteRequest;
 import org.monkey.mmq.core.exception.ErrorCode;
 import org.monkey.mmq.core.exception.MmqException;
+import org.monkey.mmq.core.storage.kv.KvStorage;
 import org.monkey.mmq.core.utils.ByteUtils;
 import org.monkey.mmq.core.utils.Loggers;
 import org.monkey.mmq.core.utils.StringUtils;
@@ -64,11 +65,11 @@ public class PersistentServiceProcessor extends BasePersistentServiceProcessor {
      */
     private volatile boolean hasLeader = false;
     
-    public PersistentServiceProcessor(ProtocolManager protocolManager, String kvStorageBaseDir,
+    public PersistentServiceProcessor(ProtocolManager protocolManager, KvStorage kvStorage,
                                       String raftGroup,
                                       Function<String, Class<? extends Record>> getClassOfRecordFromKey)
             throws Exception {
-        super(kvStorageBaseDir, raftGroup, getClassOfRecordFromKey);
+        super(kvStorage, raftGroup, getClassOfRecordFromKey);
         this.raftGroup = raftGroup;
         this.protocol = protocolManager.getCpProtocol();
         this.getClassOfRecordFromKey = getClassOfRecordFromKey;

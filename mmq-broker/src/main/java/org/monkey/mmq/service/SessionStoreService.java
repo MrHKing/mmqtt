@@ -85,7 +85,8 @@ public class SessionStoreService implements RecordListener<ClientMateData> {
     public SessionStoreService(ServerMemberManager memberManager,
                                SubscribeStoreService subscribeStoreService,
                                DupPublishMessageStoreService dupPublishMessageStoreService,
-                               ActorSystem actorSystem, RpcClient rpcClient) {
+                               ActorSystem actorSystem,
+                               RpcClient rpcClient) {
         this.memberManager = memberManager;
         this.subscribeStoreService = subscribeStoreService;
         this.dupPublishMessageStoreService = dupPublishMessageStoreService;
@@ -129,6 +130,11 @@ public class SessionStoreService implements RecordListener<ClientMateData> {
         ClientPutMessage clientPutMessage = new ClientPutMessage();
         clientPutMessage.setClientMateData(new ClientMateData(clientId, sessionStore.getUser(), clientIp, this.memberManager.getSelf().getIp(), this.memberManager.getSelf().getPort()));
 
+        ActorRef actorRef = clientActors.get(clientId);
+        if (actorRef != null) {
+            actorRef.tell(clientPutMessage, ActorRef.noSender());
+            return;
+        }
         // create client actor
         ActorRef clientActor = actorSystem.actorOf((Props.create(ClientActor.class,
                 consistencyService,
@@ -209,13 +215,29 @@ public class SessionStoreService implements RecordListener<ClientMateData> {
 
     @Override
     public void onChange(String key, ClientMateData value) throws Exception {
+        SessionMateData sessionMateData = storage.get(value.getClientId());
+        // 如果当前节点没有此客户端，则在集群中删除此客户端
+        if (sessionMateData == null
+                && memberManager.getSelf().getIp().equals(value.getNodeIp())
+                && memberManager.getSelf().getPort() == value.getNodePort()) {
+            try {
+                consistencyService.remove(key);
+                subscribeStoreService.deleteByClient(value.getClientId());
+            } catch (MmqException e) {
+                Loggers.BROKER_SERVER.error("client session remove failed.", e);
+            }
+            return;
+        }
         clientStory.put(key, value);
         globalMQTTMessageCounter.countInbound(MqttMessageType.CONNECT);
+
     }
 
     @Override
     public void onDelete(String key) throws Exception {
         ClientMateData clientMateData = clientStory.get(key);
+        if (clientMateData == null) return;
+
         if (clientActors.get(clientMateData.getClientId()) != null) {
             ActorSelection actorRef = actorSystem.actorSelection("/user/" + clientMateData.getClientId());
             actorRef.tell(new StopMessage(), ActorRef.noSender());

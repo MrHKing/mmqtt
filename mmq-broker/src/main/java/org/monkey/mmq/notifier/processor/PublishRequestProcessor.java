@@ -21,11 +21,14 @@ import com.alipay.remoting.rpc.protocol.AsyncUserProcessor;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.mqtt.*;
 import org.monkey.mmq.config.Loggers;
+import org.monkey.mmq.core.actor.metadata.message.PublishInOutType;
 import org.monkey.mmq.core.cluster.Member;
 import org.monkey.mmq.core.entity.InternalMessage;
 import org.monkey.mmq.core.actor.metadata.message.DupPublishMessageMateData;
 import org.monkey.mmq.core.actor.metadata.message.SessionMateData;
+import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.service.DupPublishMessageStoreService;
+import org.monkey.mmq.service.GlobalMetricsStoreService;
 import org.monkey.mmq.service.SessionStoreService;
 import org.monkey.mmq.service.SubscribeStoreService;
 
@@ -44,25 +47,34 @@ public class PublishRequestProcessor extends AsyncUserProcessor<InternalMessage>
 
     private final SubscribeStoreService subscribeStoreService;
 
+    private final GlobalMetricsStoreService globalMetricsStoreService;
+
     private final SessionStoreService sessionStoreService;
     private final DupPublishMessageStoreService dupPublishMessageStoreService;
 
     public PublishRequestProcessor(Member local,
                                    SubscribeStoreService subscribeStoreService,
                                    SessionStoreService sessionStoreService,
-                                   DupPublishMessageStoreService dupPublishMessageStoreService) {
+                                   DupPublishMessageStoreService dupPublishMessageStoreService,
+                                   GlobalMetricsStoreService globalMetricsStoreService) {
         this.local = local;
         this.subscribeStoreService = subscribeStoreService;
         this.sessionStoreService = sessionStoreService;
         this.dupPublishMessageStoreService = dupPublishMessageStoreService;
+        this.globalMetricsStoreService = globalMetricsStoreService;
     }
 
     @Override
     public void handleRequest(BizContext bizContext, AsyncContext asyncContext, InternalMessage message) {
         // 处理消息
-        this.sendPublishMessage(message.getTopic(), MqttQoS.valueOf(message.getMqttQoS()),
-                message.getMessageBytes().toByteArray(), message.getRetain(),
-                message.getDup(), message.getMessageId(),message.getClientId());
+        try {
+            this.sendPublishMessage(message.getTopic(), MqttQoS.valueOf(message.getMqttQoS()),
+                    message.getMessageBytes().toByteArray(), message.getRetain(),
+                    message.getDup(), message.getMessageId(),message.getClientId());
+            this.globalMetricsStoreService.put(message.getClientId(), message.getMessageBytes().toByteArray().length, PublishInOutType.OUT);
+        } catch (MmqException e) {
+            Loggers.BROKER_SERVER.error(e.getErrMsg());
+        }
     }
 
     @Override

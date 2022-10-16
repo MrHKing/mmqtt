@@ -22,10 +22,7 @@ import org.monkey.mmq.auth.model.User;
 import org.monkey.mmq.core.consistency.matedata.Datum;
 import org.monkey.mmq.core.consistency.matedata.Record;
 import org.monkey.mmq.core.consistency.matedata.RecordListener;
-import org.monkey.mmq.core.consistency.persistent.BasePersistentServiceProcessor;
-import org.monkey.mmq.core.consistency.persistent.PersistentConsistencyService;
-import org.monkey.mmq.core.consistency.persistent.PersistentServiceProcessor;
-import org.monkey.mmq.core.consistency.persistent.StandalonePersistentServiceProcessor;
+import org.monkey.mmq.core.consistency.persistent.*;
 import org.monkey.mmq.core.distributed.ProtocolManager;
 import org.monkey.mmq.core.env.EnvUtil;
 import org.monkey.mmq.core.exception.MmqException;
@@ -96,9 +93,9 @@ public class AuthPersistentConsistencyServiceDelegateImpl implements PersistentC
     
     private BasePersistentServiceProcessor createNewPersistentServiceProcessor(ProtocolManager protocolManager) throws Exception {
         final BasePersistentServiceProcessor processor =
-                EnvUtil.getStandaloneMode() ? new StandalonePersistentServiceProcessor(this.baseDir,
+                EnvUtil.getStandaloneMode() ? new StandalonePersistentServiceProcessor(new MmqKvStorage(this.baseDir),
                         MQTT_PERSISTENT_AUTH_GROUP, this::getClassOfRecordFromKey)
-                        : new PersistentServiceProcessor(protocolManager, this.baseDir,
+                        : new PersistentServiceProcessor(protocolManager, new MmqKvStorage(this.baseDir),
                         MQTT_PERSISTENT_AUTH_GROUP, this::getClassOfRecordFromKey);
         processor.afterConstruct();
         return processor;

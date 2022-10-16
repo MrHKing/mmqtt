@@ -33,6 +33,7 @@ import org.monkey.mmq.config.UtilsAndCommons;
 import org.monkey.mmq.core.actor.metadata.message.*;
 import org.monkey.mmq.core.actor.metadata.subscribe.SubscribeMateData;
 import org.monkey.mmq.core.actor.metadata.system.SystemInfoMateData;
+import org.monkey.mmq.core.storage.kv.MemoryKvStorage;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Paths;
@@ -97,9 +98,9 @@ public class MqttPersistentConsistencyServiceDelegateImpl implements PersistentC
     
     private BasePersistentServiceProcessor createNewPersistentServiceProcessor(ProtocolManager protocolManager) throws Exception {
         final BasePersistentServiceProcessor processor =
-                EnvUtil.getStandaloneMode() ? new StandalonePersistentServiceProcessor(this.baseDir,
+                EnvUtil.getStandaloneMode() ? new StandalonePersistentServiceProcessor(new MemoryKvStorage(),
                         Constants.MQTT_PERSISTENT_BROKER_GROUP, this::getClassOfRecordFromKey)
-                        : new PersistentServiceProcessor(protocolManager, this.baseDir,
+                        : new PersistentServiceProcessor(protocolManager, new MemoryKvStorage(),
                         Constants.MQTT_PERSISTENT_BROKER_GROUP, this::getClassOfRecordFromKey);
         processor.afterConstruct();
         return processor;

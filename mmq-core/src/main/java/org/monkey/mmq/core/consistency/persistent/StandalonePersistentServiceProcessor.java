@@ -28,6 +28,7 @@ import org.monkey.mmq.core.entity.Response;
 import org.monkey.mmq.core.entity.WriteRequest;
 import org.monkey.mmq.core.exception.ErrorCode;
 import org.monkey.mmq.core.exception.MmqException;
+import org.monkey.mmq.core.storage.kv.KvStorage;
 import org.monkey.mmq.core.utils.ByteUtils;
 
 
@@ -49,9 +50,9 @@ public class StandalonePersistentServiceProcessor extends BasePersistentServiceP
 
     private final String raftGroup;
 
-    public StandalonePersistentServiceProcessor(String kvStorageBaseDir, String raftGroup,
+    public StandalonePersistentServiceProcessor(KvStorage kvStorage, String raftGroup,
                                                 Function<String, Class<? extends Record>> getClassOfRecordFromKey) throws Exception {
-        super(kvStorageBaseDir, raftGroup, getClassOfRecordFromKey);
+        super(kvStorage, raftGroup, getClassOfRecordFromKey);
         super.afterConstruct();
         this.raftGroup = raftGroup;
         this.getClassOfRecordFromKey = getClassOfRecordFromKey;

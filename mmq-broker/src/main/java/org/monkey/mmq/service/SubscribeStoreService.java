@@ -24,7 +24,6 @@ import org.monkey.mmq.config.KeyBuilder;
 import org.monkey.mmq.core.consistency.matedata.RecordListener;
 import org.monkey.mmq.config.UtilsAndCommons;
 import org.monkey.mmq.core.actor.metadata.subscribe.SubscribeMateData;
-import org.monkey.mmq.core.actor.metadata.system.SystemInfoMateData;
 import org.monkey.mmq.core.consistency.persistent.ConsistencyService;
 import org.monkey.mmq.metrics.GlobalMQTTMessageCounter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,6 +78,14 @@ public class SubscribeStoreService implements RecordListener<SubscribeMateData> 
         subscribeStore.setNodeIp(memberManager.getSelf().getIp());
         subscribeStore.setNodePort(memberManager.getSelf().getPort());
         consistencyService.put(key, subscribeStore);
+    }
+
+    public void deleteByClient(String clientId) {
+        try {
+            this.onDelete(clientId);
+        } catch (Exception exception) {
+            Loggers.BROKER_SERVER.error(exception.getMessage());
+        }
     }
 
     @Async
@@ -179,6 +186,7 @@ public class SubscribeStoreService implements RecordListener<SubscribeMateData> 
 
     @Override
     public void onChange(String key, SubscribeMateData value) throws Exception {
+
         if (StrUtil.contains(value.getTopicFilter(), '#') || StrUtil.contains(value.getTopicFilter(), '+')) {
             ConcurrentHashMap<String, SubscribeMateData> clientConcurrentHashMap = subWildcard.get(value.getTopicFilter());
             if (clientConcurrentHashMap == null) {
@@ -187,7 +195,7 @@ public class SubscribeStoreService implements RecordListener<SubscribeMateData> 
             clientConcurrentHashMap.put(key, value);
             subWildcard.put(value.getTopicFilter(), clientConcurrentHashMap);
             globalMQTTMessageCounter.countInbound(MqttMessageType.SUBSCRIBE);
-        } else  {
+        } else {
             ConcurrentHashMap<String, SubscribeMateData> clientConcurrentHashMap = subscribes.get(value.getTopicFilter());
             if (clientConcurrentHashMap == null) {
                 clientConcurrentHashMap = new ConcurrentHashMap<>();
@@ -200,12 +208,21 @@ public class SubscribeStoreService implements RecordListener<SubscribeMateData> 
 
     @Override
     public void onDelete(String key) throws Exception {
+        AtomicInteger count = new AtomicInteger();
         subscribes.forEach((subKey, client) -> {
-            client.remove(key);
+            Object value = client.remove(key);
+            if (value != null) {
+                count.getAndIncrement();
+            }
         });
         subWildcard.forEach((subKey, client) -> {
-            client.remove(key);
+            Object value = client.remove(key);
+            if (value != null) {
+                count.getAndIncrement();
+            }
         });
-        globalMQTTMessageCounter.countOutbound(MqttMessageType.SUBSCRIBE);
+        for (int i = 0; i < count.get(); i++) {
+            globalMQTTMessageCounter.countOutbound(MqttMessageType.SUBSCRIBE);
+        }
     }
 }

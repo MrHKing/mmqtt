@@ -52,13 +52,13 @@ public class GlobalMQTTMessageCounter {
 
     public void countOutbound(final MqttMessageType mqttMessageType) {
         metricsHolder.getOutgoingMessageCounter().inc();
-        if (CONNECT.equals(mqttMessageType)) {
+        if (CONNECT.equals(mqttMessageType) && metricsHolder.getIncomingConnectCounter().getCount() != 0) {
             metricsHolder.getIncomingConnectCounter().dec();
         }
         if (PUBLISH.equals(mqttMessageType)) {
             metricsHolder.getOutgoingPublishCounter().inc();
         }
-        if (SUBSCRIBE.equals(mqttMessageType)) {
+        if (SUBSCRIBE.equals(mqttMessageType) && metricsHolder.getSubscriptionCounter().getCount() != 0) {
             metricsHolder.getSubscriptionCounter().dec();
         }
     }

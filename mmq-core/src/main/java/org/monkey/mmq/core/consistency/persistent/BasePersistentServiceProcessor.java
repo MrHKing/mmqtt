@@ -79,7 +79,7 @@ public abstract class BasePersistentServiceProcessor extends RequestProcessor4CP
         }
     }
     
-    protected final MmqKvStorage kvStorage;
+    protected final KvStorage kvStorage;
     
     protected final Serializer serializer;
 
@@ -105,8 +105,8 @@ public abstract class BasePersistentServiceProcessor extends RequestProcessor4CP
     
     protected final int queueMaxSize = 16384;
     
-    public BasePersistentServiceProcessor(String kvStorageBaseDir, String raftGroup, Function<String, Class<? extends Record>> getClassOfRecordFromKey) throws Exception {
-        this.kvStorage = new MmqKvStorage(kvStorageBaseDir);
+    public BasePersistentServiceProcessor(KvStorage kvStorage, String raftGroup, Function<String, Class<? extends Record>> getClassOfRecordFromKey) throws Exception {
+        this.kvStorage = kvStorage;
         this.raftGroup = raftGroup;
         this.serializer = SerializeFactory.getSerializer("JSON");
         this.getClassOfRecordFromKey = getClassOfRecordFromKey;
