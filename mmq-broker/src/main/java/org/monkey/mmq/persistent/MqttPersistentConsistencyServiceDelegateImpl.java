@@ -19,10 +19,7 @@ package org.monkey.mmq.persistent;
 
 import org.monkey.mmq.config.KeyBuilder;
 import org.monkey.mmq.core.common.Constants;
-import org.monkey.mmq.core.consistency.persistent.BasePersistentServiceProcessor;
-import org.monkey.mmq.core.consistency.persistent.PersistentConsistencyService;
-import org.monkey.mmq.core.consistency.persistent.PersistentServiceProcessor;
-import org.monkey.mmq.core.consistency.persistent.StandalonePersistentServiceProcessor;
+import org.monkey.mmq.core.consistency.persistent.*;
 import org.monkey.mmq.core.distributed.ProtocolManager;
 import org.monkey.mmq.core.env.EnvUtil;
 import org.monkey.mmq.core.exception.MmqException;
@@ -98,9 +95,9 @@ public class MqttPersistentConsistencyServiceDelegateImpl implements PersistentC
     
     private BasePersistentServiceProcessor createNewPersistentServiceProcessor(ProtocolManager protocolManager) throws Exception {
         final BasePersistentServiceProcessor processor =
-                EnvUtil.getStandaloneMode() ? new StandalonePersistentServiceProcessor(new MemoryKvStorage(),
+                EnvUtil.getStandaloneMode() ? new StandalonePersistentServiceProcessor(new MmqKvStorage(this.baseDir),
                         Constants.MQTT_PERSISTENT_BROKER_GROUP, this::getClassOfRecordFromKey)
-                        : new PersistentServiceProcessor(protocolManager, new MemoryKvStorage(),
+                        : new PersistentServiceProcessor(protocolManager, new MmqKvStorage(this.baseDir),
                         Constants.MQTT_PERSISTENT_BROKER_GROUP, this::getClassOfRecordFromKey);
         processor.afterConstruct();
         return processor;

@@ -48,5 +48,5 @@ public class UtilsAndCommons {
     public static final String CIDR_REGEX = "[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}/[0-9]+";
 
     public static final String DATA_BASE_DIR =
-            EnvUtil.getMmqHome() + File.separator + "data" + File.separator + "mqtt";
+            EnvUtil.getMmqHome() + File.separator + "data" + File.separator + "broker";
 }
