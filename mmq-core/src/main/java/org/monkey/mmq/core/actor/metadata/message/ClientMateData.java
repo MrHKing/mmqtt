@@ -15,6 +15,7 @@
  */
 package org.monkey.mmq.core.actor.metadata.message;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.monkey.mmq.core.consistency.matedata.Record;
 
 import java.io.Serializable;
@@ -33,6 +34,7 @@ public class ClientMateData implements Record, Serializable {
 
     private String user;
 
+    @JsonFormat(timezone ="GMT+8",pattern ="yyyy-MM-dd HH:mm:ss")
     private Date connectTime;
 
     private String address;
