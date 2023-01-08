@@ -98,7 +98,7 @@ const columns = [
   },
   {
     title: '连接时间',
-    dataIndex: 'connectTiem',
+    dataIndex: 'connectTime',
     sorter: true
   },
   {

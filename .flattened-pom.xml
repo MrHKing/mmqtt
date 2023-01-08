@@ -19,7 +19,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.monkey.mmq</groupId>
   <artifactId>mmq</artifactId>
-  <version>1.1.4</version>
+  <version>1.1.5</version>
   <packaging>pom</packaging>
   <name>Monkey mmq ${project.version}</name>
   <description>Top mmq project pom.xml file</description>
@@ -117,7 +117,7 @@
     <maven-enforcer-plugin.version>1.4.1</maven-enforcer-plugin.version>
     <commons-lang3.version>3.4</commons-lang3.version>
     <reflections.version>0.9.11</reflections.version>
-    <revision>1.1.4</revision>
+    <revision>1.1.5</revision>
     <jackson.annotations.version>2.12.2</jackson.annotations.version>
     <sonar.jacoco.itReportPath>${project.basedir}/../test/target/jacoco-it.exec</sonar.jacoco.itReportPath>
     <jacoco-maven-plugin.version>0.7.8</jacoco-maven-plugin.version>

@@ -54,6 +54,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.4.3</version>
                 <configuration>
                     <!-- main方法的地址 只需要修改这个地址-->
                     <mainClass>org.monkey.mmq.web.Mmq</mainClass>

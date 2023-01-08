@@ -16,10 +16,6 @@
         <module name="mmq-api" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="mmq-bridge" target="1.8" />
-      <module name="mmq-consistency" target="8" />
-      <module name="mmq-device" target="1.8" />
-    </bytecodeTargetLevel>
+    <bytecodeTargetLevel target="1.8" />
   </component>
 </project>
