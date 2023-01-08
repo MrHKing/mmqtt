@@ -65,7 +65,7 @@ public class DisConnect {
 			dupPubRelMessageStoreService.deleteForClient(clientId);
 		}
 		LoggerUtils.printIfDebugEnabled(Loggers.BROKER_PROTOCOL,"DISCONNECT - clientId: {}, cleanSession: {}", clientId, sessionStore.isCleanSession());
-		sessionStoreService.delete(clientId);
+		sessionStoreService.delete(clientId, channel.id().asLongText());
 		channel.close();
 	}
 

@@ -122,7 +122,14 @@ public class SessionStoreService implements RecordListener<ClientMateData> {
     }
 
     public void put(String clientId, SessionMateData sessionStore) throws MmqException {
+        SessionMateData sessionMateData = storage.get(clientId);
+        if (sessionMateData != null) {
+            sessionMateData.getChannel().close();
+            storage.remove(clientId);
+        }
+
         storage.put(clientId, sessionStore);
+
         InetSocketAddress clientIpSocket = (InetSocketAddress)sessionStore.getChannel().remoteAddress();
         String clientIp = clientIpSocket.getAddress().getHostAddress();
 
@@ -192,8 +199,25 @@ public class SessionStoreService implements RecordListener<ClientMateData> {
         return storage.containsKey(clientId);
     }
 
+    public void delete(String clientId, String channelId) {
+        SessionMateData sessionMateData = storage.get(clientId);
+        if (sessionMateData != null && sessionMateData.getChannel().id().asLongText().equals(channelId)) {
+            storage.remove(clientId);
+            ClientRemoveMessage clientRemoveMessage = new ClientRemoveMessage();
+            ClientMateData clientMateData = new ClientMateData();
+            clientMateData.setClientId(clientId);
+            clientRemoveMessage.setClientMateData(clientMateData);
+            ActorSelection actorRef = actorSystem.actorSelection("/user/" + clientId);
+            actorRef.tell(clientRemoveMessage, ActorRef.noSender());
+        }
+    }
+
     public void delete(String clientId) throws MmqException {
-        storage.remove(clientId);
+        SessionMateData sessionMateData = storage.get(clientId);
+        if (sessionMateData != null) {
+            sessionMateData.getChannel().close();
+            storage.remove(clientId);
+        }
         ClientRemoveMessage clientRemoveMessage = new ClientRemoveMessage();
         ClientMateData clientMateData = new ClientMateData();
         clientMateData.setClientId(clientId);

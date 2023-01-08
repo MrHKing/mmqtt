@@ -159,7 +159,7 @@ public class ProtocolProcess {
 
 	public Connect connect() {
 		if (connect == null) {
-			connect = new Connect(sessionStoreService, subscribeStoreService, dupPublishMessageStoreService, dupPubRelMessageStoreService, authService);
+			connect = new Connect(sessionStoreService, subscribeStoreService, dupPublishMessageStoreService, dupPubRelMessageStoreService, authService, this.connectExecutor);
 		}
 		return connect;
 	}

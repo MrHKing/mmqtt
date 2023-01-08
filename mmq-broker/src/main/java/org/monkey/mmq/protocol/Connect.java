@@ -19,6 +19,8 @@ package org.monkey.mmq.protocol;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.handler.codec.mqtt.*;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.AttributeKey;
@@ -36,6 +38,7 @@ import org.monkey.mmq.service.SessionStoreService;
 import org.monkey.mmq.service.SubscribeStoreService;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 /**
  * CONNECT连接处理
@@ -53,12 +56,22 @@ public class Connect {
 
 	private IMqttAuthService authService;
 
-	public Connect(SessionStoreService sessionStoreService, SubscribeStoreService subscribeStoreService, DupPublishMessageStoreService dupPublishMessageStoreService, DupPubRelMessageStoreService dupPubRelMessageStoreService, IMqttAuthService authService) {
+	private ExecutorService connectExecutor;
+
+	private int total = 100;
+
+	public Connect(SessionStoreService sessionStoreService,
+				   SubscribeStoreService subscribeStoreService,
+				   DupPublishMessageStoreService dupPublishMessageStoreService,
+				   DupPubRelMessageStoreService dupPubRelMessageStoreService,
+				   IMqttAuthService authService,
+				   ExecutorService connectExecutor) {
 		this.sessionStoreService = sessionStoreService;
 		this.subscribeStoreService = subscribeStoreService;
 		this.dupPublishMessageStoreService = dupPublishMessageStoreService;
 		this.dupPubRelMessageStoreService = dupPubRelMessageStoreService;
 		this.authService = authService;
+		this.connectExecutor = connectExecutor;
 	}
 
 	public void processConnect(Channel channel, MqttConnectMessage msg) throws MmqException {
@@ -118,15 +131,20 @@ public class Connect {
 				dupPublishMessageStoreService.deleteForClient(msg.payload().clientIdentifier());
 				dupPubRelMessageStoreService.deleteForClient(msg.payload().clientIdentifier());
 			}
-			previous.close();
+//			previous.close();
+
 		}
+		handle(channel, msg, username);
+	}
+
+	private void handle(Channel channel, MqttConnectMessage msg, String username) throws MmqException {
 		// 处理遗嘱信息
 		SessionMateData sessionStore = new SessionMateData(msg.payload().clientIdentifier(),
 				channel, msg.variableHeader().isCleanSession(), null, username);
 		if (msg.variableHeader().isWillFlag()) {
 			MqttPublishMessage willMessage = (MqttPublishMessage) MqttMessageFactory.newMessage(
-				new MqttFixedHeader(MqttMessageType.PUBLISH, false, MqttQoS.valueOf(msg.variableHeader().willQos()), msg.variableHeader().isWillRetain(), 0),
-				new MqttPublishVariableHeader(msg.payload().willTopic(), 0), Unpooled.buffer().writeBytes(msg.payload().willMessageInBytes()));
+					new MqttFixedHeader(MqttMessageType.PUBLISH, false, MqttQoS.valueOf(msg.variableHeader().willQos()), msg.variableHeader().isWillRetain(), 0),
+					new MqttPublishVariableHeader(msg.payload().willTopic(), 0), Unpooled.buffer().writeBytes(msg.payload().willMessageInBytes()));
 			sessionStore.setWillMessage(willMessage);
 		}
 		// 处理连接心跳包
@@ -142,8 +160,8 @@ public class Connect {
 		channel.attr(AttributeKey.valueOf("clientId")).set(msg.payload().clientIdentifier());
 		Boolean sessionPresent = sessionStoreService.containsKey(msg.payload().clientIdentifier()) && !msg.variableHeader().isCleanSession();
 		MqttConnAckMessage okResp = (MqttConnAckMessage) MqttMessageFactory.newMessage(
-			new MqttFixedHeader(MqttMessageType.CONNACK, false, MqttQoS.AT_MOST_ONCE, false, 0),
-			new MqttConnAckVariableHeader(MqttConnectReturnCode.CONNECTION_ACCEPTED, sessionPresent), null);
+				new MqttFixedHeader(MqttMessageType.CONNACK, false, MqttQoS.AT_MOST_ONCE, false, 0),
+				new MqttConnAckVariableHeader(MqttConnectReturnCode.CONNECTION_ACCEPTED, sessionPresent), null);
 		channel.writeAndFlush(okResp);
 		Loggers.BROKER_PROTOCOL.info("CONNECT - clientId: {}, cleanSession: {}", msg.payload().clientIdentifier(), msg.variableHeader().isCleanSession());
 		// 如果cleanSession为0, 需要重发同一clientId存储的未完成的QoS1和QoS2的DUP消息
@@ -152,17 +170,16 @@ public class Connect {
 			List<DupPubRelMessageMateData> dupPubRelMessageStoreList = dupPubRelMessageStoreService.get(msg.payload().clientIdentifier());
 			dupPublishMessageStoreList.forEach(dupPublishMessageStore -> {
 				MqttPublishMessage publishMessage = (MqttPublishMessage) MqttMessageFactory.newMessage(
-					new MqttFixedHeader(MqttMessageType.PUBLISH, true, MqttQoS.valueOf(dupPublishMessageStore.getMqttQoS()), false, 0),
-					new MqttPublishVariableHeader(dupPublishMessageStore.getTopic(), dupPublishMessageStore.getMessageId()), Unpooled.buffer().writeBytes(dupPublishMessageStore.getMessageBytes()));
+						new MqttFixedHeader(MqttMessageType.PUBLISH, true, MqttQoS.valueOf(dupPublishMessageStore.getMqttQoS()), false, 0),
+						new MqttPublishVariableHeader(dupPublishMessageStore.getTopic(), dupPublishMessageStore.getMessageId()), Unpooled.buffer().writeBytes(dupPublishMessageStore.getMessageBytes()));
 				channel.writeAndFlush(publishMessage);
 			});
 			dupPubRelMessageStoreList.forEach(dupPubRelMessageStore -> {
 				MqttMessage pubRelMessage = MqttMessageFactory.newMessage(
-					new MqttFixedHeader(MqttMessageType.PUBREL, true, MqttQoS.AT_MOST_ONCE, false, 0),
-					MqttMessageIdVariableHeader.from(dupPubRelMessageStore.getMessageId()), null);
+						new MqttFixedHeader(MqttMessageType.PUBREL, true, MqttQoS.AT_MOST_ONCE, false, 0),
+						MqttMessageIdVariableHeader.from(dupPubRelMessageStore.getMessageId()), null);
 				channel.writeAndFlush(pubRelMessage);
 			});
 		}
 	}
-
 }
