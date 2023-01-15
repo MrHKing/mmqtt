@@ -31,10 +31,14 @@ import org.monkey.mmq.config.Loggers;
 import org.monkey.mmq.core.exception.MmqException;
 import org.monkey.mmq.core.actor.metadata.message.SessionMateData;
 import org.monkey.mmq.core.actor.message.SystemMessage;
+import org.monkey.mmq.core.utils.JacksonUtils;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.util.HashMap;
+import java.util.Map;
 
-import static org.monkey.mmq.core.common.Constants.MODULES;
+import static org.monkey.mmq.core.common.Constants.*;
 
 /**
  * MQTT消息处理
@@ -94,7 +98,20 @@ public class BrokerHandler extends ChannelInboundHandlerAdapter {
 				case CONNECT:
 					//protocolProcess.getConnectExecutor().submit(() -> {
 						try {
+							MqttConnectMessage mqttConnectMessage = (MqttConnectMessage) msg;
 							protocolProcess.connect().processConnect(ctx.channel(), (MqttConnectMessage) msg);
+							SystemMessage systemMessage = new SystemMessage();
+							systemMessage.setTopic(CLIENT_CONNECT  + "/" + mqttConnectMessage.payload().clientIdentifier());
+							Map payload = new HashMap();
+							payload.put("clientId", mqttConnectMessage.payload().clientIdentifier());
+//							payload.put("username", mqttConnectMessage.payload().userName());
+							InetSocketAddress clientIpSocket = (InetSocketAddress)ctx.channel().remoteAddress();
+							String clientIp = clientIpSocket.getAddress().getHostAddress();
+							payload.put("ip", clientIp);
+							systemMessage.setPayload(JacksonUtils.toJson(payload));
+							systemMessage.setMqttQoS(MqttQoS.AT_LEAST_ONCE);
+							ActorSelection actorRef = actorSystem.actorSelection("/user/" + ((MqttConnectMessage) msg).payload().clientIdentifier());
+							actorRef.tell(systemMessage, ActorRef.noSender());
 						} catch (MmqException e) {
 							Loggers.BROKER_SERVER.error(e.getErrMsg());
 							SystemMessage systemMessage = new SystemMessage();

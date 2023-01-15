@@ -50,4 +50,8 @@ public class Constants {
     public static final String RULE_ENGINE =  SYSTOPIC + "/RULE";
 
     public static final String MODULES =  SYSTOPIC + "/MODULES";
+
+    public static final String CLIENT_CONNECT =  SYSTOPIC + "/client/connected";
+
+    public static final String CLIENT_DISCONNECT =  SYSTOPIC + "/client/disconnected";
 }

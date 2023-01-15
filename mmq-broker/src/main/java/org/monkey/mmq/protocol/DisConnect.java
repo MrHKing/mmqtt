@@ -16,17 +16,29 @@
 
 package org.monkey.mmq.protocol;
 
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
-import io.netty.handler.codec.mqtt.MqttMessage;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.handler.codec.mqtt.*;
 import io.netty.util.AttributeKey;
 import org.monkey.mmq.config.Loggers;
+import org.monkey.mmq.core.actor.metadata.subscribe.SubscribeMateData;
 import org.monkey.mmq.core.exception.MmqException;
+import org.monkey.mmq.core.utils.JacksonUtils;
 import org.monkey.mmq.core.utils.LoggerUtils;
 import org.monkey.mmq.core.actor.metadata.message.SessionMateData;
 import org.monkey.mmq.service.DupPubRelMessageStoreService;
 import org.monkey.mmq.service.DupPublishMessageStoreService;
 import org.monkey.mmq.service.SessionStoreService;
 import org.monkey.mmq.service.SubscribeStoreService;
+
+import java.net.InetSocketAddress;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.monkey.mmq.core.common.Constants.CLIENT_DISCONNECT;
 
 
 /**
@@ -66,6 +78,24 @@ public class DisConnect {
 		}
 		LoggerUtils.printIfDebugEnabled(Loggers.BROKER_PROTOCOL,"DISCONNECT - clientId: {}, cleanSession: {}", clientId, sessionStore.isCleanSession());
 		sessionStoreService.delete(clientId, channel.id().asLongText());
+
+		// 发送设备下线通知
+		List<SubscribeMateData> subscribeStores = subscribeStoreService.search(CLIENT_DISCONNECT + "/" + clientId);
+		subscribeStores.forEach(subscribeStore -> {
+			Map payload = new HashMap();
+			payload.put("clientId", clientId);
+			InetSocketAddress clientIpSocket = (InetSocketAddress) channel.remoteAddress();
+			String clientIp = clientIpSocket.getAddress().getHostAddress();
+			payload.put("ip", clientIp);
+			MqttQoS respQoS = MqttQoS.AT_LEAST_ONCE;
+			MqttPublishMessage publishMessage = (MqttPublishMessage) MqttMessageFactory.newMessage(
+					new MqttFixedHeader(MqttMessageType.PUBLISH, false, respQoS, false, 0),
+					new MqttPublishVariableHeader(CLIENT_DISCONNECT + "/" + clientId, 0), Unpooled.buffer().writeBytes(JacksonUtils.toJson(payload).getBytes()));
+			SessionMateData subSession = sessionStoreService.get(subscribeStore.getClientId());
+			if (subSession != null) {
+				subSession.getChannel().writeAndFlush(publishMessage);
+			}
+		});
 		channel.close();
 	}
 
