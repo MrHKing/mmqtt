@@ -41,6 +41,9 @@ import static org.monkey.mmq.config.config.Constants.*;
 public class MQTTDriver implements ResourceDriver<MqttClient> {
 
     private ConcurrentHashMap<String, MqttClient> mqttClientConcurrentHashMap = new ConcurrentHashMap<>();
+
+    private ConcurrentHashMap<String, ST> stringSTConcurrentHashMap = new ConcurrentHashMap<>();
+
     /**
      * 设置超时时间
      */
@@ -176,7 +179,12 @@ public class MQTTDriver implements ResourceDriver<MqttClient> {
                         && resourcesMateData.getResource().get(PAYLOAD) != "") {
                     DriverFactory.setProperty(property, topic, username);
                     String template = resourcesMateData.getResource().get(PAYLOAD).toString();
-                    ST st = new ST(template);
+                    ST st = stringSTConcurrentHashMap.get(template);
+                    if (st == null) {
+                        st = new ST(template);
+                        stringSTConcurrentHashMap.put(template, st);
+                    }
+                    st.remove("json");
                     st.add("json", property);
                     content = st.render();
                 }

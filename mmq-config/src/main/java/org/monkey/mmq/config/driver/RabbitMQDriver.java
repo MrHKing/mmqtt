@@ -51,6 +51,7 @@ public class RabbitMQDriver implements ResourceDriver<Channel> {
 
     private ConcurrentHashMap<String, Connection> dataSources = new ConcurrentHashMap<>();
 
+    private ConcurrentHashMap<String, ST> stringSTConcurrentHashMap = new ConcurrentHashMap<>();
 
     @Override
     public void addDriver(String resourceId, Map<String, Object> resource) {
@@ -139,7 +140,12 @@ public class RabbitMQDriver implements ResourceDriver<Channel> {
                 if (!resourcesMateData.getResource().get(PAYLOAD).equals(PAYLOAD)) {
                     DriverFactory.setProperty(property, topic, username);
                     String template = resourcesMateData.getResource().get(PAYLOAD).toString();
-                    ST st = new ST(template);
+                    ST st = stringSTConcurrentHashMap.get(template);
+                    if (st == null) {
+                        st = new ST(template);
+                        stringSTConcurrentHashMap.put(template, st);
+                    }
+                    st.remove("json");
                     st.add("json", property);
                     content = st.render();
                 }

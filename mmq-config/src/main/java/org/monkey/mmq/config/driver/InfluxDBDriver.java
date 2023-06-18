@@ -43,6 +43,8 @@ public class InfluxDBDriver implements ResourceDriver<InfluxDBClient> {
 
     private ConcurrentHashMap<String, InfluxDBClient> dataSources = new ConcurrentHashMap<>();
 
+    private ConcurrentHashMap<String, ST> stringSTConcurrentHashMap = new ConcurrentHashMap<>();
+
     @Override
     public void addDriver(String resourceId, Map resource) {
         InfluxDBClient client = dataSources.get(resourceId);
@@ -105,7 +107,12 @@ public class InfluxDBDriver implements ResourceDriver<InfluxDBClient> {
                 DriverFactory.setProperty(property, topic, username);
 
                 String sql = resourcesMateData.getResource().get("sql").toString();
-                ST st = new ST(sql);
+                ST st = stringSTConcurrentHashMap.get(sql);
+                if (st == null) {
+                    st = new ST(sql);
+                    stringSTConcurrentHashMap.put(sql, st);
+                }
+                st.remove("json");
                 st.add("json", property);
                 String content = st.render();
                 WriteApiBlocking writeApi = client.getWriteApiBlocking();

@@ -48,6 +48,9 @@ import static org.monkey.mmq.config.config.Constants.*;
 public class InfluxDB1XDriver implements ResourceDriver<InfluxDB> {
 
     private ConcurrentHashMap<String, InfluxDB> dataSources = new ConcurrentHashMap<>();
+
+    private ConcurrentHashMap<String, ST> stringSTConcurrentHashMap = new ConcurrentHashMap<>();
+
     private static final String retentionPolicyName = "autogen";
 
     @Override
@@ -129,7 +132,12 @@ public class InfluxDB1XDriver implements ResourceDriver<InfluxDB> {
             if (client != null && resourcesMateData.getResource().get(SQL) != null) {
                 DriverFactory.setProperty(property, topic, username);
                 String payload = resourcesMateData.getResource().get(SQL).toString();
-                ST content = new ST(payload);
+                ST content = stringSTConcurrentHashMap.get(payload);
+                if (content == null) {
+                    content = new ST(payload);
+                    stringSTConcurrentHashMap.put(payload, content);
+                }
+                content.remove("json");
                 content.add("json", property);
                 List<Map> maps = JSON.parseArray(content.render(), Map.class);
                 for (Map map : maps) {

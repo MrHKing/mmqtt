@@ -36,106 +36,20 @@ import static org.monkey.mmq.config.config.Constants.*;
  * @author solley
  */
 @Component
-public class SqlServerDriver implements ResourceDriver<Connection>{
-
-    private ConcurrentHashMap<String, DruidDataSource> dataSources = new ConcurrentHashMap<>();
-
-    static final String JDBC_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+public class SqlServerDriver extends AbstractJDBCDriver {
 
     @Override
-    public void addDriver(String resourceId, Map<String, Object> resource) {
-        DruidDataSource druidDataSource = dataSources.get(resourceId);
-        if (druidDataSource != null) {
-            druidDataSource.close();
-            dataSources.remove(resourceId);
-        }
+    protected String getDriverClassName() {
+        return "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+    }
 
-        if (StringUtils.isEmpty(resource.get(IP).toString())) return;
-        if (StringUtils.isEmpty(resource.get(DATABASE_NAME).toString())) return;
-        if (StringUtils.isEmpty(resource.get(USERNAME).toString())) return;
-        if (StringUtils.isEmpty(resource.get(PASSWORD).toString())) return;
+    @Override
+    protected String getDriverUrl() {
+        return "jdbc:sqlserver://%s:%s;DatabaseName=%s";
+    }
 
-        DruidDataSource dataSource = new DruidDataSource(); // 创建Druid连接池
-        dataSource.setDriverClassName(JDBC_DRIVER); // 设置连接池的数据库驱动
-        dataSource.setUrl(String.format("jdbc:sqlserver://%s:%s;DatabaseName=%s",
-                resource.get(IP).toString(),
-                resource.get(PORT).toString(),
-                resource.get(DATABASE_NAME).toString())); // 设置数据库的连接地址
-        dataSource.setUsername(resource.get(USERNAME).toString()); // 数据库的用户名
-        dataSource.setPassword(resource.get(PASSWORD).toString()); // 数据库的密码
+    @Override
+    protected void initDataSource(DruidDataSource dataSource) {
         dataSource.setValidationQuery("select 'x'");
-        dataSource.setInitialSize(8); // 设置连接池的初始大小
-        dataSource.setMinIdle(1); // 设置连接池大小的下限
-        dataSource.setMaxActive(20); // 设置连接池大小的上限
-        try {
-            dataSource.getConnection();
-        } catch (SQLException throwables) {
-            return;
-        }
-        dataSources.put(resourceId, dataSource);
     }
-
-    @Override
-    public void deleteDriver(String resourceId) {
-        DruidDataSource druidDataSource = dataSources.get(resourceId);
-        if (druidDataSource != null) {
-            druidDataSource.close();
-        }
-        dataSources.remove(resourceId);
-    }
-
-    @Override
-    public Connection getDriver(String resourceId) throws Exception {
-        if (dataSources == null) return null;
-        if (dataSources.get(resourceId) == null) return null;
-        if (!dataSources.get(resourceId).isInited()) return null;
-        return dataSources.get(resourceId).getConnection();
-    }
-
-    @Override
-    public boolean testConnect(ResourcesMateData resourcesMateData) {
-
-        try {
-            Class.forName(JDBC_DRIVER);
-            DriverManager.getConnection(String.format("jdbc:sqlserver://%s:%s;DatabaseName=%s",
-                    resourcesMateData.getResource().get(IP).toString(),
-                    resourcesMateData.getResource().get(PORT).toString(),
-                    resourcesMateData.getResource().get(DATABASE_NAME).toString()),
-                    resourcesMateData.getResource().get(USERNAME).toString(),
-                    resourcesMateData.getResource().get(PASSWORD).toString());
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    @Override
-    public void handle(Map property, ResourcesMateData resourcesMateData,
-                       String topic, int qos, String address, String username) throws MmqException {
-        Connection connection = null;
-        try {
-            connection = (Connection) this.getDriver(resourcesMateData.getResourceID());
-            if (connection != null) {
-                DriverFactory.setProperty(property, topic, username);
-                String sql = resourcesMateData.getResource().get(SQL).toString();
-                ST content = new ST(sql);
-                content.add("json", property);
-                String[] sqlRet = content.render().split(";");
-                if (sqlRet.length == 0) connection.close();
-                for (String temp : sqlRet) {
-                    connection.createStatement().execute(temp);
-                }
-                connection.close();
-            }
-        } catch (Exception e) {
-            throw new MmqException(e.hashCode(), e.getMessage());
-        } finally {
-            try {
-                connection.close();
-            } catch (SQLException throwables) {
-                throw new MmqException(throwables.hashCode(), throwables.getMessage());
-            }
-        }
-    }
-
 }
