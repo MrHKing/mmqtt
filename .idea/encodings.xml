@@ -1,16 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/distribution/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/distribution/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mmq-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mmq-api/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mmq-auth/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mmq-auth/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mmq-broker/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mmq-broker/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mmq-config/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mmq-config/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mmq-core/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mmq-core/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mmq-plugs/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mmq-plugs/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mmq-rule-engine/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mmq-rule-engine/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mmq-web/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mmq-web/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
   </component>
 </project>
