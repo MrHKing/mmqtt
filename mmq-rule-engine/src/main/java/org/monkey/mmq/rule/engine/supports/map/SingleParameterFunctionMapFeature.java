@@ -17,7 +17,6 @@
 
 package org.monkey.mmq.rule.engine.supports.map;
 
-import jdk.nashorn.internal.objects.annotations.Getter;
 import net.sf.jsqlparser.expression.Expression;
 import org.apache.commons.collections.CollectionUtils;
 import org.monkey.mmq.rule.engine.ReactorQLMetadata;

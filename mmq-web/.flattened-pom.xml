@@ -113,24 +113,6 @@
         <plugins>
           <plugin>
             <artifactId>maven-jar-plugin</artifactId>
-            <version>2.4</version>
-            <executions>
-              <execution>
-                <id>default-jar</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>jar</goal>
-                </goals>
-                <configuration>
-                  <archive>
-                    <manifest>
-                      <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                      <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                    </manifest>
-                  </archive>
-                </configuration>
-              </execution>
-            </executions>
             <configuration>
               <archive>
                 <manifest>
@@ -157,11 +139,6 @@
           </plugin>
         </plugins>
       </build>
-      <properties>
-        <os.detected.name>windows</os.detected.name>
-        <os.detected.classifier>windows-x86_64</os.detected.classifier>
-        <os.detected.arch>x86_64</os.detected.arch>
-      </properties>
     </profile>
   </profiles>
 </project>

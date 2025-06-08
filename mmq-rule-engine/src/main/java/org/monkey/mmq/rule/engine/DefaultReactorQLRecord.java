@@ -16,8 +16,6 @@
 
 package org.monkey.mmq.rule.engine;
 
-import jdk.nashorn.internal.objects.annotations.Getter;
-import jdk.nashorn.internal.objects.annotations.Setter;
 import org.monkey.mmq.rule.engine.utils.CompareUtils;
 import reactor.core.publisher.Flux;
 

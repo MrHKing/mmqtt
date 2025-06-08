@@ -16,7 +16,6 @@
 
 package org.monkey.mmq.rule.engine.supports.from;
 
-import jdk.nashorn.internal.objects.annotations.Getter;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.expression.operators.relational.ItemsListVisitor;
 import net.sf.jsqlparser.expression.operators.relational.MultiExpressionList;
